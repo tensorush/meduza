@@ -3,7 +3,7 @@
 [![CI][ci-shield]][ci-url]
 [![License][license-shield]][license-url]
 
-### Zig codebase layout generator that emits a [Markdown Mermaid class diagram](https://mermaid.js.org/syntax/classDiagram.html).
+### Zig codebase layout generator that emits a [Mermaid class diagram](https://mermaid.js.org/syntax/classDiagram.html).
 
 #### :rocket: Usage
 
@@ -47,49 +47,50 @@
 
 ```mermaid
 classDiagram
-    namespace dir_stem {
-        class file {
-            <<file>>
-            field: T,
-            test()
-        }
+    namespace dir__stem {
+        class dir__stem__file
     }
+    class dir__stem__file {
+        T field
+        test()
+    }
+
     class Enum {
         <<enum>>
-        Value,
-        +func(arg: T) E!R
+        Value
+        +func(T arg) R
     }
     class Error {
         <<error>>
-        Value,
+        Value
     }
     class Union {
         <<union>>
-        field: T,
-        +func(arg: T) E!R
+        T field
+        +func(T arg) R
     }
     class Opaque {
         <<opaque>>
-        field: T,
-        +func(arg: T) E!R
+        T field
+        +func(T arg) R
     }
     class Struct {
         <<struct>>
-        field: T,
-        +func(arg: T) E!R
+        T field
+        +func(T arg) R
     }
 ```
 
-| Type          |                  Zig                   |                    Meduza                    |
-|---------------|:--------------------------------------:|:--------------------------------------------:|
-| File          |             `dir/stem.zig`             | `namespace dir_stem {class file {<<file>>}}` |
-| Enum          |    `const Enum = enum { Value, };`     |       `class Enum {<<enum>> Value, }`        |
-| Error         |   `const Error = error { Value, };`    |      `class Error { <<error>> Value, }`      |
-| Union         |  `const Union = union { field: T, };`  |    `class Union { <<union>> field: T, }`     |
-| Opaque        | `const Opaque = opaque { field: T, };` |   `class Opaque { <<opaque>> field: T, }`    |
-| Struct        | `const Struct = struct { field: T, };` |   `class Struct { <<struct>> field: T, }`    |
-| Function      | `pub fn` / `fn` `func(arg: T) E!R {}`  |        `+` / `-` `func(arg: T) : E!R`        |
-| Test function |            `test "name" {}`            |               `test "name"()`                |
+| Type          |                  Zig                   |                      Meduza                      |
+|---------------|:--------------------------------------:|:------------------------------------------------:|
+| File          |             `dir/stem.zig`             | `namespace dir__stem {class dir__stem__file {}}` |
+| Enum          |    `const Enum = enum { Value, };`     |          `class Enum {<<enum>> Value }`          |
+| Error         |   `const Error = error { Value, };`    |        `class Error { <<error>> Value }`         |
+| Union         |  `const Union = union { field: T, };`  |       `class Union { <<union>> T field }`        |
+| Opaque        | `const Opaque = opaque { field: T, };` |      `class Opaque { <<opaque>> T field }`       |
+| Struct        | `const Struct = struct { field: T, };` |      `class Struct { <<struct>> T field }`       |
+| Function      |  `pub fn` / `fn` `func(arg: T) R {}`   |           `+` / `-` `func(T arg) : R`            |
+| Test function |            `test "name" {}`            |                 `test "name"()`                  |
 
 
 <!-- MARKDOWN LINKS -->

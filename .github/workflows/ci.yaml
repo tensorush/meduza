@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
+        with:
+          submodules: true
 
       - name: Set up Zig
         uses: goto-bus-stop/setup-zig@v2

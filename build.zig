@@ -13,9 +13,9 @@ pub fn build(b: *std.Build) void {
         .optimize = .Debug,
         .version = .{ .major = 1, .minor = 0, .patch = 0 },
     });
+    b.installArtifact(meduza);
 
     const meduza_run = b.addRunArtifact(meduza);
-
     meduza_step.dependOn(&meduza_run.step);
     b.default_step.dependOn(meduza_step);
 
