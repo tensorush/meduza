@@ -47,50 +47,53 @@
 
 ```mermaid
 classDiagram
-    namespace dir__stem {
-        class dir__stem__file
+    class `dir/stem` {
+        +field: T
+        test "name"()
     }
-    class dir__stem__file {
-        T field
-        test()
-    }
-
     class Enum {
         <<enum>>
-        Value
-        +func(T arg) R
+        +Value*
+        +func(arg) E!R
     }
+    Enum --> `dir/stem`
     class Error {
         <<error>>
-        Value
+        +Value*
     }
+    Error --> `dir/stem`
     class Union {
         <<union>>
-        T field
-        +func(T arg) R
+        +field: T
+        +func(arg: T) E!R
     }
+    Union --> `dir/stem`
     class Opaque {
         <<opaque>>
-        T field
-        +func(T arg) R
+        +field: T
+        +func(arg: T) E!R
     }
+    Opaque --> `dir/stem`
     class Struct {
         <<struct>>
-        T field
-        +func(T arg) R
+        +field: T
+        +func(arg: T) E!R
     }
+    Struct --> `dir/stem`
 ```
 
-| Type          |                  Zig                   |                      Meduza                      |
-|---------------|:--------------------------------------:|:------------------------------------------------:|
-| File          |             `dir/stem.zig`             | `namespace dir__stem {class dir__stem__file {}}` |
-| Enum          |    `const Enum = enum { Value, };`     |          `class Enum {<<enum>> Value }`          |
-| Error         |   `const Error = error { Value, };`    |        `class Error { <<error>> Value }`         |
-| Union         |  `const Union = union { field: T, };`  |       `class Union { <<union>> T field }`        |
-| Opaque        | `const Opaque = opaque { field: T, };` |      `class Opaque { <<opaque>> T field }`       |
-| Struct        | `const Struct = struct { field: T, };` |      `class Struct { <<struct>> T field }`       |
-| Function      |  `pub fn` / `fn` `func(arg: T) R {}`   |           `+` / `-` `func(T arg) : R`            |
-| Test function |            `test "name" {}`            |                 `test "name"()`                  |
+| Type             |                   Zig                    |                 Meduza                 |
+|------------------|:----------------------------------------:|:--------------------------------------:|
+| File             |              `dir/stem.zig`              |          `class dir/stem {}`           |
+| Enum             |     `const Enum = enum { Value, };`      |    `class Enum { <<enum>> Value* }`    |
+| Error            |    `const Error = error { Value, };`     |   `class Error { <<error>> Value* }`   |
+| Union            |   `const Union = union { field: T, };`   |  `class Union { <<union>> field: T }`  |
+| Opaque           |  `const Opaque = opaque { field: T, };`  | `class Opaque { <<opaque>> field: T }` |
+| Struct           |  `const Struct = struct { field: T, };`  | `class Struct { <<struct>> field: T }` |
+| Function         |  `pub fn` / `fn` `func(arg: T) E!R {}`   |     `+` / `-` `func(arg: T) : E!R`     |
+| Error union      |    `error{Value}!struct { field: T }`    |   `error[Value]!struct [ field: T ]`   |
+| Test function    |             `test "name" {}`             |            `test "name"()`             |
+| Nesting relation | `const B = enum { const A = enum {}; };` |               `A --> B`                |
 
 
 <!-- MARKDOWN LINKS -->
