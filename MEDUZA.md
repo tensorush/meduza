@@ -1,157 +1,114 @@
 ```mermaid
 classDiagram
-namespace config {
-    class file {
-        <<file>>
-    }
+class Basis {
+    +axis2: Vec
+    +axis3: Vec
+    +init(u) Basis
 }
-namespace vector {
-    class Basis {
-        <<struct>>
-        axis2: Vec4,
-        axis3: Vec4,
-    }
-    class file {
-        <<file>>
-        +buildBasis(u: Vec4) Basis 
-        +transformIntoBasis(u_in: Vec4, u_x: Vec4, u_y: Vec4, u_z: Vec4) Vec4 
-        +createUnitVector(x: f64, y: f64, z: f64) Vec4 
-        +normalize(u: Vec4) Vec4 
-        +reflect(direction: Vec4, normal: Vec4) Vec4 
-        +crossProduct(u: Vec4, v: Vec4) Vec4 
-        +dotProduct(u: Vec4, v: Vec4) f64 
-        +getMaxComponent(u: Vec4) f64 
-    }
+link Basis "https://github.com/tensorush/zigzag/blob/main/src/vector.zig#L7"
+class `vector.zig` {
+    +transformIntoBasis(u_in, u_x, u_y, u_z) Vec
+    +normalize(u) Vec
+    +crossProduct(u, v) Vec
+    +dotProduct(u, v) f64
+    +getMaxComponent(u) f64
 }
-namespace main {
-    class file {
-        <<file>>
-        +main() (std.mem.Allocator.Error || std.os.GetRandomError || std.Thread.CpuCountError || std.Thread.SpawnError || std.fs.File.OpenError || std.os.WriteError || error[TimedOut])!void 
-    }
+`vector.zig` <-- Basis
+link `vector.zig` "https://github.com/tensorush/zigzag/blob/main/src/vector.zig"
+class `main.zig` {
+    +main() MainError!void
 }
-namespace material {
-    class MaterialType {
-        <<enum>>
-        DIFFUSE,
-        GLOSSY,
-        MIRROR,
-    }
-    class Material {
-        <<struct>>
-        material_type: MaterialType,
-        specular: vector.Vec4,
-        emissive: vector.Vec4,
-        diffuse: vector.Vec4,
-        specular_exponent: f64,
-    }
-    class file {
-        <<file>>
-        +interreflectSpecular(normal: vector.Vec4, hit_point: vector.Vec4, x_sphere_sample: f64, y_sphere_sample: f64, specular_exponent: f64, cur_ray: ray.Ray) ray.Ray 
-        +interreflectDiffuse(normal: vector.Vec4, hit_point: vector.Vec4, x_sphere_sample: f64, y_sphere_sample: f64) ray.Ray 
-        +sampleHemisphereSpecular(x_sphere_sample: f64, y_sphere_sample: f64, specular_exponent: f64) vector.Vec4 
-        +sampleHemisphereDiffuse(x_sphere_sample: f64, y_sphere_sample: f64) vector.Vec4 
-    }
+link `main.zig` "https://github.com/tensorush/zigzag/blob/main/src/main.zig"
+class Hit {
+    -ray_factor: f64
+    -sphere_idx_opt: ?usize
 }
-namespace tracer {
-    class Tracer {
-        <<struct>>
-        samples: [config.NUM_SAMPLES_PER_PIXEL * config.NUM_SCREEN_DIMS]f64,
-        scene: *scene.Scene,
-    }
-    class file {
-        <<file>>
-        +tracePaths(tracer: Tracer, pixels: []u8, offset: usize, size: usize) std.os.GetRandomError!void 
-    }
+link Hit "https://github.com/tensorush/zigzag/blob/main/src/Tracer.zig#L23"
+class Ray {
+    -direction: vector.Vec
+    -origin: vector.Vec
+    -computeHitPoint(self, ray_factor) vector.Vec
+    -intersect(self, scene) Hit
+    -computeRaySphereHit(self, sphere) f64
 }
-namespace sphere {
-    class Sphere {
-        <<struct>>
-        material: *const material.Material,
-        center: vector.Vec4,
-        radius: f64,
-        +computeRaySphereHit(self: Sphere, cur_ray: ray.Ray) f64 
-        +isLight(self: Sphere) bool 
-    }
-    class file {
-        <<file>>
-        +makeSphere(radius: f64, center: vector.Vec4, cur_material: *const material.Material) Sphere 
-    }
+Ray <-- Hit
+link Ray "https://github.com/tensorush/zigzag/blob/main/src/Tracer.zig#L19"
+class `Tracer.zig` {
+    +samples: [NUM_SAMPLES_PER_PIXEL * NUM_FRAME_DIMS]f64
+    +scene: Scene
+    +tracePaths(self, frame, offset, size, rng, render_dim) void
+    -tracePath(self, ray, x_sphere_sample, y_sphere_sample, rng) vector.Vec
+    -sampleLights(scene, hit_point, normal, ray_direction, material) vector.Vec
+    +samplePixels(samples, rng) void
+    -applyTentFilter(samples) void
+    -interreflectSpecular(normal, hit_point, x_sphere_sample, y_sphere_sample, specular_exponent, ray) Ray
+    -interreflectDiffuse(normal, hit_point, x_sphere_sample, y_sphere_sample) Ray
+    -sampleHemisphereSpecular(x_sphere_sample, y_sphere_sample, specular_exponent) vector.Vec
+    -sampleHemisphereDiffuse(x_sphere_sample, y_sphere_sample) vector.Vec
+    -reflect(direction, normal) vector.Vec
+    +renderPpm(frame, render_dim) (std.fs.File.OpenError || std.os.WriteError)!void
+    -getPixel(u) @Vector(3, u8)
+    -getColor(x) u8
 }
-namespace camera {
-    class Camera {
-        <<struct>>
-        direction: vector.Vec4,
-        field_of_view: f64,
-    }
-    class file {
-        <<file>>
-        +samplePixels(samples: *[config.NUM_SAMPLES_PER_PIXEL * config.NUM_SCREEN_DIMS]f64, rng: std.rand.Random) void 
-        +applyTentFilter(samples: *[config.NUM_SAMPLES_PER_PIXEL * config.NUM_SCREEN_DIMS]f64) void 
-    }
+`Tracer.zig` <-- Ray
+link `Tracer.zig` "https://github.com/tensorush/zigzag/blob/main/src/Tracer.zig"
+class Kind {
+    +Diffuse
+    +Glossy
+    +Mirror
 }
-namespace scene {
-    class Scene {
-        <<struct>>
-        spheres: std.ArrayList(sphere.Sphere),
-        lights: std.ArrayList(usize),
-        camera: *camera.Camera,
-        +intersect(self: *Scene, cur_ray: ray.Ray) Hit 
-        +collectLights(self: *Scene) std.mem.Allocator.Error!void 
-    }
-    class Hit {
-        <<struct>>
-        sphere_idx_opt: ?usize,
-        ray_factor: f64,
-    }
-    class file {
-        <<file>>
-        +sampleLights(scene: *Scene, hit_point: vector.Vec4, normal: vector.Vec4, ray_direction: vector.Vec4, cur_material: *const material.Material) vector.Vec4 
-    }
+link Kind "https://github.com/tensorush/zigzag/blob/main/src/Scene.zig#L20"
+class Material {
+    +specular: vector.Vec
+    +emissive: vector.Vec
+    +diffuse: vector.Vec
+    +specular_exponent: f64
+    +kind: Kind
 }
-namespace image {
-    class file {
-        <<file>>
-        +createImage(pixels: []const u8) (std.fs.File.OpenError || std.os.WriteError)!void 
-        +getColor(u: vector.Vec4) Color 
-        -getColorComponent(x: f64) u8 
-    }
+Material <-- Kind
+link Material "https://github.com/tensorush/zigzag/blob/main/src/Scene.zig#L13"
+class Sphere {
+    +center: vector.Vec
+    +material: Material
+    +radius: f64
+    +init(material, center, radius) Sphere
 }
-namespace ray {
-    class Ray {
-        <<struct>>
-        direction: vector.Vec4,
-        origin: vector.Vec4,
-        +computeHitPoint(self: Ray, ray_factor: f64) vector.Vec4 
-    }
-    class file {
-        <<file>>
-        +tracePath(cur_ray: Ray, cur_scene: *scene.Scene, x_sphere_sample: f64, y_sphere_sample: f64, samples: [config.NUM_SAMPLES_PER_PIXEL * config.NUM_SCREEN_DIMS]f64, rng: std.rand.Random) vector.Vec4 
-    }
+link Sphere "https://github.com/tensorush/zigzag/blob/main/src/Scene.zig#L27"
+class Camera {
+    -direction: vector.Vec
+    -fov: f64
 }
-namespace worker {
-    class Worker {
-        <<struct>>
-        done: std.atomic.Atomic(bool),
-        job_count: std.atomic.Atomic(u32),
-        done_count: *std.atomic.Atomic(u32),
-        queue: *std.atomic.Queue(WorkChunk),
-        cur_job_count: u32,
-        +launch(self: *Worker) (std.os.GetRandomError || error[TimedOut])!void 
-        +wait(self: *Worker) error[TimedOut]!void 
-        +put(self: *Worker, node: *std.atomic.Queue(WorkChunk).Node) void 
-        +wake(self: *Worker) void 
-    }
-    class WorkChunk {
-        <<struct>>
-        tracer: *tracer.Tracer,
-        buffer: *[]u8,
-        offset: usize,
-        size: usize,
-    }
-    class file {
-        <<file>>
-        +waitUntilDone(done_count: *std.atomic.Atomic(u32), target_count: u32) error[TimedOut]!void 
-        +joinThread(thread: std.Thread, worker: *Worker) void 
-    }
+link Camera "https://github.com/tensorush/zigzag/blob/main/src/Scene.zig#L37"
+class `Scene.zig` {
+    +light_idxs: std.BoundedArray(usize
+    +spheres: std.BoundedArray(Sphere
+    +camera: Camera
+    +initCornellBox() Scene
 }
+`Scene.zig` <-- Material
+`Scene.zig` <-- Sphere
+`Scene.zig` <-- Camera
+link `Scene.zig` "https://github.com/tensorush/zigzag/blob/main/src/Scene.zig"
+class Chunk {
+    +tracer: *Tracer
+    +offset: usize
+    +frame: []u8
+    +size: usize
+}
+link Chunk "https://github.com/tensorush/zigzag/blob/main/src/Worker.zig#L12"
+class `Worker.zig` {
+    +is_done: std.atomic.Atomic(bool)
+    +job_count: std.atomic.Atomic(u32)
+    +done_count: *std.atomic.Atomic(u32)
+    +queue: *std.atomic.Queue(Chunk)
+    +cur_job_count: u32
+    +spawn(self, rng, render_dim) void
+    +put(self, node) .Node) void
+    +wake(self) void
+    +join(thread, worker) void
+    +wait(self) void
+    +waitUntilDone(done_count) , target_count: u32) void
+}
+`Worker.zig` <-- Chunk
+link `Worker.zig` "https://github.com/tensorush/zigzag/blob/main/src/Worker.zig"
 ```

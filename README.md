@@ -47,62 +47,58 @@
 
 ```mermaid
 classDiagram
-    class `dir/stem` {
-        +field: T
+    class `dir/file.zig` {
+        field: T
         test "name"()
+    }
+    class Error {
+        <<error>>
+        Value
     }
     class Enum {
         <<enum>>
-        +Value*
+        Value
         +func(arg) E!R
     }
-    Enum --> `dir/stem`
-    class Error {
-        <<error>>
-        +Value*
-    }
-    Error --> `dir/stem`
     class Union {
         <<union>>
-        +field: T
-        +func(arg: T) E!R
+        field: T
+        +func(arg) E!R
     }
-    Union --> `dir/stem`
-    class Opaque {
-        <<opaque>>
-        +field: T
-        +func(arg: T) E!R
-    }
-    Opaque --> `dir/stem`
     class Struct {
         <<struct>>
-        +field: T
-        +func(arg: T) E!R
+        field: T
+        +func(arg) E!R
     }
-    Struct --> `dir/stem`
+    class Opaque {
+        <<opaque>>
+        field: T
+        +func(arg) E!R
+    }
+    Error --> `dir/file.zig`
+    Enum --> `dir/file.zig`
+    Union --> `dir/file.zig`
+    Struct --> `dir/file.zig`
+    Opaque --> `dir/file.zig`
 ```
 
-| Type             |                   Zig                    |                 Meduza                 |
-|------------------|:----------------------------------------:|:--------------------------------------:|
-| File             |              `dir/stem.zig`              |          `class dir/stem {}`           |
-| Enum             |     `const Enum = enum { Value, };`      |    `class Enum { <<enum>> Value* }`    |
-| Error            |    `const Error = error { Value, };`     |   `class Error { <<error>> Value* }`   |
-| Union            |   `const Union = union { field: T, };`   |  `class Union { <<union>> field: T }`  |
-| Opaque           |  `const Opaque = opaque { field: T, };`  | `class Opaque { <<opaque>> field: T }` |
-| Struct           |  `const Struct = struct { field: T, };`  | `class Struct { <<struct>> field: T }` |
-| Function         |  `pub fn` / `fn` `func(arg: T) E!R {}`   |     `+` / `-` `func(arg: T) : E!R`     |
-| Error union      |    `error{Value}!struct { field: T }`    |   `error[Value]!struct [ field: T ]`   |
-| Test function    |             `test "name" {}`             |            `test "name"()`             |
-| Nesting relation | `const B = enum { const A = enum {}; };` |               `A --> B`                |
+| Type          |                  Zig                   |                 Meduza                 |
+|---------------|:--------------------------------------:|:--------------------------------------:|
+| File          |             `dir/file.zig`             |        `class dir/file.zig {}`         |
+| Error         |   `const Error = error { Value, };`    |   `class Error { <<error>> Value }`    |
+| Enum          |    `const Enum = enum { Value, };`     |    `class Enum { <<enum>> Value }`     |
+| Union         |  `const Union = union { field: T, };`  |  `class Union { <<union>> field: T }`  |
+| Struct        | `const Struct = struct { field: T, };` | `class Struct { <<struct>> field: T }` |
+| Opaque        | `const Opaque = opaque { field: T, };` | `class Opaque { <<opaque>> field: T }` |
+| Function      |   `pub fn` / `fn` `func(arg) E!R {}`   |      `+` / `-` `func(arg) : E!R`       |
+| Error union   |   `error{Value}!struct { field: T }`   |   `error[Value]!struct [ field: T ]`   |
+| Test function |            `test "name" {}`            |            `test "name"()`             |
+| Type relation | `B.zig`: `const A = enum { Value, };`  |             `A --> B.zig`              |
 
 
 <!-- MARKDOWN LINKS -->
 
 [ci-shield]: https://img.shields.io/github/actions/workflow/status/tensorush/meduza/ci.yaml?branch=main&style=for-the-badge&logo=github&label=CI&labelColor=black
 [ci-url]: https://github.com/tensorush/meduza/blob/main/.github/workflows/ci.yaml
-[cd-shield]: https://img.shields.io/github/actions/workflow/status/tensorush/meduza/cd.yaml?branch=main&style=for-the-badge&logo=github&label=CD&labelColor=black
-[cd-url]: https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml
-[docs-shield]: https://img.shields.io/badge/click-F6A516?style=for-the-badge&logo=zig&logoColor=F6A516&label=docs&labelColor=black
-[docs-url]: https://tensorush.github.io/meduza
-[license-shield]: https://img.shields.io/github/license/tensorush/meduza.svg?style=for-the-badge&labelColor=black
+[license-shield]: https://img.shields.io/github/license/tensorush/meduza.svg?style=for-the-badge&labelColor=black&kill_cache=1
 [license-url]: https://github.com/tensorush/meduza/blob/main/LICENSE.md

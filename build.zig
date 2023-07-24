@@ -10,8 +10,8 @@ pub fn build(b: *std.Build) void {
         .name = "meduza",
         .root_source_file = root_source_file,
         .target = b.standardTargetOptions(.{}),
-        .optimize = .Debug,
-        .version = .{ .major = 1, .minor = 0, .patch = 0 },
+        .optimize = b.standardOptimizeOption(.{}),
+        .version = .{ .major = 1, .minor = 1, .patch = 0 },
     });
     b.installArtifact(meduza);
 

@@ -1,35 +1,74 @@
 const std = @import("std");
 
-const SRC_DIR_PATH = "zigzag/src";
+const SRC_DIR_PATH = "src";
+const CODEBASE_NAME = "zigzag";
+const MAX_NUM_ARGS: usize = 1 << 5;
 const MAX_NUM_DECLS: usize = 1 << 8;
-const MAX_FILE_SIZE: usize = 1 << 20;
-const REPO_LINK = "https://github.com/tensorush/zigzag";
+const MAX_NUM_FUNCS: usize = 1 << 8;
+const MAX_NUM_TYPES: usize = 1 << 8;
+const MAX_FILE_SIZE: usize = 1 << 22;
+const GITHUB_LINK = "https://github.com/tensorush/zigzag";
 
 const MainError = error{
     Overflow,
 } || std.mem.Allocator.Error || std.fs.Dir.DeleteTreeError || std.fs.File.WriteError || std.fs.File.OpenError || std.fs.Dir.OpenError || std.os.PReadError;
 
-const Declaration = struct {
-    tag: DeclarationTag,
-    start: usize,
-    end: usize,
+const Container = struct {
+    start: std.zig.Ast.ByteOffset,
+    end: std.zig.Ast.ByteOffset,
+    tag: Tag,
 
-    fn print(self: Declaration, src: []const u8, writer: anytype) (@TypeOf(writer).Error)!void {
-        try writer.writeAll("        ");
-        switch (self.tag) {
-            .test_func => try writer.print("{s}()\n", .{src[self.start..self.end]}),
-            .pub_func => try writer.print("+{s}\n", .{src[self.start..self.end]}),
-            .func => try writer.print("-{s}\n", .{src[self.start..self.end]}),
-            else => try writer.print("{s}\n", .{src[self.start..self.end]}),
+    const Tag = enum {
+        Struct,
+        Opaque,
+        Union,
+        Error,
+        Enum,
+    };
+};
+
+const FnProto = struct {
+    args: std.BoundedArray(struct { start: std.zig.Ast.ByteOffset, end: std.zig.Ast.ByteOffset }, MAX_NUM_ARGS),
+    rt_start: std.zig.Ast.ByteOffset,
+    rt_end: std.zig.Ast.ByteOffset,
+    is_pub: bool,
+
+    pub fn print(self: FnProto, src: []const u8, writer: anytype) (@TypeOf(writer).Error)!void {
+        try writer.writeAll("    ");
+        const fn_proto_name = src[self.args.get(0).start..self.args.get(0).end];
+        if (self.is_pub) {
+            try writer.print("+{s}(", .{fn_proto_name});
+        } else {
+            try writer.print("-{s}(", .{fn_proto_name});
         }
+        if (self.args.len > 1) {
+            try writer.writeAll(src[self.args.get(1).start..self.args.get(1).end]);
+        }
+        if (self.args.len > 2) {
+            for (self.args.constSlice()[2..]) |arg| {
+                try writer.writeAll(", ");
+                try writer.print("{s}", .{src[arg.start..arg.end]});
+            }
+        }
+        try writer.print(") {s}\n", .{src[self.rt_start..self.rt_end]});
     }
 };
 
-const DeclarationTag = enum {
-    container_field,
-    test_func,
-    pub_func,
-    func,
+const Decl = struct {
+    start: std.zig.Ast.ByteOffset,
+    end: std.zig.Ast.ByteOffset,
+    is_test: bool,
+
+    fn print(self: Decl, is_pub: bool, src: []const u8, writer: anytype) (@TypeOf(writer).Error)!void {
+        try writer.writeAll("    ");
+        if (self.is_test) {
+            try writer.print("{s}()\n", .{src[self.start..self.end]});
+        } else if (is_pub) {
+            try writer.print("+{s}\n", .{src[self.start..self.end]});
+        } else {
+            try writer.print("-{s}\n", .{src[self.start..self.end]});
+        }
+    }
 };
 
 pub fn main() MainError!void {
@@ -52,10 +91,10 @@ pub fn main() MainError!void {
 
     try writer.writeAll("```mermaid\nclassDiagram\n");
 
-    var src_dir = try cur_dir.openDir(SRC_DIR_PATH, .{});
+    var src_dir = try cur_dir.openDir(CODEBASE_NAME ++ "/" ++ SRC_DIR_PATH, .{});
     defer src_dir.close();
 
-    var src_dir_iter = try cur_dir.openIterableDir(SRC_DIR_PATH, .{});
+    var src_dir_iter = try cur_dir.openIterableDir(CODEBASE_NAME ++ "/" ++ SRC_DIR_PATH, .{});
     defer src_dir_iter.close();
 
     var walker = try src_dir_iter.walk(allocator);
@@ -66,27 +105,19 @@ pub fn main() MainError!void {
             continue;
         }
 
-        try writer.writeAll("namespace ");
-
-        if (std.fs.path.dirname(entry.path)) |path| {
-            for (path) |byte| {
-                if (std.fs.path.isSep(byte)) {
-                    try writer.writeByte('_');
-                } else {
-                    try writer.writeByte(byte);
-                }
-            }
-            try writer.writeByte('_');
-        }
-
-        try writer.print("{s} {c}\n", .{ std.fs.path.stem(entry.path), '{' });
-
         var src_buf: [MAX_FILE_SIZE]u8 = undefined;
         var src = try src_dir.readFile(entry.path, src_buf[0..]);
         src_buf[src.len] = 0;
 
-        var nested_decls = std.BoundedArray(Declaration, MAX_NUM_DECLS){};
-        var file_decls = std.BoundedArray(Declaration, MAX_NUM_DECLS){};
+        var nested_container_fn_protos = std.BoundedArray(FnProto, MAX_NUM_FUNCS){};
+        var nested_container_decls = std.BoundedArray(Decl, MAX_NUM_DECLS){};
+        var nested_containers = std.BoundedArray(Container, MAX_NUM_TYPES){};
+        var nested_fn_protos = std.BoundedArray(FnProto, MAX_NUM_FUNCS){};
+        var nested_decls = std.BoundedArray(Decl, MAX_NUM_DECLS){};
+
+        var file_containers = std.BoundedArray(Container, MAX_NUM_TYPES){};
+        var file_fn_protos = std.BoundedArray(FnProto, MAX_NUM_FUNCS){};
+        var file_decls = std.BoundedArray(Decl, MAX_NUM_DECLS){};
 
         const ast = try std.zig.Ast.parse(allocator, @ptrCast(src), .zig);
 
@@ -103,9 +134,13 @@ pub fn main() MainError!void {
                     const start = starts[main_tokens[i]];
                     const end = starts[main_tokens[i - 1]] - 1;
                     if (start > 0 and src[start - 1] == ' ') {
-                        nested_decls.appendAssumeCapacity(.{ .tag = .test_func, .start = start, .end = end });
+                        if (std.mem.eql(u8, "     ", src[start - 5 .. start])) {
+                            nested_container_decls.appendAssumeCapacity(.{ .is_test = true, .start = start, .end = end });
+                        } else {
+                            nested_decls.appendAssumeCapacity(.{ .is_test = true, .start = start, .end = end });
+                        }
                     } else {
-                        file_decls.appendAssumeCapacity(.{ .tag = .test_func, .start = start, .end = end });
+                        file_decls.appendAssumeCapacity(.{ .is_test = true, .start = start, .end = end });
                     }
                 },
                 .fn_proto_simple, .fn_proto_multi, .fn_proto_one, .fn_proto => {
@@ -113,42 +148,72 @@ pub fn main() MainError!void {
                     if (src[start] == '(') {
                         continue;
                     }
-                    var end: usize = undefined;
+                    var end_token_idx: std.zig.Ast.TokenIndex = undefined;
+                    var rt_end: std.zig.Ast.ByteOffset = undefined;
                     for (node_tags[i + 1 ..], i + 1..) |tag, j| {
                         if (tag == .fn_decl) {
-                            end = starts[main_tokens[node_datas[j].rhs]];
+                            end_token_idx = main_tokens[node_datas[j].rhs];
+                            rt_end = starts[end_token_idx] - 1;
                             break;
                         }
                     }
-                    for (src[start..end]) |*byte| {
-                        if (byte.* == '\n') {
-                            byte.* = ' ';
-                        } else if (byte.* == '{') {
-                            byte.* = '[';
-                        } else if (byte.* == '}') {
-                            byte.* = ']';
+                    var args: std.meta.fieldInfo(FnProto, .args).type = .{};
+                    var rt_start: std.zig.Ast.ByteOffset = undefined;
+                    args.appendAssumeCapacity(.{ .start = start, .end = starts[main_tokens[i] + 2] });
+                    for (token_tags[main_tokens[i] + 3 .. end_token_idx], main_tokens[i] + 3..end_token_idx) |token_tag, j| {
+                        if (token_tag == .colon) {
+                            args.appendAssumeCapacity(.{ .start = starts[j - 1], .end = starts[j] });
+                        } else if (token_tag == .r_paren) {
+                            rt_start = starts[j + 1];
+                            break;
                         }
                     }
-                    const pub_token_idx = main_tokens[i] - 1;
+                    for (src[rt_start..rt_end]) |*byte| {
+                        switch (byte.*) {
+                            '{' => byte.* = '[',
+                            '}' => byte.* = ']',
+                            else => {},
+                        }
+                    }
+                    var first_token_idx = main_tokens[i] - 1;
+                    var is_pub = false;
+                    switch (token_tags[first_token_idx]) {
+                        .keyword_export, .keyword_inline, .keyword_noinline => {
+                            if (token_tags[first_token_idx - 1] == .keyword_pub) {
+                                first_token_idx -= 1;
+                                is_pub = true;
+                            }
+                        },
+                        .keyword_pub => is_pub = true,
+                        else => first_token_idx += 1,
+                    }
                     if (node_tags[i - 1] != .root) {
-                        if (token_tags[pub_token_idx] == .keyword_pub) {
-                            if (src[starts[pub_token_idx] - 1] == ' ') {
-                                nested_decls.appendAssumeCapacity(.{ .tag = .pub_func, .start = start, .end = end });
+                        if (token_tags[first_token_idx] == .keyword_pub) {
+                            if (src[starts[first_token_idx] - 1] == ' ') {
+                                if (std.mem.eql(u8, "     ", src[starts[first_token_idx] - 5 .. starts[first_token_idx]])) {
+                                    nested_container_fn_protos.appendAssumeCapacity(.{ .is_pub = true, .args = args, .rt_start = rt_start, .rt_end = rt_end });
+                                } else {
+                                    nested_fn_protos.appendAssumeCapacity(.{ .is_pub = true, .args = args, .rt_start = rt_start, .rt_end = rt_end });
+                                }
                             } else {
-                                file_decls.appendAssumeCapacity(.{ .tag = .pub_func, .start = start, .end = end });
+                                file_fn_protos.appendAssumeCapacity(.{ .is_pub = true, .args = args, .rt_start = rt_start, .rt_end = rt_end });
                             }
                         } else {
-                            if (src[starts[pub_token_idx] - 1] == ' ') {
-                                nested_decls.appendAssumeCapacity(.{ .tag = .func, .start = start, .end = end });
+                            if (src[starts[first_token_idx] - 1] == ' ') {
+                                if (std.mem.eql(u8, "     ", src[starts[first_token_idx] - 5 .. starts[first_token_idx]])) {
+                                    nested_container_fn_protos.appendAssumeCapacity(.{ .is_pub = false, .args = args, .rt_start = rt_start, .rt_end = rt_end });
+                                } else {
+                                    nested_fn_protos.appendAssumeCapacity(.{ .is_pub = false, .args = args, .rt_start = rt_start, .rt_end = rt_end });
+                                }
                             } else {
-                                file_decls.appendAssumeCapacity(.{ .tag = .func, .start = start, .end = end });
+                                file_fn_protos.appendAssumeCapacity(.{ .is_pub = false, .args = args, .rt_start = rt_start, .rt_end = rt_end });
                             }
                         }
                     } else {
-                        if (token_tags[pub_token_idx] == .keyword_pub) {
-                            file_decls.appendAssumeCapacity(.{ .tag = .pub_func, .start = start, .end = end });
+                        if (token_tags[first_token_idx] == .keyword_pub) {
+                            file_fn_protos.appendAssumeCapacity(.{ .is_pub = true, .args = args, .rt_start = rt_start, .rt_end = rt_end });
                         } else {
-                            file_decls.appendAssumeCapacity(.{ .tag = .func, .start = start, .end = end });
+                            file_fn_protos.appendAssumeCapacity(.{ .is_pub = false, .args = args, .rt_start = rt_start, .rt_end = rt_end });
                         }
                     }
                 },
@@ -156,9 +221,37 @@ pub fn main() MainError!void {
                     if (node_tags[i + 1] != .simple_var_decl) {
                         continue;
                     }
+                    var first_token_idx = main_tokens[i] - 3;
+                    var is_pub = false;
+                    switch (token_tags[first_token_idx]) {
+                        .keyword_const, .keyword_var => {
+                            switch (token_tags[first_token_idx - 1]) {
+                                .keyword_export => {
+                                    first_token_idx -= 1;
+                                    if (token_tags[first_token_idx - 1] == .keyword_pub) {
+                                        first_token_idx -= 1;
+                                        is_pub = true;
+                                    }
+                                },
+                                .keyword_pub => {
+                                    first_token_idx -= 1;
+                                    is_pub = true;
+                                },
+                                else => {},
+                            }
+                        },
+                        .keyword_export => {
+                            if (token_tags[first_token_idx - 1] == .keyword_pub) {
+                                first_token_idx -= 1;
+                                is_pub = true;
+                            }
+                        },
+                        .keyword_pub => is_pub = true,
+                        else => unreachable,
+                    }
                     const start = starts[main_tokens[i] - 2];
                     const end = starts[main_tokens[i] - 1] - 1;
-                    try writer.print("    class {s} {c}\n        <<error>>\n", .{ src[start..end], '{' });
+                    try writer.print("class {s} {c}\n", .{ src[start..end], '{' });
                     var token_idx = main_tokens[i] + 2;
                     var token_tag = token_tags[token_idx];
                     while (token_tag != .r_brace) : (token_tag = token_tags[token_idx]) {
@@ -166,11 +259,26 @@ pub fn main() MainError!void {
                             const val_start = starts[token_idx];
                             token_idx += 1;
                             const val_end = starts[token_idx] + 1;
-                            try writer.print("        {s}\n", .{src[val_start..val_end]});
+                            if (is_pub) {
+                                try writer.print("    +{s}\n", .{src[val_start..val_end]});
+                            } else {
+                                try writer.print("    -{s}\n", .{src[val_start..val_end]});
+                            }
                         }
                         token_idx += 1;
                     }
-                    try writer.writeAll("    }\n");
+                    if (src[starts[first_token_idx] - 1] == ' ') {
+                        nested_containers.appendAssumeCapacity(.{ .tag = .Error, .start = start, .end = end });
+                    } else {
+                        file_containers.appendAssumeCapacity(.{ .tag = .Error, .start = start, .end = end });
+                    }
+                    var line_num: usize = 1;
+                    for (src[0..start]) |byte| {
+                        if (byte == '\n') {
+                            line_num += 1;
+                        }
+                    }
+                    try writer.print("link {s} \"{s}/blob/main/{s}/{s}#L{d}\"\n", .{ src[start..end], GITHUB_LINK, SRC_DIR_PATH, entry.path, line_num });
                 },
                 .container_decl,
                 .container_decl_trailing,
@@ -188,55 +296,130 @@ pub fn main() MainError!void {
                     if (node_tags[i + 1] != .simple_var_decl) {
                         continue;
                     }
-                    var main_token = main_tokens[i] - 2;
-                    var start = starts[main_token];
-                    var end = starts[main_tokens[i] - 1] - 1;
+                    var name_token_idx = main_tokens[i] - 1;
+                    var end = starts[name_token_idx] - 1;
+                    name_token_idx -= 1;
+                    var start = starts[name_token_idx];
                     switch (token_tags[main_tokens[i] - 1]) {
                         .keyword_extern, .keyword_packed => {
-                            main_token -= 1;
-                            start = starts[main_token];
-                            end = starts[main_tokens[i] - 2] - 1;
+                            end = starts[name_token_idx] - 1;
+                            name_token_idx -= 1;
+                            start = starts[name_token_idx];
                         },
                         else => {},
                     }
-                    try writer.print("    class {s} {c}\n        ", .{ src[start..end], '{' });
-                    switch (src[starts[main_tokens[i]]]) {
-                        'e' => try writer.writeAll("<<enum>>\n"),
-                        'u' => try writer.writeAll("<<union>>\n"),
-                        'o' => try writer.writeAll("<<opaque>>\n"),
-                        's' => try writer.writeAll("<<struct>>\n"),
-                        else => {},
+                    const tag: Container.Tag = switch (src[starts[main_tokens[i]]]) {
+                        's' => .Struct,
+                        'o' => .Opaque,
+                        'u' => .Union,
+                        'e' => .Enum,
+                        else => unreachable,
+                    };
+                    var first_token_idx = name_token_idx - 1;
+                    var is_pub = false;
+                    switch (token_tags[first_token_idx]) {
+                        .keyword_const, .keyword_var => {
+                            switch (token_tags[first_token_idx - 1]) {
+                                .keyword_export => {
+                                    first_token_idx -= 1;
+                                    if (token_tags[first_token_idx - 1] == .keyword_pub) {
+                                        first_token_idx -= 1;
+                                        is_pub = true;
+                                    }
+                                },
+                                .keyword_pub => {
+                                    first_token_idx -= 1;
+                                    is_pub = true;
+                                },
+                                else => {},
+                            }
+                        },
+                        .keyword_export => {
+                            if (token_tags[first_token_idx - 1] == .keyword_pub) {
+                                first_token_idx -= 1;
+                                is_pub = true;
+                            }
+                        },
+                        .keyword_pub => is_pub = true,
+                        else => unreachable,
                     }
-                    for (nested_decls.constSlice()) |decl| {
-                        try decl.print(src, writer);
+                    try writer.print("class {s} {c}\n", .{ src[start..end], '{' });
+                    if (src[starts[first_token_idx] - 1] == ' ') {
+                        for (nested_container_decls.constSlice()) |decl| {
+                            try decl.print(is_pub, src, writer);
+                        }
+                        try nested_container_decls.resize(0);
+                        for (nested_container_fn_protos.constSlice()) |fn_proto| {
+                            try fn_proto.print(src, writer);
+                        }
+                        try nested_container_fn_protos.resize(0);
+                    } else {
+                        for (nested_decls.constSlice()) |decl| {
+                            try decl.print(is_pub, src, writer);
+                        }
+                        try nested_decls.resize(0);
+                        for (nested_fn_protos.constSlice()) |fn_proto| {
+                            try fn_proto.print(src, writer);
+                        }
+                        try nested_fn_protos.resize(0);
                     }
-                    try nested_decls.resize(0);
-                    try writer.writeAll("    }\n");
+                    try writer.writeAll("}\n");
+                    for (nested_containers.constSlice()) |container| {
+                        try writer.print("{s} <-- {s}\n", .{ src[start..end], src[container.start..container.end] });
+                    }
+                    try nested_containers.resize(0);
+                    if (src[starts[first_token_idx] - 1] == ' ') {
+                        nested_containers.appendAssumeCapacity(.{ .tag = tag, .start = start, .end = end });
+                    } else {
+                        file_containers.appendAssumeCapacity(.{ .tag = tag, .start = start, .end = end });
+                    }
+                    var line_num: usize = 1;
+                    for (src[0..start]) |byte| {
+                        if (byte == '\n') {
+                            line_num += 1;
+                        }
+                    }
+                    try writer.print("link {s} \"{s}/blob/main/{s}/{s}#L{d}\"\n", .{ src[start..end], GITHUB_LINK, SRC_DIR_PATH, entry.path, line_num });
                 },
                 .container_field_init, .container_field_align, .container_field => {
                     const start = starts[main_tokens[i]];
-                    var end = std.mem.indexOfAnyPos(u8, src, start, "=,}").?;
+                    var end: u32 = @intCast(std.mem.indexOfAnyPos(u8, src, start, "=,}").?);
                     switch (src[end]) {
-                        '=', '}' => src[end - 1] = ',',
-                        ',' => end += 1,
+                        '=', '}' => end -= 1,
                         else => {},
                     }
                     std.mem.replaceScalar(u8, src[start..end], '{', '[');
                     std.mem.replaceScalar(u8, src[start..end], '}', ']');
                     if (node_tags[i - 2] != .root and src[start - 1] == ' ') {
-                        nested_decls.appendAssumeCapacity(.{ .tag = .container_field, .start = start, .end = end });
+                        if (std.mem.eql(u8, "     ", src[start - 5 .. start])) {
+                            nested_container_decls.appendAssumeCapacity(.{ .is_test = false, .start = start, .end = end });
+                        } else {
+                            nested_decls.appendAssumeCapacity(.{ .is_test = false, .start = start, .end = end });
+                        }
                     } else {
-                        file_decls.appendAssumeCapacity(.{ .tag = .container_field, .start = start, .end = end });
+                        file_decls.appendAssumeCapacity(.{ .is_test = false, .start = start, .end = end });
                     }
                 },
                 else => {},
             }
         }
-        try writer.writeAll("    class file {\n        <<file>>\n");
-        for (file_decls.constSlice()) |decl| {
-            try decl.print(src, writer);
+        try writer.print("class `{s}`", .{entry.path});
+        if (file_decls.len > 0 or file_fn_protos.len > 0) {
+            try writer.writeAll(" {\n");
+            for (file_decls.constSlice()) |decl| {
+                try decl.print(true, src, writer);
+            }
+            for (file_fn_protos.constSlice()) |fn_proto| {
+                try fn_proto.print(src, writer);
+            }
+            try writer.writeAll("}\n");
+        } else {
+            try writer.writeByte('\n');
         }
-        try writer.writeAll("    }\n}\n");
+        for (file_containers.constSlice()) |container| {
+            try writer.print("`{s}` <-- {s}\n", .{ entry.path, src[container.start..container.end] });
+        }
+        try writer.print("link `{s}` \"{s}/blob/main/{s}/{s}\"\n", .{ entry.path, GITHUB_LINK, SRC_DIR_PATH, entry.path });
     }
 
     try writer.writeAll("```\n");
