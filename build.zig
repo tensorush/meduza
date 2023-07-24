@@ -7,8 +7,8 @@ pub fn build(b: *std.Build) void {
     const clap_dep = b.dependency("clap", .{});
     const clap_mod = clap_dep.module("clap");
 
-    // Meduza codebase layout generator
-    const meduza_step = b.step("meduza", "Run Meduza codebase layout generator");
+    // Meduza codebase graph generator
+    const meduza_step = b.step("meduza", "Run Meduza codebase graph generator");
 
     const meduza = b.addExecutable(.{
         .name = "meduza",

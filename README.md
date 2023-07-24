@@ -5,7 +5,7 @@
 [![Meduza][mdz-shield]][mdz-url]
 [![License][license-shield]][license-url]
 
-### Zig codebase layout generator that emits a [Mermaid class diagram](https://mermaid.js.org/syntax/classDiagram.html).
+### Zig codebase graph generator that emits a [Mermaid class diagram](https://mermaid.js.org/syntax/classDiagram.html).
 
 #### :rocket: Usage
 
