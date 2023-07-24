@@ -2,7 +2,7 @@
 
 [![CI][ci-shield]][ci-url]
 [![CD][cd-shield]][cd-url]
-[![Mermaid][mmd-shield]][mmd-url]
+[![Meduza][mdz-shield]][mdz-url]
 [![License][license-shield]][license-url]
 
 ### Zig codebase layout generator that emits a [Mermaid class diagram](https://mermaid.js.org/syntax/classDiagram.html).
@@ -99,7 +99,7 @@ classDiagram
 [ci-url]: https://github.com/tensorush/meduza/blob/main/.github/workflows/ci.yaml
 [cd-shield]: https://img.shields.io/github/actions/workflow/status/tensorush/meduza/cd.yaml?branch=main&style=for-the-badge&logo=github&label=CD&labelColor=black
 [cd-url]: https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml
-[mmd-shield]: https://img.shields.io/badge/click-F6A516?style=for-the-badge&logo=zig&logoColor=F6A516&label=meduza&labelColor=black
-[mmd-url]: https://tensorush.github.io/meduza/meduza.html
+[mdz-shield]: https://img.shields.io/badge/click-F6A516?style=for-the-badge&logo=zig&logoColor=F6A516&label=meduza&labelColor=black
+[mdz-url]: https://tensorush.github.io/meduza/meduza.html
 [license-shield]: https://img.shields.io/github/license/tensorush/meduza.svg?style=for-the-badge&labelColor=black&kill_cache=1
 [license-url]: https://github.com/tensorush/meduza/blob/main/LICENSE.md
