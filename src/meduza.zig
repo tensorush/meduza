@@ -82,7 +82,7 @@ pub fn run(
     const cur_dir = std.fs.cwd();
 
     var buf: [16]u8 = undefined;
-    const file_path = try std.fmt.bufPrint(buf[0..], "out/meduza.{s}", .{@tagName(extension)});
+    const file_path = try std.fmt.bufPrint(buf[0..], "out/mdz.{s}", .{@tagName(extension)});
 
     const meduza_file = try cur_dir.createFile(file_path, .{});
     defer meduza_file.close();
