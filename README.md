@@ -100,6 +100,6 @@ classDiagram
 [cd-shield]: https://img.shields.io/github/actions/workflow/status/tensorush/meduza/cd.yaml?branch=main&style=for-the-badge&logo=github&label=CD&labelColor=black
 [cd-url]: https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml
 [mdz-shield]: https://img.shields.io/badge/click-F6A516?style=for-the-badge&logo=zig&logoColor=F6A516&label=meduza&labelColor=black
-[mdz-url]: https://tensorush.github.io/meduza/meduza.html
+[mdz-url]: https://tensorush.github.io/meduza/mdz.html
 [license-shield]: https://img.shields.io/github/license/tensorush/meduza.svg?style=for-the-badge&labelColor=black&kill_cache=1
 [license-url]: https://github.com/tensorush/meduza/blob/main/LICENSE.md
