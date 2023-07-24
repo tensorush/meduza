@@ -27,7 +27,7 @@ jobs:
       - name: Run Meduza codebase layout generator
         run: |
           zig env
-          zig build meduza
+          zig build meduza -- -r https://github.com/tensorush/zigzag/blob/main/src -l zigzag/src -n "Zigzag path tracer"
 
   lint:
     runs-on: ubuntu-latest

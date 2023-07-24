@@ -1,4 +1,10 @@
 .{
     .name = "meduza",
-    .version = "1.1.0",
+    .version = "1.2.0",
+    .dependencies = .{
+        .clap = .{
+            .url = "https://github.com/Hejsil/zig-clap/archive/bdb5853.tar.gz",
+            .hash = "12202af04ec78191f2018458a7be29f54e0d9118f7688e7a226857acf754d68b8473",
+        },
+    },
 }

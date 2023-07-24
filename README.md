@@ -52,48 +52,43 @@ classDiagram
         test "name"()
     }
     class Error {
-        <<error>>
         Value
     }
     class Enum {
-        <<enum>>
         Value
         +func(arg) E!R
     }
     class Union {
-        <<union>>
         field: T
         +func(arg) E!R
     }
     class Struct {
-        <<struct>>
         field: T
         +func(arg) E!R
     }
     class Opaque {
-        <<opaque>>
         field: T
         +func(arg) E!R
     }
-    Error --> `dir/file.zig`
-    Enum --> `dir/file.zig`
-    Union --> `dir/file.zig`
-    Struct --> `dir/file.zig`
-    Opaque --> `dir/file.zig`
+    `dir/file.zig` <-- Error
+    `dir/file.zig` <-- Enum
+    `dir/file.zig` <-- Union
+    `dir/file.zig` <-- Struct
+    `dir/file.zig` <-- Opaque
 ```
 
-| Type          |                  Zig                   |                 Meduza                 |
-|---------------|:--------------------------------------:|:--------------------------------------:|
-| File          |             `dir/file.zig`             |        `class dir/file.zig {}`         |
-| Error         |   `const Error = error { Value, };`    |   `class Error { <<error>> Value }`    |
-| Enum          |    `const Enum = enum { Value, };`     |    `class Enum { <<enum>> Value }`     |
-| Union         |  `const Union = union { field: T, };`  |  `class Union { <<union>> field: T }`  |
-| Struct        | `const Struct = struct { field: T, };` | `class Struct { <<struct>> field: T }` |
-| Opaque        | `const Opaque = opaque { field: T, };` | `class Opaque { <<opaque>> field: T }` |
-| Function      |   `pub fn` / `fn` `func(arg) E!R {}`   |      `+` / `-` `func(arg) : E!R`       |
-| Error union   |   `error{Value}!struct { field: T }`   |   `error[Value]!struct [ field: T ]`   |
-| Test function |            `test "name" {}`            |            `test "name"()`             |
-| Type relation | `B.zig`: `const A = enum { Value, };`  |             `A --> B.zig`              |
+| Type          |                  Zig                   |               Meduza               |
+|---------------|:--------------------------------------:|:----------------------------------:|
+| File          |             `dir/file.zig`             |      `class dir/file.zig {}`       |
+| Error         |   `const Error = error { Value, };`    |      `class Error { Value }`       |
+| Enum          |    `const Enum = enum { Value, };`     |       `class Enum { Value }`       |
+| Union         |  `const Union = union { field: T, };`  |     `class Union { field: T }`     |
+| Struct        | `const Struct = struct { field: T, };` |    `class Struct { field: T }`     |
+| Opaque        | `const Opaque = opaque { field: T, };` |    `class Opaque { field: T }`     |
+| Function      |   `pub fn` / `fn` `func(arg) E!R {}`   |    `+` / `-` `func(arg) : E!R`     |
+| Error union   |   `error{Value}!struct { field: T }`   | `error[Value]!struct [ field: T ]` |
+| Test function |            `test "name" {}`            |          `test "name"()`           |
+| Type relation | `B.zig`: `const A = enum { Value, };`  |           `B.zig <-- A`            |
 
 
 <!-- MARKDOWN LINKS -->

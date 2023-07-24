@@ -1,0 +1,58 @@
+name: Continuos Delivery
+
+on:
+  push:
+    branches: [main]
+    paths: ["**.zig"]
+
+  pull_request:
+    branches: [main]
+    paths: ["**.zig"]
+
+  workflow_dispatch:
+
+permissions:
+  pages: write
+  contents: read
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Zig
+        uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: master
+
+      - name: Run Meduza codebase layout generator
+        run: |
+          zig env
+          zig build meduza -- -r https://github.com/tensorush/zigzag/blob/main/src -l zigzag/src -n "Zigzag path tracer" -e html
+
+      - name: Upload artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ./out/
+
+  deploy:
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy artifact to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

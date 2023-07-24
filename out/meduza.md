@@ -1,4 +1,7 @@
 ```mermaid
+---
+title: Zigzag path tracer codebase
+---
 classDiagram
 class Basis {
     +axis2: Vec
