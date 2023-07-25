@@ -45,6 +45,12 @@
 
     </details>
 
+#### :sparkles: Features
+
+- Generator emits either `.html`, `.md`, or `.mmd` Mermaid class diagram.
+
+- Types link to the respective code on the remote (GitHub doesn't support).
+
 #### :world_map: Legend
 
 ```mermaid
