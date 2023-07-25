@@ -7,7 +7,7 @@ title: Zigzag path tracer codebase
         'theme': 'base',
         'themeVariables': {
             'fontSize': '18px',
-            'fontFamily': 'arial',
+            'fontFamily': 'Arial',
             'lineColor': '#F6A516',
             'primaryColor': '#28282B',
             'primaryTextColor': '#F6A516'

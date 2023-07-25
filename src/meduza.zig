@@ -105,7 +105,7 @@ pub fn generate(
                 \\            'theme': 'base',
                 \\            'themeVariables': {
                 \\                'fontSize': '18px',
-                \\                'fontFamily': 'arial',
+                \\                'fontFamily': 'Arial',
                 \\                'lineColor': '#F6A516',
                 \\                'primaryColor': '#28282B',
                 \\                'primaryTextColor': '#F6A516'
@@ -125,7 +125,7 @@ pub fn generate(
                 \\        'theme': 'base',
                 \\        'themeVariables': {
                 \\            'fontSize': '18px',
-                \\            'fontFamily': 'arial',
+                \\            'fontFamily': 'Arial',
                 \\            'lineColor': '#F6A516',
                 \\            'primaryColor': '#28282B',
                 \\            'primaryTextColor': '#F6A516'
