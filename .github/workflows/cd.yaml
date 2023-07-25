@@ -38,7 +38,7 @@ jobs:
       - name: Run Meduza codebase graph generator
         run: |
           zig env
-          zig build meduza -- -r https://github.com/tensorush/zigzag/blob/main/src -l zigzag/src -t "Zigzag path tracer" -e html
+          zig build meduza -- -r https://github.com/tensorush/zigzag/blob/main/src -l zigzag/src -t "Zigzag path tracer" -o ./out/mdz.html
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v1

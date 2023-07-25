@@ -6,7 +6,10 @@ const MAX_NUM_FUNCS: usize = 1 << 8;
 const MAX_NUM_TYPES: usize = 1 << 8;
 const MAX_FILE_SIZE: usize = 1 << 22;
 
-pub const Error = error{Overflow} || std.mem.Allocator.Error || std.fmt.BufPrintError || std.fs.Dir.DeleteTreeError || std.fs.File.WriteError || std.fs.File.OpenError || std.fs.Dir.OpenError || std.os.PReadError;
+pub const Error = error{
+    Overflow,
+    UnsupportedExtension,
+} || std.mem.Allocator.Error || std.fmt.BufPrintError || std.fs.Dir.DeleteTreeError || std.fs.File.WriteError || std.fs.File.OpenError || std.fs.Dir.OpenError || std.os.PReadError || std.os.MakeDirError;
 
 pub const Ext = enum {
     html,
@@ -77,26 +80,29 @@ pub fn generate(
     remote_src_dir_path: []const u8,
     local_src_dir_path: []const u8,
     codebase_title: []const u8,
-    extension: Ext,
+    out_file_path: []const u8,
 ) Error!void {
+    const ext = std.meta.stringToEnum(Ext, std.fs.path.extension(out_file_path)[1..]) orelse return error.UnsupportedExtension;
+
     const cur_dir = std.fs.cwd();
 
-    var buf: [16]u8 = undefined;
-    const file_path = try std.fmt.bufPrint(buf[0..], "out/mdz.{s}", .{@tagName(extension)});
+    if (std.fs.path.dirname(out_file_path)) |out_dir_path| {
+        try cur_dir.makePath(out_dir_path);
+    }
 
-    const meduza_file = try cur_dir.createFile(file_path, .{});
-    defer meduza_file.close();
+    const out_file = try cur_dir.createFile(out_file_path, .{});
+    defer out_file.close();
 
-    var buf_writer = std.io.bufferedWriter(meduza_file.writer());
+    var buf_writer = std.io.bufferedWriter(out_file.writer());
     const writer = buf_writer.writer();
 
-    switch (extension) {
+    switch (ext) {
         .html => try writer.writeAll("<html>\n\n<body>\n"),
         .md => try writer.writeAll("```mermaid\n"),
         .mmd => {},
     }
 
-    switch (extension) {
+    switch (ext) {
         .html => {
             try writer.writeAll(
                 \\    <script type="module">
@@ -105,7 +111,7 @@ pub fn generate(
                 \\            'theme': 'base',
                 \\            'themeVariables': {
                 \\                'fontSize': '18px',
-                \\                'fontFamily': 'Arial',
+                \\                'fontFamily': 'arial',
                 \\                'lineColor': '#F6A516',
                 \\                'primaryColor': '#28282B',
                 \\                'primaryTextColor': '#F6A516'
@@ -125,7 +131,7 @@ pub fn generate(
                 \\        'theme': 'base',
                 \\        'themeVariables': {
                 \\            'fontSize': '18px',
-                \\            'fontFamily': 'Arial',
+                \\            'fontFamily': 'arial',
                 \\            'lineColor': '#F6A516',
                 \\            'primaryColor': '#28282B',
                 \\            'primaryTextColor': '#F6A516'
@@ -183,6 +189,9 @@ pub fn generate(
                     const end = starts[main_tokens[i - 1]] - 1;
                     if (start > 0 and src[start - 1] == ' ') {
                         if (std.mem.eql(u8, "     ", src[start - 5 .. start])) {
+                            if (std.mem.eql(u8, "         ", src[start - 9 .. start])) {
+                                continue;
+                            }
                             nested_container_decls.appendAssumeCapacity(.{ .is_test = true, .start = start, .end = end });
                         } else {
                             nested_decls.appendAssumeCapacity(.{ .is_test = true, .start = start, .end = end });
@@ -235,10 +244,14 @@ pub fn generate(
                         .keyword_pub => is_pub = true,
                         else => first_token_idx += 1,
                     }
+                    const first_token_start = starts[first_token_idx];
                     if (node_tags[i - 1] != .root) {
                         if (token_tags[first_token_idx] == .keyword_pub) {
-                            if (src[starts[first_token_idx] - 1] == ' ') {
-                                if (std.mem.eql(u8, "     ", src[starts[first_token_idx] - 5 .. starts[first_token_idx]])) {
+                            if (src[first_token_start - 1] == ' ') {
+                                if (std.mem.eql(u8, "     ", src[first_token_start - 5 .. first_token_start])) {
+                                    if (std.mem.eql(u8, "         ", src[first_token_start - 9 .. first_token_start])) {
+                                        continue;
+                                    }
                                     nested_container_fn_protos.appendAssumeCapacity(.{ .is_pub = true, .args = args, .rt_start = rt_start, .rt_end = rt_end });
                                 } else {
                                     nested_fn_protos.appendAssumeCapacity(.{ .is_pub = true, .args = args, .rt_start = rt_start, .rt_end = rt_end });
@@ -247,8 +260,11 @@ pub fn generate(
                                 file_fn_protos.appendAssumeCapacity(.{ .is_pub = true, .args = args, .rt_start = rt_start, .rt_end = rt_end });
                             }
                         } else {
-                            if (src[starts[first_token_idx] - 1] == ' ') {
-                                if (std.mem.eql(u8, "     ", src[starts[first_token_idx] - 5 .. starts[first_token_idx]])) {
+                            if (src[first_token_start - 1] == ' ') {
+                                if (std.mem.eql(u8, "     ", src[first_token_start - 5 .. first_token_start])) {
+                                    if (std.mem.eql(u8, "         ", src[first_token_start - 9 .. first_token_start])) {
+                                        continue;
+                                    }
                                     nested_container_fn_protos.appendAssumeCapacity(.{ .is_pub = false, .args = args, .rt_start = rt_start, .rt_end = rt_end });
                                 } else {
                                     nested_fn_protos.appendAssumeCapacity(.{ .is_pub = false, .args = args, .rt_start = rt_start, .rt_end = rt_end });
@@ -297,16 +313,21 @@ pub fn generate(
                         .keyword_pub => is_pub = true,
                         else => unreachable,
                     }
+                    const first_token_start = starts[first_token_idx];
+                    const is_not_at_root = first_token_start > 0;
+                    if (is_not_at_root and std.mem.eql(u8, "     ", src[first_token_start - 5 .. first_token_start])) {
+                        continue;
+                    }
                     const start = starts[main_tokens[i] - 2];
                     const end = starts[main_tokens[i] - 1] - 1;
                     try writer.print("class {s}[\"{s} [error]\"] {c}\n", .{ src[start..end], src[start..end], '{' });
                     var token_idx = main_tokens[i] + 2;
                     var token_tag = token_tags[token_idx];
-                    while (token_tag != .r_brace) : (token_tag = token_tags[token_idx]) {
+                    while (token_tag != .semicolon) : (token_tag = token_tags[token_idx]) {
                         if (token_tag == .identifier) {
                             const val_start = starts[token_idx];
                             token_idx += 1;
-                            const val_end = starts[token_idx] + 1;
+                            const val_end = starts[token_idx];
                             if (is_pub) {
                                 try writer.print("    +{s}\n", .{src[val_start..val_end]});
                             } else {
@@ -315,7 +336,7 @@ pub fn generate(
                         }
                         token_idx += 1;
                     }
-                    if (src[starts[first_token_idx] - 1] == ' ') {
+                    if (is_not_at_root and src[first_token_start - 1] == ' ') {
                         nested_containers.appendAssumeCapacity(.{ .tag = .@"error", .start = start, .end = end });
                     } else {
                         file_containers.appendAssumeCapacity(.{ .tag = .@"error", .start = start, .end = end });
@@ -326,7 +347,7 @@ pub fn generate(
                             line_num += 1;
                         }
                     }
-                    try writer.print("link {s} \"{s}/{s}#L{d}\"\n", .{ src[start..end], remote_src_dir_path, entry.path, line_num });
+                    try writer.print("{c}\nlink {s} \"{s}/{s}#L{d}\"\n", .{ '}', src[start..end], remote_src_dir_path, entry.path, line_num });
                 },
                 .container_decl,
                 .container_decl_trailing,
@@ -391,32 +412,48 @@ pub fn generate(
                         .keyword_pub => is_pub = true,
                         else => unreachable,
                     }
-                    try writer.print("class {s}[\"{s} [{s}]\"] {c}\n", .{ src[start..end], src[start..end], @tagName(tag), '{' });
-                    if (src[starts[first_token_idx] - 1] == ' ') {
-                        for (nested_container_decls.constSlice()) |decl| {
-                            try decl.print(is_pub, src, writer);
-                        }
-                        try nested_container_decls.resize(0);
-                        for (nested_container_fn_protos.constSlice()) |fn_proto| {
-                            try fn_proto.print(src, writer);
-                        }
-                        try nested_container_fn_protos.resize(0);
-                    } else {
-                        for (nested_decls.constSlice()) |decl| {
-                            try decl.print(is_pub, src, writer);
-                        }
-                        try nested_decls.resize(0);
-                        for (nested_fn_protos.constSlice()) |fn_proto| {
-                            try fn_proto.print(src, writer);
-                        }
-                        try nested_fn_protos.resize(0);
+                    const first_token_start = starts[first_token_idx];
+                    const is_not_at_root = first_token_start > 0;
+                    if (is_not_at_root and std.mem.eql(u8, "     ", src[first_token_start - 5 .. first_token_start])) {
+                        continue;
                     }
-                    try writer.writeAll("}\n");
+                    try writer.print("class {s}[\"{s} [{s}]\"]", .{ src[start..end], src[start..end], @tagName(tag) });
+                    if (is_not_at_root and src[first_token_start - 1] == ' ') {
+                        if (nested_container_decls.len > 0 or nested_container_fn_protos.len > 0) {
+                            try writer.writeAll(" {\n");
+                            for (nested_container_decls.constSlice()) |decl| {
+                                try decl.print(is_pub, src, writer);
+                            }
+                            try nested_container_decls.resize(0);
+                            for (nested_container_fn_protos.constSlice()) |fn_proto| {
+                                try fn_proto.print(src, writer);
+                            }
+                            try nested_container_fn_protos.resize(0);
+                            try writer.writeAll("}\n");
+                        } else {
+                            try writer.writeByte('\n');
+                        }
+                    } else {
+                        if (nested_decls.len > 0 or nested_fn_protos.len > 0) {
+                            try writer.writeAll(" {\n");
+                            for (nested_decls.constSlice()) |decl| {
+                                try decl.print(is_pub, src, writer);
+                            }
+                            try nested_decls.resize(0);
+                            for (nested_fn_protos.constSlice()) |fn_proto| {
+                                try fn_proto.print(src, writer);
+                            }
+                            try nested_fn_protos.resize(0);
+                            try writer.writeAll("}\n");
+                        } else {
+                            try writer.writeByte('\n');
+                        }
+                    }
                     for (nested_containers.constSlice()) |container| {
                         try writer.print("{s} <-- {s}\n", .{ src[start..end], src[container.start..container.end] });
                     }
                     try nested_containers.resize(0);
-                    if (src[starts[first_token_idx] - 1] == ' ') {
+                    if (is_not_at_root and src[first_token_start - 1] == ' ') {
                         nested_containers.appendAssumeCapacity(.{ .tag = tag, .start = start, .end = end });
                     } else {
                         file_containers.appendAssumeCapacity(.{ .tag = tag, .start = start, .end = end });
@@ -443,6 +480,9 @@ pub fn generate(
                     std.mem.replaceScalar(u8, src[start..end], '}', ']');
                     if (node_tags[i - 2] != .root and src[start - 1] == ' ') {
                         if (std.mem.eql(u8, "     ", src[start - 5 .. start])) {
+                            if (std.mem.eql(u8, "         ", src[start - 9 .. start])) {
+                                continue;
+                            }
                             nested_container_decls.appendAssumeCapacity(.{ .is_test = false, .start = start, .end = end });
                         } else {
                             nested_decls.appendAssumeCapacity(.{ .is_test = false, .start = start, .end = end });
@@ -473,7 +513,7 @@ pub fn generate(
         try writer.print("link `{s}` \"{s}/{s}\"\n", .{ entry.path, remote_src_dir_path, entry.path });
     }
 
-    switch (extension) {
+    switch (ext) {
         .html => {
             try writer.writeAll(
                 \\    </pre>

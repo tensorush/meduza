@@ -51,6 +51,8 @@
 
 - Types link to the respective code on the remote (GitHub doesn't support).
 
+- Types at the 0th and 1st indentation levels are parsed, while the rest are skipped.
+
 #### :world_map: Legend
 
 ```mermaid
@@ -59,7 +61,7 @@
         'theme': 'base',
         'themeVariables': {
             'fontSize': '18px',
-            'fontFamily': 'Arial',
+            'fontFamily': 'arial',
             'lineColor': '#F6A516',
             'primaryColor': '#28282B',
             'primaryTextColor': '#F6A516'
