@@ -28,7 +28,7 @@ pub fn main() Error!void {
     defer arena.deinit();
     var allocator = arena.allocator();
 
-    var res = try clap.parse(clap.Help, &PARAMS, PARSERS, .{});
+    var res = clap.parse(clap.Help, &PARAMS, PARSERS, .{}) catch unreachable;
     defer res.deinit();
 
     var remote_src_dir_path: []const u8 = "https://github.com/tensorush/zigzag/blob/main/src";
