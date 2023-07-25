@@ -8,8 +8,8 @@ title: Zigzag path tracer codebase
         'securityLevel': 'loose',
         'themeVariables': {
             'fontSize': '18px',
-            'fontFamily': 'arial',
             'lineColor': '#F6A516',
+            'fontFamily': 'Fira Code',
             'primaryColor': '#28282B',
             'primaryTextColor': '#F6A516'
         }

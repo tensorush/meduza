@@ -31,9 +31,9 @@ pub fn main() Error!void {
     var res = clap.parse(clap.Help, &PARAMS, PARSERS, .{}) catch unreachable;
     defer res.deinit();
 
-    var remote_src_dir_path: []const u8 = "https://github.com/tensorush/zigzag/blob/main/src";
-    var local_src_dir_path: []const u8 = "zigzag/src";
-    var codebase_title: []const u8 = "Zigzag path tracer";
+    var remote_src_dir_path: []const u8 = undefined;
+    var local_src_dir_path: []const u8 = undefined;
+    var codebase_title: []const u8 = undefined;
     var extension = meduza.Ext.md;
 
     if (res.args.remote) |remote| {
