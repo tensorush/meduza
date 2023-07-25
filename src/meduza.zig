@@ -106,8 +106,8 @@ pub fn generate(
                 \\            'securityLevel': 'loose',
                 \\            'themeVariables': {
                 \\                'fontSize': '18px',
+                \\                'fontFamily': 'arial',
                 \\                'lineColor': '#F6A516',
-                \\                'fontFamily': 'Fira Code',
                 \\                'primaryColor': '#28282B',
                 \\                'primaryTextColor': '#F6A516'
                 \\            }
@@ -127,8 +127,8 @@ pub fn generate(
                 \\        'securityLevel': 'loose',
                 \\        'themeVariables': {
                 \\            'fontSize': '18px',
+                \\            'fontFamily': 'arial',
                 \\            'lineColor': '#F6A516',
-                \\            'fontFamily': 'Fira Code',
                 \\            'primaryColor': '#28282B',
                 \\            'primaryTextColor': '#F6A516'
                 \\        }
