@@ -48,6 +48,18 @@
 #### :world_map: Legend
 
 ```mermaid
+%%{
+    init: {
+        'theme': 'base',
+        'themeVariables': {
+            'fontSize': '18px',
+            'fontFamily': 'arial',
+            'lineColor': '#F6A516',
+            'primaryColor': '#28282B',
+            'primaryTextColor': '#F6A516'
+        }
+    }
+}%%
 classDiagram
     class `dir/file.zig` {
         field: T

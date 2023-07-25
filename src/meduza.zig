@@ -103,7 +103,6 @@ pub fn generate(
                 \\        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.2.4/dist/mermaid.esm.min.mjs';
                 \\        mermaid.initialize({
                 \\            'theme': 'base',
-                \\            'securityLevel': 'loose',
                 \\            'themeVariables': {
                 \\                'fontSize': '18px',
                 \\                'fontFamily': 'arial',
@@ -124,7 +123,6 @@ pub fn generate(
                 \\%%{
                 \\    init: {
                 \\        'theme': 'base',
-                \\        'securityLevel': 'loose',
                 \\        'themeVariables': {
                 \\            'fontSize': '18px',
                 \\            'fontFamily': 'arial',

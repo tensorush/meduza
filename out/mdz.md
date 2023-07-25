@@ -5,7 +5,6 @@ title: Zigzag path tracer codebase
 %%{
     init: {
         'theme': 'base',
-        'securityLevel': 'loose',
         'themeVariables': {
             'fontSize': '18px',
             'fontFamily': 'arial',
