@@ -2,8 +2,21 @@
 ---
 title: Zigzag path tracer codebase
 ---
+%%{
+    init: {
+        'theme': 'base',
+        'securityLevel': 'loose',
+        'themeVariables': {
+            'fontSize': '18px',
+            'lineColor': '#F6A516',
+            'fontFamily': 'Fira Code',
+            'primaryColor': '#28282B',
+            'primaryTextColor': '#F6A516'
+        }
+    }
+}%%
 classDiagram
-class Basis {
+class Basis["Basis [struct]"] {
     +axis2: Vec
     +axis3: Vec
     +init(u) Basis
@@ -22,12 +35,12 @@ class `main.zig` {
     +main() MainError!void
 }
 link `main.zig` "https://github.com/tensorush/zigzag/blob/main/src/main.zig"
-class Hit {
+class Hit["Hit [struct]"] {
     -ray_factor: f64
-    -sphere_idx_opt: ?usize
+    -sphere_idx_opt: ?u8
 }
 link Hit "https://github.com/tensorush/zigzag/blob/main/src/Tracer.zig#L23"
-class Ray {
+class Ray["Ray [struct]"] {
     -direction: vector.Vec
     -origin: vector.Vec
     -computeHitPoint(self, ray_factor) vector.Vec
@@ -55,13 +68,13 @@ class `Tracer.zig` {
 }
 `Tracer.zig` <-- Ray
 link `Tracer.zig` "https://github.com/tensorush/zigzag/blob/main/src/Tracer.zig"
-class Kind {
+class Kind["Kind [enum]"] {
     +Diffuse
     +Glossy
     +Mirror
 }
 link Kind "https://github.com/tensorush/zigzag/blob/main/src/Scene.zig#L20"
-class Material {
+class Material["Material [struct]"] {
     +specular: vector.Vec
     +emissive: vector.Vec
     +diffuse: vector.Vec
@@ -70,21 +83,21 @@ class Material {
 }
 Material <-- Kind
 link Material "https://github.com/tensorush/zigzag/blob/main/src/Scene.zig#L13"
-class Sphere {
+class Sphere["Sphere [struct]"] {
     +center: vector.Vec
     +material: Material
     +radius: f64
     +init(material, center, radius) Sphere
 }
 link Sphere "https://github.com/tensorush/zigzag/blob/main/src/Scene.zig#L27"
-class Camera {
+class Camera["Camera [struct]"] {
     -direction: vector.Vec
     -fov: f64
 }
 link Camera "https://github.com/tensorush/zigzag/blob/main/src/Scene.zig#L37"
 class `Scene.zig` {
-    +light_idxs: std.BoundedArray(usize
-    +spheres: std.BoundedArray(Sphere
+    +spheres: std.BoundedArray(Sphere, MAX_NUM_SPHERES)
+    +light_idxs: std.BoundedArray(u8, MAX_NUM_LIGHTS)
     +camera: Camera
     +initCornellBox() Scene
 }
@@ -92,11 +105,11 @@ class `Scene.zig` {
 `Scene.zig` <-- Sphere
 `Scene.zig` <-- Camera
 link `Scene.zig` "https://github.com/tensorush/zigzag/blob/main/src/Scene.zig"
-class Chunk {
+class Chunk["Chunk [struct]"] {
     +tracer: *Tracer
-    +offset: usize
     +frame: []u8
-    +size: usize
+    +offset: u16
+    +size: u16
 }
 link Chunk "https://github.com/tensorush/zigzag/blob/main/src/Worker.zig#L12"
 class `Worker.zig` {

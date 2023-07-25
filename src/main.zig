@@ -5,8 +5,8 @@ const meduza = @import("meduza.zig");
 const PARAMS = clap.parseParamsComptime(
     \\-r, --remote <STR>   Remote source directory path (required).
     \\-l, --local <STR>    Local source directory path (required).
-    \\-n, --name <STR>     Codebase name (required).
-    \\-e, --ext <EXT>      File extension: md, mmd, or html (default: md).
+    \\-t, --title <STR>    Codebase title (required).
+    \\-e, --ext <EXT>      File extension: html, md, or mmd (default: md).
     \\-h, --help           Display help.
     \\
 );
@@ -33,7 +33,7 @@ pub fn main() !void {
 
     var remote_src_dir_path: []const u8 = "https://github.com/tensorush/zigzag/blob/main/src";
     var local_src_dir_path: []const u8 = "zigzag/src";
-    var codebase_name: []const u8 = "Zigzag path tracer";
+    var codebase_title: []const u8 = "Zigzag path tracer";
     var extension = meduza.Ext.md;
 
     if (res.args.remote) |remote| {
@@ -48,8 +48,8 @@ pub fn main() !void {
         return clap.help(std.io.getStdErr().writer(), clap.Help, &PARAMS, .{});
     }
 
-    if (res.args.name) |name| {
-        codebase_name = name;
+    if (res.args.title) |title| {
+        codebase_title = title;
     } else {
         return clap.help(std.io.getStdErr().writer(), clap.Help, &PARAMS, .{});
     }
@@ -62,5 +62,5 @@ pub fn main() !void {
         return clap.help(std.io.getStdErr().writer(), clap.Help, &PARAMS, .{});
     }
 
-    try meduza.run(allocator, remote_src_dir_path, local_src_dir_path, codebase_name, extension);
+    try meduza.generate(allocator, remote_src_dir_path, local_src_dir_path, codebase_title, extension);
 }

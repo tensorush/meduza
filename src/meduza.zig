@@ -20,11 +20,11 @@ const Container = struct {
     tag: Tag,
 
     const Tag = enum {
-        Struct,
-        Opaque,
-        Union,
-        Error,
-        Enum,
+        @"struct",
+        @"opaque",
+        @"union",
+        @"error",
+        @"enum",
     };
 };
 
@@ -72,11 +72,11 @@ const Decl = struct {
     }
 };
 
-pub fn run(
+pub fn generate(
     allocator: std.mem.Allocator,
     remote_src_dir_path: []const u8,
     local_src_dir_path: []const u8,
-    codebase_name: []const u8,
+    codebase_title: []const u8,
     extension: Ext,
 ) Error!void {
     const cur_dir = std.fs.cwd();
@@ -91,12 +91,55 @@ pub fn run(
     const writer = buf_writer.writer();
 
     switch (extension) {
-        .html => try writer.writeAll("<html>\n\n<body>\n    <pre class=\"mermaid\">\n"),
+        .html => try writer.writeAll("<html>\n\n<body>\n"),
         .md => try writer.writeAll("```mermaid\n"),
         .mmd => {},
     }
 
-    try writer.print("---\ntitle: {s} codebase\n---\nclassDiagram\n", .{codebase_name});
+    switch (extension) {
+        .html => {
+            try writer.writeAll(
+                \\    <script type="module">
+                \\        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.2.4/dist/mermaid.esm.min.mjs';
+                \\        mermaid.initialize({
+                \\            'theme': 'base',
+                \\            'securityLevel': 'loose',
+                \\            'themeVariables': {
+                \\                'fontSize': '18px',
+                \\                'lineColor': '#F6A516',
+                \\                'fontFamily': 'Fira Code',
+                \\                'primaryColor': '#28282B',
+                \\                'primaryTextColor': '#F6A516'
+                \\            }
+                \\        });
+                \\    </script>
+                \\    <pre class="mermaid">
+                \\
+            );
+            try writer.print("---\ntitle: {s} codebase\n---\n", .{codebase_title});
+        },
+        .md, .mmd => {
+            try writer.print("---\ntitle: {s} codebase\n---\n", .{codebase_title});
+            try writer.writeAll(
+                \\%%{
+                \\    init: {
+                \\        'theme': 'base',
+                \\        'securityLevel': 'loose',
+                \\        'themeVariables': {
+                \\            'fontSize': '18px',
+                \\            'lineColor': '#F6A516',
+                \\            'fontFamily': 'Fira Code',
+                \\            'primaryColor': '#28282B',
+                \\            'primaryTextColor': '#F6A516'
+                \\        }
+                \\    }
+                \\}%%
+                \\
+            );
+        },
+    }
+
+    try writer.writeAll("classDiagram\n");
 
     var src_dir = try cur_dir.openDir(local_src_dir_path, .{});
     defer src_dir.close();
@@ -258,7 +301,7 @@ pub fn run(
                     }
                     const start = starts[main_tokens[i] - 2];
                     const end = starts[main_tokens[i] - 1] - 1;
-                    try writer.print("class {s} {c}\n", .{ src[start..end], '{' });
+                    try writer.print("class {s}[\"{s} [error]\"] {c}\n", .{ src[start..end], src[start..end], '{' });
                     var token_idx = main_tokens[i] + 2;
                     var token_tag = token_tags[token_idx];
                     while (token_tag != .r_brace) : (token_tag = token_tags[token_idx]) {
@@ -275,9 +318,9 @@ pub fn run(
                         token_idx += 1;
                     }
                     if (src[starts[first_token_idx] - 1] == ' ') {
-                        nested_containers.appendAssumeCapacity(.{ .tag = .Error, .start = start, .end = end });
+                        nested_containers.appendAssumeCapacity(.{ .tag = .@"error", .start = start, .end = end });
                     } else {
-                        file_containers.appendAssumeCapacity(.{ .tag = .Error, .start = start, .end = end });
+                        file_containers.appendAssumeCapacity(.{ .tag = .@"error", .start = start, .end = end });
                     }
                     var line_num: usize = 1;
                     for (src[0..start]) |byte| {
@@ -316,10 +359,10 @@ pub fn run(
                         else => {},
                     }
                     const tag: Container.Tag = switch (src[starts[main_tokens[i]]]) {
-                        's' => .Struct,
-                        'o' => .Opaque,
-                        'u' => .Union,
-                        'e' => .Enum,
+                        's' => .@"struct",
+                        'o' => .@"opaque",
+                        'u' => .@"union",
+                        'e' => .@"enum",
                         else => unreachable,
                     };
                     var first_token_idx = name_token_idx - 1;
@@ -350,7 +393,7 @@ pub fn run(
                         .keyword_pub => is_pub = true,
                         else => unreachable,
                     }
-                    try writer.print("class {s} {c}\n", .{ src[start..end], '{' });
+                    try writer.print("class {s}[\"{s} [{s}]\"] {c}\n", .{ src[start..end], src[start..end], @tagName(tag), '{' });
                     if (src[starts[first_token_idx] - 1] == ' ') {
                         for (nested_container_decls.constSlice()) |decl| {
                             try decl.print(is_pub, src, writer);
@@ -390,9 +433,12 @@ pub fn run(
                 },
                 .container_field_init, .container_field_align, .container_field => {
                     const start = starts[main_tokens[i]];
-                    var end: u32 = @intCast(std.mem.indexOfAnyPos(u8, src, start, "=,}").?);
+                    var end: std.zig.Ast.ByteOffset = @intCast(std.mem.indexOfAnyPos(u8, src, start, "(=,}").?);
                     switch (src[end]) {
                         '=', '}' => end -= 1,
+                        '(' => {
+                            end = @intCast(std.mem.indexOfScalarPos(u8, src, end, ')').? + 1);
+                        },
                         else => {},
                     }
                     std.mem.replaceScalar(u8, src[start..end], '{', '[');
@@ -431,18 +477,13 @@ pub fn run(
 
     switch (extension) {
         .html => {
-            const html_end =
+            try writer.writeAll(
                 \\    </pre>
-                \\    <script type="module">
-                \\        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.2.4/dist/mermaid.esm.min.mjs';
-                \\        mermaid.initialize({});
-                \\    </script>
                 \\</body>
                 \\
                 \\</html>
                 \\
-            ;
-            try writer.writeAll(html_end);
+            );
         },
         .md => try writer.writeAll("```\n"),
         .mmd => {},
