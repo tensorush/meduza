@@ -100,7 +100,7 @@ pub fn generate(
     var buf_stdout_writer = std.io.bufferedWriter(stdout.writer());
     const stdout_writer = buf_stdout_writer.writer();
 
-    try stdout_writer.writeAll("Tips:\n");
+    try stdout_writer.writeAll("Tips for improving code readability:\n");
 
     switch (ext) {
         .html => try writer.writeAll("<html>\n\n<body>\n"),
@@ -254,7 +254,7 @@ pub fn generate(
                                         line_num += 1;
                                     }
                                 }
-                                try stdout_writer.print("- Consider making a single line or referencing a type definition instead: {s}/{s}#L{d}\"\n", .{ remote_src_dir_path, entry.path, line_num });
+                                try stdout_writer.print("  - Consider making a single line or referencing a type definition instead: {s}/{s}#L{d}\"\n", .{ remote_src_dir_path, entry.path, line_num });
                                 rt_end = @intCast(j - 2);
                                 break;
                             },
@@ -563,7 +563,9 @@ pub fn generate(
         .mmd => {},
     }
 
-    try buf_writer.flush();
+    try stdout_writer.writeAll("That's all the tips!\n");
 
     try buf_stdout_writer.flush();
+
+    try buf_writer.flush();
 }

@@ -48,7 +48,7 @@ jobs:
 
       - name: Emit SVG
         run: |
-          echo '{\n    "maxTextSize": 250000\n}' >> config.json
+          echo "{\n    \"maxTextSize\": 250000\n}" >> config.json && cat config.json
           mmdc -i ./out/mdz.mmd -o ./out/mdz.svg -b black -c config.json
 
       - name: Upload artifact for GitHub Pages
