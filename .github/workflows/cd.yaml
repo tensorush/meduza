@@ -38,7 +38,7 @@ jobs:
       - name: Run Meduza codebase graph generator
         run: |
           zig env
-          zig build meduza -- -r https://github.com/tensorush/zigzag/blob/main/src -l zigzag/src -t "Zigzag path tracer" -o ./out/mdz.mmd
+          zig build meduza -- -r https://github.com/tigerbeetle/tigerbeetle/blob/main/src -l ./tigerbeetle/src -t "Tigerbeetle database" -o ./out/mdz.mmd
 
       - name: Install Mermaid CLI
         run: |
@@ -47,7 +47,9 @@ jobs:
           ./node-v18.17.0-linux-x64/bin/npm install -g @mermaid-js/mermaid-cli
 
       - name: Emit SVG
-        run: mmdc -b black -i ./out/mdz.mmd -o ./out/mdz.svg
+        run: |
+          echo '{\n    "maxTextSize": 250000\n}' >> config.json
+          mmdc -i ./out/mdz.mmd -o ./out/mdz.svg -b black -c config.json
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v1

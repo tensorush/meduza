@@ -96,6 +96,12 @@ pub fn generate(
     var buf_writer = std.io.bufferedWriter(out_file.writer());
     const writer = buf_writer.writer();
 
+    const stdout = std.io.getStdOut();
+    var buf_stdout_writer = std.io.bufferedWriter(stdout.writer());
+    const stdout_writer = buf_stdout_writer.writer();
+
+    try stdout_writer.writeAll("Tips:\n");
+
     switch (ext) {
         .html => try writer.writeAll("<html>\n\n<body>\n"),
         .md => try writer.writeAll("```mermaid\n"),
@@ -121,10 +127,10 @@ pub fn generate(
                 \\    <pre class="mermaid">
                 \\
             );
-            try writer.print("---\ntitle: {s} codebase\n---\n", .{codebase_title});
+            try writer.print("---\ntitle: {s}\n---\n", .{codebase_title});
         },
         .md, .mmd => {
-            try writer.print("---\ntitle: {s} codebase\n---\n", .{codebase_title});
+            try writer.print("---\ntitle: {s}\n---\n", .{codebase_title});
             try writer.writeAll(
                 \\%%{
                 \\    init: {
@@ -182,7 +188,7 @@ pub fn generate(
         const token_tags = ast.tokens.items(.tag);
         const starts = ast.tokens.items(.start);
 
-        for (node_tags, 0..) |node_tag, i| {
+        outer: for (node_tags, 0..) |node_tag, i| {
             switch (node_tag) {
                 .test_decl => {
                     const start = starts[main_tokens[i]];
@@ -202,8 +208,12 @@ pub fn generate(
                 },
                 .fn_proto_simple, .fn_proto_multi, .fn_proto_one, .fn_proto => {
                     const start = starts[main_tokens[i] + 1];
-                    if (src[start] == '(') {
-                        continue;
+                    switch (src[start]) {
+                        '(' => continue,
+                        else => switch (token_tags[main_tokens[i] - 1]) {
+                            .keyword_extern, .string_literal => continue,
+                            else => {},
+                        },
                     }
                     var end_token_idx: std.zig.Ast.TokenIndex = undefined;
                     var rt_end: std.zig.Ast.ByteOffset = undefined;
@@ -215,18 +225,39 @@ pub fn generate(
                         }
                     }
                     var args: std.meta.fieldInfo(FnProto, .args).type = .{};
-                    var rt_start: std.zig.Ast.ByteOffset = undefined;
                     args.appendAssumeCapacity(.{ .start = start, .end = starts[main_tokens[i] + 2] });
-                    for (token_tags[main_tokens[i] + 3 .. end_token_idx], main_tokens[i] + 3..end_token_idx) |token_tag, j| {
-                        if (token_tag == .colon) {
-                            args.appendAssumeCapacity(.{ .start = starts[j - 1], .end = starts[j] });
-                        } else if (token_tag == .r_paren) {
-                            rt_start = starts[j + 1];
-                            break;
+                    var rt_start: std.zig.Ast.ByteOffset = undefined;
+                    var token_idx = main_tokens[i] + 3;
+                    var is_arg = true;
+                    while (true) : (token_idx += 1) {
+                        switch (token_tags[token_idx]) {
+                            .l_brace => token_idx = @intCast(std.mem.indexOfScalarPos(std.zig.Token.Tag, token_tags, token_idx + 1, .r_brace).?),
+                            .l_paren => token_idx = @intCast(std.mem.indexOfScalarPos(std.zig.Token.Tag, token_tags, token_idx + 1, .r_paren).?),
+                            .colon => if (is_arg) {
+                                args.appendAssumeCapacity(.{ .start = starts[token_idx - 1], .end = starts[token_idx] });
+                                is_arg = false;
+                            },
+                            .comma => is_arg = true,
+                            .r_paren => {
+                                rt_start = starts[token_idx + 1];
+                                break;
+                            },
+                            else => {},
                         }
                     }
-                    for (src[rt_start..rt_end]) |*byte| {
+                    for (src[rt_start..rt_end], rt_start..rt_end) |*byte, j| {
                         switch (byte.*) {
+                            '\n' => {
+                                var line_num: usize = 2;
+                                for (src[0..j]) |b| {
+                                    if (b == '\n') {
+                                        line_num += 1;
+                                    }
+                                }
+                                try stdout_writer.print("- Consider making a single line or referencing a type definition instead: {s}/{s}#L{d}\"\n", .{ remote_src_dir_path, entry.path, line_num });
+                                rt_end = @intCast(j - 2);
+                                break;
+                            },
                             '{' => byte.* = '[',
                             '}' => byte.* = ']',
                             else => {},
@@ -449,13 +480,13 @@ pub fn generate(
                             try writer.writeByte('\n');
                         }
                     }
-                    for (nested_containers.constSlice()) |container| {
-                        try writer.print("{s} <-- {s}\n", .{ src[start..end], src[container.start..container.end] });
-                    }
-                    try nested_containers.resize(0);
                     if (is_not_at_root and src[first_token_start - 1] == ' ') {
                         nested_containers.appendAssumeCapacity(.{ .tag = tag, .start = start, .end = end });
                     } else {
+                        for (nested_containers.constSlice()) |container| {
+                            try writer.print("{s} <-- {s}\n", .{ src[start..end], src[container.start..container.end] });
+                        }
+                        try nested_containers.resize(0);
                         file_containers.appendAssumeCapacity(.{ .tag = tag, .start = start, .end = end });
                     }
                     var line_num: usize = 1;
@@ -468,13 +499,18 @@ pub fn generate(
                 },
                 .container_field_init, .container_field_align, .container_field => {
                     const start = starts[main_tokens[i]];
-                    var end: std.zig.Ast.ByteOffset = @intCast(std.mem.indexOfAnyPos(u8, src, start, "(=,}").?);
+                    var end: std.zig.Ast.ByteOffset = @intCast(std.mem.indexOfAnyPos(u8, src, start, "(={,}").?);
                     switch (src[end]) {
-                        '=', '}' => end -= 1,
-                        '(' => {
-                            end = @intCast(std.mem.indexOfScalarPos(u8, src, end, ')').? + 1);
-                        },
+                        '(' => end = @intCast(std.mem.indexOfScalarPos(u8, src, end, ')').? + 1),
+                        '=', '{', '}' => end -= 1,
                         else => {},
+                    }
+                    for (node_tags[i..]) |tag| {
+                        switch (tag) {
+                            .fn_proto_simple, .fn_proto_multi, .fn_proto_one, .fn_proto => break,
+                            .fn_decl => continue :outer,
+                            else => {},
+                        }
                     }
                     std.mem.replaceScalar(u8, src[start..end], '{', '[');
                     std.mem.replaceScalar(u8, src[start..end], '}', ']');
@@ -528,4 +564,6 @@ pub fn generate(
     }
 
     try buf_writer.flush();
+
+    try buf_stdout_writer.flush();
 }

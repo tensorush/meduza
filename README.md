@@ -47,13 +47,15 @@
 
 #### :sparkles: Features
 
-- Generator emits either `.html`, `.md`, or `.mmd` Mermaid class diagram.
+- Generate either `.html`, `.md`, or `.mmd` Mermaid class diagram.
 
-- Conversion of `.md` or `.mmd` diagram to `.svg` with Mermaid CLI ([see CD pipeline](https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml#L43)).
+- Learn how to improve code readability for your codebase from printed tips.
 
-- Type definitions at the 0th and 1st indentation levels are parsed, while the rest are skipped.
+- Convert `.md` or `.mmd` diagram to `.svg` with Mermaid CLI ([see CD pipeline](https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml#L52)).
 
-- Types link to the respective code on the remote (GitHub Mermaid blocks such redirections, though).
+- Generate a large diagram (`maxTextSize` > 50'000) with Mermaid CLI ([see CD pipeline](https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml#L51)).
+
+- Click on types to go to respective code lines on the remote (GitHub Mermaid prohibits this, though).
 
 #### :world_map: Legend
 
@@ -71,34 +73,34 @@
     }
 }%%
 classDiagram
-    class `dir/file.zig` {
-        fld: T
-        test "name"()
-    }
-    class Error["Error [error]"] {
-        Value
-    }
-    class Enum["Enum [enum]"] {
-        Value
-        +func(arg) E!R
-    }
-    class Union["Union [union]"] {
-        fld: T
-        +func(arg) E!R
-    }
-    class Struct["Struct [struct]"] {
-        fld: T
-        +func(arg) E!R
-    }
-    class Opaque["Opaque [opaque]"] {
-        fld: T
-        +func(arg) E!R
-    }
-    `dir/file.zig` <-- Error
-    `dir/file.zig` <-- Enum
-    `dir/file.zig` <-- Union
-    `dir/file.zig` <-- Struct
-    `dir/file.zig` <-- Opaque
+class `dir/file.zig` {
+    fld: T
+    test "name"()
+}
+class Error["Error [error]"] {
+    Value
+}
+class Enum["Enum [enum]"] {
+    Value
+    +func(arg) E!R
+}
+class Union["Union [union]"] {
+    fld: T
+    +func(arg) E!R
+}
+class Struct["Struct [struct]"] {
+    fld: T
+    +func(arg) E!R
+}
+class Opaque["Opaque [opaque]"] {
+    fld: T
+    +func(arg) E!R
+}
+`dir/file.zig` <-- Error
+`dir/file.zig` <-- Enum
+`dir/file.zig` <-- Union
+`dir/file.zig` <-- Struct
+`dir/file.zig` <-- Opaque
 ```
 
 | Type          |                  Zig                  |                    Meduza                    |
