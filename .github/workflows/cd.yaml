@@ -40,13 +40,11 @@ jobs:
           zig env
           zig build meduza -- -r https://github.com/tensorush/zigzag/blob/main/src -l zigzag/src -t "Zigzag path tracer" -o ./out/mdz.mmd
 
-      - name: Install NPM
-        uses: bahmutov/npm-install@v1
-        with:
-          useLockFile: false
-
       - name: Install Mermaid CLI
-        run: npm install -g @mermaid-js/mermaid-cli
+        run: |
+          curl -so node.tar.xz https://nodejs.org/dist/v18.17.0/node-v18.17.0-linux-x64.tar.xz
+          tar xf node.tar.xz
+          ./node-v18.17.0-linux-x64/bin/npm install -g @mermaid-js/mermaid-cli
 
       - name: Emit SVG
         run: mmdc -i ./out/mdz.mmd -b black
