@@ -49,6 +49,8 @@
 
 - Generator emits either `.html`, `.md`, or `.mmd` Mermaid class diagram.
 
+- Convert `.md` or `.mmd` file to `.svg` with Mermaid CLI (see [CD pipeline](https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml#L43)).
+
 - Types link to the respective code on the remote (GitHub doesn't support).
 
 - Types at the 0th and 1st indentation levels are parsed, while the rest are skipped.

@@ -47,7 +47,7 @@ jobs:
           ./node-v18.17.0-linux-x64/bin/npm install -g @mermaid-js/mermaid-cli
 
       - name: Emit SVG
-        run: mmdc -i ./out/mdz.mmd -b black
+        run: mmdc -b black -i ./out/mdz.mmd -o ./out/mdz.svg
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v1
