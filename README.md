@@ -32,7 +32,7 @@
 
     </details>
 
-2. Add `meduza` as a module in your `build.zig`.
+2. Add `meduza` as a run artifact in your `build.zig`.
 
     <details>
 
@@ -40,7 +40,10 @@
 
     ```zig
     const meduza = b.dependency("meduza", .{});
-    exe.addModule("meduza", meduza.module("meduza"));
+    const meduza_run = b.addRunArtifact(meduza.artifact("meduza"));
+    if (b.args) |args| {
+        meduza_run.addArgs(args);
+    }
     ```
 
     </details>
