@@ -35,10 +35,10 @@ jobs:
         with:
           version: master
 
-      - name: Run Meduza codebase graph generator
+      - name: Run Meduza codebase graph generator on Tigerbeetle database
         run: |
           zig env
-          zig build meduza -- -r https://github.com/tigerbeetle/tigerbeetle/blob/main/src -l tigerbeetle/src -t "Tigerbeetle database"
+          zig build meduza -- -r https://github.com/tigerbeetle/tigerbeetle/blob/main/src -l tigerbeetle/src -t "Tigerbeetle database" -e mmd
 
       - name: Install Mermaid CLI
         run: |
@@ -49,7 +49,7 @@ jobs:
       - name: Emit SVG
         run: |
           echo -e "{\n    \"maxTextSize\": 250000\n}" >> config.json
-          mmdc -i ./out/src.md -o ./out/tigerbeetle.svg -b black -c config.json
+          mmdc -i ./out/src.mmd -o ./out/src.svg -b black -c config.json
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v1
