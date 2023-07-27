@@ -15,7 +15,7 @@ pub fn build(b: *std.Build) void {
         .root_source_file = root_source_file,
         .target = b.standardTargetOptions(.{}),
         .optimize = b.standardOptimizeOption(.{}),
-        .version = .{ .major = 1, .minor = 5, .patch = 0 },
+        .version = .{ .major = 1, .minor = 6, .patch = 0 },
     });
     meduza.addModule("clap", clap_mod);
     b.installArtifact(meduza);

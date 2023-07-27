@@ -49,6 +49,8 @@
 
 - Generate either `.html`, `.md`, or `.mmd` Mermaid class diagram.
 
+- Generate one diagram for each of your codebase's source directories.
+
 - Learn how to improve code readability for your codebase from printed tips.
 
 - Convert `.md` or `.mmd` diagram to `.svg` with Mermaid CLI ([see CD pipeline](https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml#L52)).

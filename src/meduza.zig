@@ -8,7 +8,6 @@ const MAX_FILE_SIZE: usize = 1 << 22;
 
 pub const Error = error{
     Overflow,
-    UnsupportedExtension,
 } || std.mem.Allocator.Error || std.fmt.BufPrintError || std.fs.Dir.DeleteTreeError || std.fs.File.WriteError || std.fs.File.OpenError || std.fs.Dir.OpenError || std.os.PReadError || std.os.MakeDirError;
 
 pub const Ext = enum {
@@ -80,76 +79,18 @@ pub fn generate(
     remote_src_dir_path: []const u8,
     local_src_dir_path: []const u8,
     codebase_title: []const u8,
-    out_file_path: []const u8,
+    out_dir_path: []const u8,
+    extension: Ext,
 ) Error!void {
-    const ext = std.meta.stringToEnum(Ext, std.fs.path.extension(out_file_path)[1..]) orelse return error.UnsupportedExtension;
-
     const cur_dir = std.fs.cwd();
 
-    if (std.fs.path.dirname(out_file_path)) |out_dir_path| {
-        try cur_dir.makePath(out_dir_path);
-    }
-
-    const out_file = try cur_dir.createFile(out_file_path, .{});
-    defer out_file.close();
-
-    var buf_writer = std.io.bufferedWriter(out_file.writer());
-    const writer = buf_writer.writer();
+    try cur_dir.makePath(out_dir_path);
 
     const stdout = std.io.getStdOut();
     var buf_stdout_writer = std.io.bufferedWriter(stdout.writer());
     const stdout_writer = buf_stdout_writer.writer();
 
     try stdout_writer.writeAll("Tips for improving code readability:\n");
-
-    switch (ext) {
-        .html => try writer.writeAll("<html>\n\n<body>\n"),
-        .md => try writer.writeAll("```mermaid\n"),
-        .mmd => {},
-    }
-
-    switch (ext) {
-        .html => {
-            try writer.writeAll(
-                \\    <script type="module">
-                \\        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.2.4/dist/mermaid.esm.min.mjs';
-                \\        mermaid.initialize({
-                \\            'theme': 'base',
-                \\            'themeVariables': {
-                \\                'fontSize': '18px',
-                \\                'fontFamily': 'arial',
-                \\                'lineColor': '#F6A516',
-                \\                'primaryColor': '#28282B',
-                \\                'primaryTextColor': '#F6A516'
-                \\            }
-                \\        });
-                \\    </script>
-                \\    <pre class="mermaid">
-                \\
-            );
-            try writer.print("---\ntitle: {s}\n---\n", .{codebase_title});
-        },
-        .md, .mmd => {
-            try writer.print("---\ntitle: {s}\n---\n", .{codebase_title});
-            try writer.writeAll(
-                \\%%{
-                \\    init: {
-                \\        'theme': 'base',
-                \\        'themeVariables': {
-                \\            'fontSize': '18px',
-                \\            'fontFamily': 'arial',
-                \\            'lineColor': '#F6A516',
-                \\            'primaryColor': '#28282B',
-                \\            'primaryTextColor': '#F6A516'
-                \\        }
-                \\    }
-                \\}%%
-                \\
-            );
-        },
-    }
-
-    try writer.writeAll("classDiagram\n");
 
     var src_dir = try cur_dir.openDir(local_src_dir_path, .{});
     defer src_dir.close();
@@ -160,9 +101,71 @@ pub fn generate(
     var walker = try src_dir_iter.walk(allocator);
     defer walker.deinit();
 
+    var out_dir = try cur_dir.openDir(out_dir_path, .{});
+    defer out_dir.close();
+
+    var out_files = std.StringArrayHashMapUnmanaged(std.fs.File){};
+    try out_files.ensureTotalCapacity(allocator, 2);
+    defer out_files.deinit(allocator);
+
+    var are_files_valid = std.StringArrayHashMapUnmanaged(bool){};
+    try are_files_valid.ensureTotalCapacity(allocator, 2);
+    defer are_files_valid.deinit(allocator);
+
+    const local_src_dir_basename = std.fs.path.basename(local_src_dir_path);
+
+    var out_file_basename: []u8 = @constCast(local_src_dir_basename);
+    var out_file_name = try std.fmt.allocPrint(allocator, "{s}.{s}", .{ local_src_dir_basename, @tagName(extension) });
+    var out_file = try out_dir.createFile(out_file_name, .{});
+    var writer = out_file.writer();
+
+    try out_files.putNoClobber(allocator, out_file_basename, out_file);
+    try are_files_valid.putNoClobber(allocator, out_file_basename, false);
+
+    try writePrologue(codebase_title, local_src_dir_path, extension, writer);
+
     while (try walker.next()) |entry| {
-        if (entry.kind != .file or !std.mem.eql(u8, ".zig", std.fs.path.extension(entry.basename))) {
-            continue;
+        switch (entry.kind) {
+            .directory => {
+                out_file_basename = try std.fmt.allocPrint(allocator, "{s}.{s}", .{ local_src_dir_basename, entry.path });
+                for (out_file_basename[local_src_dir_basename.len + 1 ..]) |*byte| {
+                    if (std.fs.path.isSep(byte.*)) {
+                        byte.* = '.';
+                    }
+                }
+
+                out_file_name = try std.fmt.allocPrint(allocator, "{s}.{s}", .{ out_file_basename, @tagName(extension) });
+                out_file = try out_dir.createFile(out_file_name, .{});
+                writer = out_file.writer();
+
+                try out_files.putNoClobber(allocator, out_file_basename, out_file);
+                try are_files_valid.putNoClobber(allocator, out_file_basename, false);
+
+                try writePrologue(codebase_title, entry.path, extension, writer);
+
+                continue;
+            },
+            .file => {
+                if (std.mem.eql(u8, ".zig", std.fs.path.extension(entry.basename))) {
+                    if (std.fs.path.dirname(entry.path)) |file_dir_path| {
+                        out_file_basename = try std.fmt.allocPrint(allocator, "{s}.{s}", .{ local_src_dir_basename, file_dir_path });
+                        for (out_file_basename[local_src_dir_basename.len + 1 ..]) |*byte| {
+                            if (std.fs.path.isSep(byte.*)) {
+                                byte.* = '.';
+                            }
+                        }
+                        out_file = out_files.get(out_file_basename).?;
+                        writer = out_file.writer();
+                    } else {
+                        out_file_basename = @constCast(local_src_dir_basename);
+                        out_file = out_files.get(local_src_dir_basename).?;
+                        writer = out_file.writer();
+                    }
+                } else {
+                    continue;
+                }
+            },
+            else => continue,
         }
 
         var src_buf: [MAX_FILE_SIZE]u8 = undefined;
@@ -172,6 +175,7 @@ pub fn generate(
         var nested_container_fn_protos = std.BoundedArray(FnProto, MAX_NUM_FUNCS){};
         var nested_container_decls = std.BoundedArray(Decl, MAX_NUM_DECLS){};
         var nested_containers = std.BoundedArray(Container, MAX_NUM_TYPES){};
+
         var nested_fn_protos = std.BoundedArray(FnProto, MAX_NUM_FUNCS){};
         var nested_decls = std.BoundedArray(Decl, MAX_NUM_DECLS){};
 
@@ -205,6 +209,7 @@ pub fn generate(
                     } else {
                         file_decls.appendAssumeCapacity(.{ .is_test = true, .start = start, .end = end });
                     }
+                    try are_files_valid.put(allocator, out_file_basename, true);
                 },
                 .fn_proto_simple, .fn_proto_multi, .fn_proto_one, .fn_proto => {
                     const start = starts[main_tokens[i] + 1];
@@ -311,6 +316,7 @@ pub fn generate(
                             file_fn_protos.appendAssumeCapacity(.{ .is_pub = false, .args = args, .rt_start = rt_start, .rt_end = rt_end });
                         }
                     }
+                    try are_files_valid.put(allocator, out_file_basename, true);
                 },
                 .error_set_decl => {
                     if (node_tags[i + 1] != .simple_var_decl) {
@@ -379,6 +385,7 @@ pub fn generate(
                         }
                     }
                     try writer.print("{c}\nlink {s} \"{s}/{s}#L{d}\"\n", .{ '}', src[start..end], remote_src_dir_path, entry.path, line_num });
+                    try are_files_valid.put(allocator, out_file_basename, true);
                 },
                 .container_decl,
                 .container_decl_trailing,
@@ -496,6 +503,7 @@ pub fn generate(
                         }
                     }
                     try writer.print("link {s} \"{s}/{s}#L{d}\"\n", .{ src[start..end], remote_src_dir_path, entry.path, line_num });
+                    try are_files_valid.put(allocator, out_file_basename, true);
                 },
                 .container_field_init, .container_field_align, .container_field => {
                     const start = starts[main_tokens[i]];
@@ -526,6 +534,7 @@ pub fn generate(
                     } else {
                         file_decls.appendAssumeCapacity(.{ .is_test = false, .start = start, .end = end });
                     }
+                    try are_files_valid.put(allocator, out_file_basename, true);
                 },
                 else => {},
             }
@@ -549,7 +558,73 @@ pub fn generate(
         try writer.print("link `{s}` \"{s}/{s}\"\n", .{ entry.path, remote_src_dir_path, entry.path });
     }
 
-    switch (ext) {
+    for (are_files_valid.keys(), 0..) |basename, i| {
+        out_file = out_files.get(basename).?;
+        if (are_files_valid.values()[i]) {
+            try writeEpilogue(extension, out_file.writer());
+            out_file.close();
+        } else {
+            out_file.close();
+            const file_name = try std.fmt.allocPrint(allocator, "{s}.{s}", .{ basename, @tagName(extension) });
+            try out_dir.deleteFile(file_name);
+        }
+    }
+
+    try buf_stdout_writer.flush();
+}
+
+inline fn writePrologue(codebase_title: []const u8, out_file_basename: []const u8, extension: Ext, writer: anytype) std.fs.File.WriteError!void {
+    switch (extension) {
+        .html => {
+            try writer.writeAll(
+                \\<html>
+                \\
+                \\<body>
+                \\    <script type="module">
+                \\        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.2.4/dist/mermaid.esm.min.mjs';
+                \\        mermaid.initialize({
+                \\            'theme': 'base',
+                \\            'themeVariables': {
+                \\                'fontSize': '18px',
+                \\                'fontFamily': 'arial',
+                \\                'lineColor': '#F6A516',
+                \\                'primaryColor': '#28282B',
+                \\                'primaryTextColor': '#F6A516'
+                \\            }
+                \\        });
+                \\    </script>
+                \\    <pre class="mermaid">
+                \\
+            );
+            try writer.print("---\ntitle: {s} ({s})\n---\n", .{ codebase_title, out_file_basename });
+        },
+        .md, .mmd => {
+            if (extension == .md) {
+                try writer.writeAll("```mermaid\n");
+            }
+            try writer.print("---\ntitle: {s} ({s})\n---\n", .{ codebase_title, out_file_basename });
+            try writer.writeAll(
+                \\%%{
+                \\    init: {
+                \\        'theme': 'base',
+                \\        'themeVariables': {
+                \\            'fontSize': '18px',
+                \\            'fontFamily': 'arial',
+                \\            'lineColor': '#F6A516',
+                \\            'primaryColor': '#28282B',
+                \\            'primaryTextColor': '#F6A516'
+                \\        }
+                \\    }
+                \\}%%
+                \\
+            );
+        },
+    }
+    try writer.writeAll("classDiagram\n");
+}
+
+inline fn writeEpilogue(extension: Ext, writer: anytype) std.fs.File.WriteError!void {
+    switch (extension) {
         .html => {
             try writer.writeAll(
                 \\    </pre>
@@ -562,10 +637,4 @@ pub fn generate(
         .md => try writer.writeAll("```\n"),
         .mmd => {},
     }
-
-    try stdout_writer.writeAll("That's all the tips!\n");
-
-    try buf_stdout_writer.flush();
-
-    try buf_writer.flush();
 }
