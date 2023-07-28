@@ -15,14 +15,14 @@ title: Tigerbeetle database (vsr)
     }
 }%%
 classDiagram
-class Status["Status [enum]"] {
+class Status["Status [enu]"] {
     +normal
     +view_change
     +recovering
     +recovering_head
 }
 link Status "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L33"
-class CommitStage["CommitStage [enum]"] {
+class CommitStage["CommitStage [enu]"] {
     -idle
     -next
     -next_journal
@@ -36,7 +36,7 @@ class CommitStage["CommitStage [enum]"] {
     -cleanup
 }
 link CommitStage "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L49"
-class ReplicaEvent["ReplicaEvent [union]"] {
+class ReplicaEvent["ReplicaEvent [uni]"] {
     +message_sent: *const Message
     +committed
     +compaction_completed
@@ -47,18 +47,18 @@ class ReplicaEvent["ReplicaEvent [union]"] {
     +sync_stage_changed
 }
 link ReplicaEvent "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L67"
-class Prepare["Prepare [struct]"] {
+class Prepare["Prepare [str]"] {
     -message: *Message
     -ok_from_all_replicas: QuorumCounter
     -ok_quorum_received: bool
 }
 link Prepare "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L91"
-class Request["Request [struct]"] {
+class Request["Request [str]"] {
     -message: *Message
     -realtime: i64
 }
 link Request "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L102"
-class HeaderIterator["HeaderIterator [struct]"] {
+class HeaderIterator["HeaderIterator [str]"] {
     -static_allocator: StaticAllocator
     -cluster: u32
     -replica_count: u8
@@ -309,7 +309,7 @@ class HeaderIterator["HeaderIterator [struct]"] {
     -next(iterator) ?*const Header
 }
 link HeaderIterator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8739"
-class DVCQuorum["DVCQuorum [struct]"] {
+class DVCQuorum["DVCQuorum [str]"] {
     -verify(dvc_quorum) void
     -verify_message(message) void
     -dvcs_all(dvc_quorum) DVCArray
@@ -325,7 +325,7 @@ class DVCQuorum["DVCQuorum [struct]"] {
 }
 DVCQuorum <-- HeaderIterator
 link DVCQuorum "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8413"
-class PipelineQueue["PipelineQueue [struct]"] {
+class PipelineQueue["PipelineQueue [str]"] {
     -prepare_queue: PrepareQueue
     -request_queue: RequestQueue
     -deinit(pipeline, message_pool) void
@@ -340,7 +340,7 @@ class PipelineQueue["PipelineQueue [struct]"] {
     -push_prepare(pipeline, message) void
 }
 link PipelineQueue "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8856"
-class PipelineCache["PipelineCache [struct]"] {
+class PipelineCache["PipelineCache [str]"] {
     -prepares: [prepares_max]?*Message
     -init_from_queue(queue) PipelineCache
     -deinit(pipeline, message_pool) void
@@ -371,7 +371,7 @@ class `vsr/replica_format.zig` {
     -ReplicaFormatType(Storage) type
 }
 link `vsr/replica_format.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_format.zig"
-class Environment["Environment [struct]"] {
+class Environment["Environment [str]"] {
     -sequence_states: SequenceStates
     -members: vsr.Members
     -superblock: *SuperBlock
@@ -407,13 +407,13 @@ class `vsr/superblock_fuzz.zig` {
 }
 `vsr/superblock_fuzz.zig` <-- Environment
 link `vsr/superblock_fuzz.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_fuzz.zig"
-class Reservation["Reservation [struct]"] {
+class Reservation["Reservation [str]"] {
     +block_base: usize
     +block_count: usize
     +session: usize
 }
 link Reservation "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set.zig#L18"
-class FreeSet["FreeSet [struct]"] {
+class FreeSet["FreeSet [str]"] {
     +index: DynamicBitSetUnmanaged
     +blocks: DynamicBitSetUnmanaged
     +staging: DynamicBitSetUnmanaged
@@ -445,12 +445,12 @@ class FreeSet["FreeSet [struct]"] {
     +blocks_count_floor(blocks_count) usize
 }
 link FreeSet "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set.zig#L41"
-class TestPattern["TestPattern [struct]"] {
+class TestPattern["TestPattern [str]"] {
     -fill: TestPatternFill
     -words: usize
 }
 link TestPattern "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set.zig#L721"
-class TestPatternFill["TestPatternFill [enum]"] {
+class TestPatternFill["TestPatternFill [enu]"] {
     -uniform_ones
     -uniform_zeros
     -literal
@@ -480,7 +480,7 @@ class `vsr/superblock_free_set.zig` {
 `vsr/superblock_free_set.zig` <-- TestPattern
 `vsr/superblock_free_set.zig` <-- TestPatternFill
 link `vsr/superblock_free_set.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set.zig"
-class VSRState["VSRState [struct]"] {
+class VSRState["VSRState [str]"] {
     +previous_checkpoint_id: u128
     +commit_min_checksum: u128
     +replica_id: u128
@@ -498,14 +498,14 @@ class VSRState["VSRState [struct]"] {
     +op_compacted(state, op) bool
 }
 link VSRState "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L127"
-class Snapshot["Snapshot [struct]"] {
+class Snapshot["Snapshot [str]"] {
     +created: u64
     +queried: u64
     +timeout: u64
     +exists(snapshot) bool
 }
 link Snapshot "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L236"
-class SuperBlockHeader["SuperBlockHeader [struct]"] {
+class SuperBlockHeader["SuperBlockHeader [str]"] {
     +checksum: u128
     +copy: u16
     +version: u16
@@ -539,7 +539,7 @@ class SuperBlockHeader["SuperBlockHeader [struct]"] {
 SuperBlockHeader <-- VSRState
 SuperBlockHeader <-- Snapshot
 link SuperBlockHeader "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L42"
-class Caller["Caller [enum]"] {
+class Caller["Caller [enu]"] {
     +format
     +open
     +checkpoint
@@ -549,14 +549,14 @@ class Caller["Caller [enum]"] {
     -updates_trailers(caller) bool
 }
 link Caller "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1634"
-class Trailer["Trailer [enum]"] {
+class Trailer["Trailer [enu]"] {
     +manifest
     +free_set
     +client_sessions
     +zone(trailer) SuperBlockZone
 }
 link Trailer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1680"
-class SuperBlockZone["SuperBlockZone [enum]"] {
+class SuperBlockZone["SuperBlockZone [enu]"] {
     +header
     +manifest
     +free_set
@@ -582,7 +582,7 @@ class `vsr/journal_format_fuzz.zig` {
     -verify_slot_header(slot, header) !void
 }
 link `vsr/journal_format_fuzz.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/journal_format_fuzz.zig"
-class ProcessSelector["ProcessSelector [enum]"] {
+class ProcessSelector["ProcessSelector [enu]"] {
     -__
     -R_
     -R0
@@ -607,7 +607,7 @@ class ProcessSelector["ProcessSelector [enum]"] {
     -C_
 }
 link ProcessSelector "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1013"
-class TestContext["TestContext [struct]"] {
+class TestContext["TestContext [str]"] {
     -cluster: *Cluster
     -log_level: std.log.Level
     -client_requests: [constants.clients_max]usize
@@ -622,11 +622,11 @@ class TestContext["TestContext [struct]"] {
     -processes(t, selector) ProcessList
 }
 link TestContext "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1038"
-class Role["Role [enum]"]
+class Role["Role [enu]"]
 link Role "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1330"
-class LinkDirection["LinkDirection [enum]"]
+class LinkDirection["LinkDirection [enu]"]
 link LinkDirection "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1425"
-class TestReplicas["TestReplicas [struct]"] {
+class TestReplicas["TestReplicas [str]"] {
     -context: *TestContext
     -cluster: *Cluster
     -replicas: std.BoundedArray(u8, constants.members_max)
@@ -668,7 +668,7 @@ class TestReplicas["TestReplicas [struct]"] {
 TestReplicas <-- Role
 TestReplicas <-- LinkDirection
 link TestReplicas "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1210"
-class TestClients["TestClients [struct]"] {
+class TestClients["TestClients [str]"] {
     -context: *TestContext
     -cluster: *Cluster
     -clients: std.BoundedArray(usize, constants.clients_max)
@@ -716,7 +716,7 @@ class `vsr/replica_test.zig` {
 `vsr/replica_test.zig` <-- TestReplicas
 `vsr/replica_test.zig` <-- TestClients
 link `vsr/replica_test.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig"
-class Aegis128["Aegis128 [struct]"] {
+class Aegis128["Aegis128 [str]"] {
     -init(key, nonce) State
     -update(blocks, d1, d2) void
     -absorb(blocks, src) void
@@ -724,7 +724,7 @@ class Aegis128["Aegis128 [struct]"] {
     -hash(blocks, source) u128
 }
 link Aegis128 "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/checksum.zig#L7"
-class TestVector["TestVector [struct]"] {
+class TestVector["TestVector [str]"] {
     -source: []const u8
     -hash: u128
 }
@@ -742,7 +742,7 @@ class `vsr/client.zig` {
     +Client(StateMachine_, MessageBus) type
 }
 link `vsr/client.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/client.zig"
-class Variant["Variant [enum]"] {
+class Variant["Variant [enu]"] {
     -valid
     -valid_high_copy
     -invalid_broken
@@ -752,7 +752,7 @@ class Variant["Variant [enum]"] {
     -invalid_vsr_state
 }
 link Variant "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_quorums_fuzz.zig#L202"
-class CopyTemplate["CopyTemplate [struct]"] {
+class CopyTemplate["CopyTemplate [str]"] {
     +sequence: u64
     +variant: Variant
     +make_valid(sequence) CopyTemplate
@@ -774,7 +774,7 @@ class `vsr/superblock_quorums_fuzz.zig` {
 }
 `vsr/superblock_quorums_fuzz.zig` <-- CopyTemplate
 link `vsr/superblock_quorums_fuzz.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_quorums_fuzz.zig"
-class FreeSetEvent["FreeSetEvent [union]"] {
+class FreeSetEvent["FreeSetEvent [uni]"] {
     -blocks: usize
     -reserve: struct
     -forfeit: void
@@ -785,7 +785,7 @@ class FreeSetEvent["FreeSetEvent [union]"] {
     -checkpoint: void
 }
 link FreeSetEvent "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set_fuzz.zig#L118"
-class FreeSetModel["FreeSetModel [struct]"] {
+class FreeSetModel["FreeSetModel [str]"] {
     -blocks_acquired: std.DynamicBitSetUnmanaged
     -blocks_released: std.DynamicBitSetUnmanaged
     -blocks_reserved: std.DynamicBitSetUnmanaged
@@ -815,7 +815,7 @@ class `vsr/superblock_free_set_fuzz.zig` {
 `vsr/superblock_free_set_fuzz.zig` <-- FreeSetEvent
 `vsr/superblock_free_set_fuzz.zig` <-- FreeSetModel
 link `vsr/superblock_free_set_fuzz.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set_fuzz.zig"
-class Options["Options [struct]"] {
+class Options["Options [str]"] {
     +superblock_copies: u8
 }
 link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_quorums.zig#L10"
@@ -826,22 +826,22 @@ class `vsr/superblock_quorums.zig` {
 }
 `vsr/superblock_quorums.zig` <-- Options
 link `vsr/superblock_quorums.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_quorums.zig"
-class ReplySlot["ReplySlot [struct]"] {
+class ReplySlot["ReplySlot [str]"] {
     +index: usize
 }
 link ReplySlot "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_client_sessions.zig#L10"
-class Entry["Entry [struct]"] {
+class Entry["Entry [str]"] {
     +session: u64
     +header: vsr.Header
 }
 link Entry "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_client_sessions.zig#L32"
-class Iterator["Iterator [struct]"] {
+class Iterator["Iterator [str]"] {
     +client_sessions: *const ClientSessions
     +index: usize
     +next(it) ?*const Entry
 }
 link Iterator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_client_sessions.zig#L305"
-class ClientSessions["ClientSessions [struct]"] {
+class ClientSessions["ClientSessions [str]"] {
     +entries: []Entry
     +entries_by_client: EntriesByClient
     +entries_free: EntriesFree
@@ -867,20 +867,20 @@ class `vsr/superblock_client_sessions.zig`
 `vsr/superblock_client_sessions.zig` <-- ReplySlot
 `vsr/superblock_client_sessions.zig` <-- ClientSessions
 link `vsr/superblock_client_sessions.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_client_sessions.zig"
-class Interval["Interval [struct]"] {
+class Interval["Interval [str]"] {
     +lower_bound: i64
     +upper_bound: i64
     +sources_true: u8
     +sources_false: u8
 }
 link Interval "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/marzullo.zig#L10"
-class Tuple["Tuple [struct]"] {
+class Tuple["Tuple [str]"] {
     +source: u8
     +offset: i64
     +bound: enum
 }
 link Tuple "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/marzullo.zig#L31"
-class Marzullo["Marzullo [struct]"] {
+class Marzullo["Marzullo [str]"] {
     +smallest_interval(tuples) Interval
     -less_than(context, a, b) bool
 }
@@ -893,7 +893,7 @@ class `vsr/marzullo.zig` {
 }
 `vsr/marzullo.zig` <-- Marzullo
 link `vsr/marzullo.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/marzullo.zig"
-class RequestingTrailers["RequestingTrailers [struct]"] {
+class RequestingTrailers["RequestingTrailers [str]"] {
     +target: Target
     +trailers: Trailers
     +previous_checkpoint_id: ?u128
@@ -901,13 +901,13 @@ class RequestingTrailers["RequestingTrailers [struct]"] {
     +done(self) bool
 }
 link RequestingTrailers "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/sync.zig#L27"
-class UpdatingSuperBlock["UpdatingSuperBlock [struct]"] {
+class UpdatingSuperBlock["UpdatingSuperBlock [str]"] {
     +target: Target
     +previous_checkpoint_id: u128
     +checkpoint_op_checksum: u128
 }
 link UpdatingSuperBlock "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/sync.zig#L50"
-class Stage["Stage [union]"] {
+class Stage["Stage [uni]"] {
     +idle
     +canceling_commit
     +canceling_grid
@@ -920,24 +920,24 @@ class Stage["Stage [union]"] {
 Stage <-- RequestingTrailers
 Stage <-- UpdatingSuperBlock
 link Stage "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/sync.zig#L9"
-class TargetCandidate["TargetCandidate [struct]"] {
+class TargetCandidate["TargetCandidate [str]"] {
     +checkpoint_id: u128
     +checkpoint_op: u64
     +canonical(target) Target
 }
 link TargetCandidate "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/sync.zig#L86"
-class Target["Target [struct]"] {
+class Target["Target [str]"] {
     +checkpoint_id: u128
     +checkpoint_op: u64
 }
 link Target "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/sync.zig#L100"
-class TargetQuorum["TargetQuorum [struct]"] {
+class TargetQuorum["TargetQuorum [str]"] {
     +candidates: [constants.replicas_max]?TargetCandidate
     +replace(quorum, replica, candidate) bool
     +count(quorum, candidate) usize
 }
 link TargetQuorum "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/sync.zig#L107"
-class Trailer["Trailer [struct]"] {
+class Trailer["Trailer [str]"] {
     +offset: u32
     +done: bool
     +size: u32
@@ -956,7 +956,7 @@ class `vsr/sync.zig` {
 `vsr/sync.zig` <-- TargetQuorum
 `vsr/sync.zig` <-- Trailer
 link `vsr/sync.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/sync.zig"
-class AssertionPoint["AssertionPoint [struct]"] {
+class AssertionPoint["AssertionPoint [str]"] {
     -replica: u8
     -time: *Time
     -epoch: Epoch
@@ -979,7 +979,7 @@ class AssertionPoint["AssertionPoint [struct]"] {
     -minimum_one_way_delay(a, b) ?Sample
 }
 link AssertionPoint "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/clock.zig#L502"
-class ClockUnitTestContainer["ClockUnitTestContainer [struct]"] {
+class ClockUnitTestContainer["ClockUnitTestContainer [str]"] {
     -time: DeterministicTime
     -clock: DeterministicClock
     -rtt: u64
@@ -991,7 +991,7 @@ class ClockUnitTestContainer["ClockUnitTestContainer [struct]"] {
 }
 ClockUnitTestContainer <-- AssertionPoint
 link ClockUnitTestContainer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/clock.zig#L458"
-class Packet["Packet [struct]"] {
+class Packet["Packet [str]"] {
     -m0: u64
     -t1: ?i64
     -clock_simulator: *ClockSimulator
@@ -1000,13 +1000,13 @@ class Packet["Packet [struct]"] {
     +command(_) Command
 }
 link Packet "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/clock.zig#L634"
-class Options["Options [struct]"] {
+class Options["Options [str]"] {
     -ping_timeout: u32
     -clock_count: u8
     -network_options: PacketSimulatorOptions
 }
 link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/clock.zig#L653"
-class ClockSimulator["ClockSimulator [struct]"] {
+class ClockSimulator["ClockSimulator [str]"] {
     -allocator: std.mem.Allocator
     -options: Options
     -ticks: u64
@@ -1030,23 +1030,23 @@ class `vsr/clock.zig` {
 `vsr/clock.zig` <-- ClockUnitTestContainer
 `vsr/clock.zig` <-- ClockSimulator
 link `vsr/clock.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/clock.zig"
-class Ring["Ring [enum]"] {
+class Ring["Ring [enu]"] {
     -headers
     -prepares
     -offset(ring, slot) u64
 }
 link Ring "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/journal.zig#L24"
-class Slot["Slot [struct]"] {
+class Slot["Slot [str]"] {
     -index: usize
 }
 link Slot "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/journal.zig#L66"
-class SlotRange["SlotRange [struct]"] {
+class SlotRange["SlotRange [str]"] {
     +head: Slot
     +tail: Slot
     +contains(range, slot) bool
 }
 link SlotRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/journal.zig#L69"
-class RecoveryDecision["RecoveryDecision [enum]"] {
+class RecoveryDecision["RecoveryDecision [enu]"] {
     -append
     -fix
     -repair
@@ -1061,7 +1061,7 @@ class RecoveryDecision["RecoveryDecision [enum]"] {
     -cut_view_range
 }
 link RecoveryDecision "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/journal.zig#L2210"
-class Matcher["Matcher [enum]"] {
+class Matcher["Matcher [enu]"] {
     -any
     -is_false
     -is_true
@@ -1069,7 +1069,7 @@ class Matcher["Matcher [enum]"] {
     -assert_is_true
 }
 link Matcher "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/journal.zig#L2225"
-class Case["Case [struct]"] {
+class Case["Case [str]"] {
     -label: []const u8
     -decision_multiple: RecoveryDecision
     -decision_single: RecoveryDecision
@@ -1079,7 +1079,7 @@ class Case["Case [struct]"] {
     -decision(case, solo) RecoveryDecision
 }
 link Case "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/journal.zig#L2227"
-class BitSet["BitSet [struct]"] {
+class BitSet["BitSet [str]"] {
     +bits: std.DynamicBitSetUnmanaged
     +count: u64
     -init_full(allocator, count) !BitSet
@@ -1107,30 +1107,30 @@ class `vsr/journal.zig` {
 `vsr/journal.zig` <-- Case
 `vsr/journal.zig` <-- BitSet
 link `vsr/journal.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/journal.zig"
-class TableExtentKey["TableExtentKey [struct]"] {
+class TableExtentKey["TableExtentKey [str]"] {
     +tree_hash: u128
     +table: u64
 }
 link TableExtentKey "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_manifest.zig#L42"
-class TableExtent["TableExtent [struct]"] {
+class TableExtent["TableExtent [str]"] {
     +block: u64
     +entry: u32
 }
 link TableExtent "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_manifest.zig#L47"
-class BlockReference["BlockReference [struct]"] {
+class BlockReference["BlockReference [str]"] {
     +tree: u128
     +checksum: u128
     +address: u64
 }
 link BlockReference "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_manifest.zig#L377"
-class IteratorReverse["IteratorReverse [struct]"] {
+class IteratorReverse["IteratorReverse [str]"] {
     +manifest: *const Manifest
     +tree: u128
     +count: u32
     +next(it) ?BlockReference
 }
 link IteratorReverse "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_manifest.zig#L386"
-class Manifest["Manifest [struct]"] {
+class Manifest["Manifest [str]"] {
     +trees: []u128
     +checksums: []u128
     +addresses: []u64

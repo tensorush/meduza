@@ -20,7 +20,7 @@ class `clients/node/docs.zig` {
     -node_current_commit_post_install_hook(arena, sample_dir, root) !void
 }
 link `clients/node/docs.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/docs.zig"
-class TypeMapping["TypeMapping [struct]"] {
+class TypeMapping["TypeMapping [str]"] {
     -name: []const u8
     -hidden_fields: []const []const u8
     -docs_link: ?[]const u8

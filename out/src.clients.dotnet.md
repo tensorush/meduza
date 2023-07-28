@@ -15,7 +15,7 @@ title: Tigerbeetle database (clients/dotnet)
     }
 }%%
 classDiagram
-class TypeMapping["TypeMapping [struct]"] {
+class TypeMapping["TypeMapping [str]"] {
     -name: []const u8
     -public
     -internal

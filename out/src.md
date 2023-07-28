@@ -15,13 +15,13 @@ title: Tigerbeetle database (tigerbeetle/src)
     }
 }%%
 classDiagram
-class AOFEntryMetadata["AOFEntryMetadata [struct]"] {
+class AOFEntryMetadata["AOFEntryMetadata [str]"] {
     +primary: u64
     +replica: u64
     +reserved: [4064]u8
 }
 link AOFEntryMetadata "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/aof.zig#L26"
-class AOFEntry["AOFEntry [struct]"] {
+class AOFEntry["AOFEntry [str]"] {
     +magic_number: u128
     +metadata: AOFEntryMetadata
     +message: [constants.message_size_max]u8 align(constants.sector_size)
@@ -31,7 +31,7 @@ class AOFEntry["AOFEntry [struct]"] {
     +from_message(self, message, options, last_checksum) void
 }
 link AOFEntry "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/aof.zig#L37"
-class AOF["AOF [struct]"] {
+class AOF["AOF [str]"] {
     +fd: os.fd_t
     +last_checksum: ?u128
     +from_absolute_path(absolute_path) !AOF
@@ -42,7 +42,7 @@ class AOF["AOF [struct]"] {
     +iterator(path) !Iterator
 }
 link AOF "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/aof.zig#L120"
-class AOFReplayClient["AOFReplayClient [struct]"] {
+class AOFReplayClient["AOFReplayClient [str]"] {
     +client: *Client
     +io: *IO
     +message_pool: *MessagePool
@@ -53,7 +53,7 @@ class AOFReplayClient["AOFReplayClient [struct]"] {
     -replay_callback(user_data, operation, result) void
 }
 link AOFReplayClient "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/aof.zig#L288"
-class EntryInfo["EntryInfo [struct]"] {
+class EntryInfo["EntryInfo [str]"] {
     -aof: *AOF.Iterator
     -index: u64
     -size: u64
@@ -72,14 +72,14 @@ class `aof.zig` {
 `aof.zig` <-- AOF
 `aof.zig` <-- AOFReplayClient
 link `aof.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/aof.zig"
-class CliArgs["CliArgs [union]"] {
+class CliArgs["CliArgs [uni]"] {
     -bytes: u32
     -memcpy: struct
     -funcsize
     -parse(arena) !CliArgs
 }
 link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/copyhound.zig#L41"
-class T["T [struct]"] {
+class T["T [str]"] {
     -check(line, want) !void
 }
 link T "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/copyhound.zig#L214"
@@ -98,7 +98,7 @@ class `iops.zig` {
     +IOPS(T, size) type
 }
 link `iops.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/iops.zig"
-class BuildOptions["BuildOptions [struct]"] {
+class BuildOptions["BuildOptions [str]"] {
     -config_base: ConfigBase
     -config_log_level: std.log.Level
     -tracer_backend: TracerBackend
@@ -107,12 +107,12 @@ class BuildOptions["BuildOptions [struct]"] {
     -config_aof_recovery: bool
 }
 link BuildOptions "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L15"
-class Config["Config [struct]"] {
+class Config["Config [str]"] {
     +cluster: ConfigCluster
     +process: ConfigProcess
 }
 link Config "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L58"
-class ConfigProcess["ConfigProcess [struct]"] {
+class ConfigProcess["ConfigProcess [str]"] {
     -log_level: std.log.Level
     -tracer_backend: TracerBackend
     -hash_log_mode: HashLogMode
@@ -160,7 +160,7 @@ class ConfigProcess["ConfigProcess [struct]"] {
     -sync_trailer_message_body_size_max: ?usize
 }
 link ConfigProcess "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L73"
-class ConfigCluster["ConfigCluster [struct]"] {
+class ConfigCluster["ConfigCluster [str]"] {
     -cache_line_size: comptime_int
     -clients_max: usize
     -pipeline_prepare_queue_max: usize
@@ -180,25 +180,25 @@ class ConfigCluster["ConfigCluster [struct]"] {
     +checksum(config) u128
 }
 link ConfigCluster "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L129"
-class ConfigBase["ConfigBase [enum]"] {
+class ConfigBase["ConfigBase [enu]"] {
     +production
     +development
     +test_min
     +default
 }
 link ConfigBase "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L182"
-class TracerBackend["TracerBackend [enum]"] {
+class TracerBackend["TracerBackend [enu]"] {
     +none
     +tracy
 }
 link TracerBackend "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L189"
-class HashLogMode["HashLogMode [enum]"] {
+class HashLogMode["HashLogMode [enu]"] {
     +none
     +create
     +check
 }
 link HashLogMode "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L195"
-class configs["configs [struct]"]
+class configs["configs [str]"]
 link configs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L201"
 class `config.zig` {
     -launder_type(T, value) T
@@ -234,7 +234,7 @@ class `ewah.zig` {
     -test_decode(Word, encoded_expect_words) !void
 }
 link `ewah.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/ewah.zig"
-class Time["Time [struct]"] {
+class Time["Time [str]"] {
     +monotonic_guard: u64
     +monotonic(self) u64
     +realtime(_) i64
@@ -244,7 +244,7 @@ link Time "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/time.zig#L9"
 class `time.zig`
 `time.zig` <-- Time
 link `time.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/time.zig"
-class State["State [enum]"] {
+class State["State [enu]"] {
     -init
     -static
     -deinit
@@ -264,12 +264,12 @@ class `static_allocator.zig` {
 }
 `static_allocator.zig` <-- State
 link `static_allocator.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/static_allocator.zig"
-class ProcessType["ProcessType [enum]"] {
+class ProcessType["ProcessType [enu]"] {
     +replica
     +client
 }
 link ProcessType "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L55"
-class Zone["Zone [enum]"] {
+class Zone["Zone [enu]"] {
     +superblock
     +wal_headers
     +wal_prepares
@@ -280,7 +280,7 @@ class Zone["Zone [enum]"] {
     +size(zone) ?u64
 }
 link Zone "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L57"
-class Command["Command [enum]"] {
+class Command["Command [enu]"] {
     +reserved
     +ping
     +pong
@@ -310,7 +310,7 @@ class Command["Command [enum]"] {
     +sync_client_sessions
 }
 link Command "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L109"
-class Operation["Operation [enum]"] {
+class Operation["Operation [enu]"] {
     +reserved
     +root
     +register
@@ -324,7 +324,7 @@ class Operation["Operation [enum]"] {
     -check_state_machine_operations(Op) void
 }
 link Operation "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L156"
-class Header["Header [struct]"] {
+class Header["Header [str]"] {
     test "empty checksum"()
     +checksum: u128
     +checksum_body: u128
@@ -382,13 +382,13 @@ class Header["Header [struct]"] {
     +root_prepare(cluster) Header
 }
 link Header "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L232"
-class BlockRequest["BlockRequest [struct]"] {
+class BlockRequest["BlockRequest [str]"] {
     +block_checksum: u128
     +block_address: u64
     +reserved: [8]u8
 }
 link BlockRequest "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L936"
-class ReconfigurationRequest["ReconfigurationRequest [struct]"] {
+class ReconfigurationRequest["ReconfigurationRequest [str]"] {
     +members: Members
     +epoch: u32
     +replica_count: u8
@@ -398,7 +398,7 @@ class ReconfigurationRequest["ReconfigurationRequest [struct]"] {
     +validate(request, current) ReconfigurationResult
 }
 link ReconfigurationRequest "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L948"
-class ReconfigurationResult["ReconfigurationResult [enum]"] {
+class ReconfigurationResult["ReconfigurationResult [enu]"] {
     +reserved
     +ok
     +replica_count_zero
@@ -418,7 +418,7 @@ class ReconfigurationResult["ReconfigurationResult [enum]"] {
     +configuration_is_no_op
 }
 link ReconfigurationResult "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1037"
-class Test["Test [struct]"] {
+class Test["Test [str]"] {
     -members: Members
     -epoch: u32
     -replica_count: u8
@@ -428,7 +428,7 @@ class Test["Test [struct]"] {
     -to_members(m) Members
 }
 link Test "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1091"
-class Timeout["Timeout [struct]"] {
+class Timeout["Timeout [str]"] {
     +name: []const u8
     +id: u128
     +after: u64
@@ -448,7 +448,7 @@ class Timeout["Timeout [struct]"] {
 }
 Timeout <-- Test
 link Timeout "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1194"
-class IdSeed["IdSeed [struct]"] {
+class IdSeed["IdSeed [str]"] {
     -raw: []const u8
     -addresses: []const std.net.Address
     -raw: []const u8
@@ -458,24 +458,24 @@ class IdSeed["IdSeed [struct]"] {
     -replica: u8 align(1)
 }
 link IdSeed "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1594"
-class Headers["Headers [struct]"] {
+class Headers["Headers [str]"] {
     -dvc_blank(op) Header
     +dvc_header_type(header) enum [ blank, valid ]
 }
 Headers <-- IdSeed
 link Headers "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1641"
-class ViewChangeCommand["ViewChangeCommand [enum]"] {
+class ViewChangeCommand["ViewChangeCommand [enu]"] {
     +do_view_change
     +start_view
 }
 link ViewChangeCommand "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1669"
-class ViewRange["ViewRange [struct]"] {
+class ViewRange["ViewRange [str]"] {
     -min: u32
     -max: u32
     +contains(range, view) bool
 }
 link ViewRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1733"
-class ViewChangeHeadersSlice["ViewChangeHeadersSlice [struct]"] {
+class ViewChangeHeadersSlice["ViewChangeHeadersSlice [str]"] {
     -command: ViewChangeCommand
     -slice: []const Header
     +init(command, slice) ViewChangeHeadersSlice
@@ -484,7 +484,7 @@ class ViewChangeHeadersSlice["ViewChangeHeadersSlice [struct]"] {
 }
 ViewChangeHeadersSlice <-- ViewRange
 link ViewChangeHeadersSlice "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1671"
-class ViewChangeHeadersArray["ViewChangeHeadersArray [struct]"] {
+class ViewChangeHeadersArray["ViewChangeHeadersArray [str]"] {
     -command: ViewChangeCommand
     -array: Headers.Array
     +root(cluster) ViewChangeHeadersArray
@@ -528,7 +528,7 @@ class `vsr.zig` {
 `vsr.zig` <-- ViewChangeHeadersSlice
 `vsr.zig` <-- ViewChangeHeadersArray
 link `vsr.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig"
-class T["T [struct]"] {
+class T["T [str]"] {
     -check(cmd, args, want) !void
 }
 link T "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/shell.zig#L285"
@@ -556,7 +556,7 @@ class `ewah_fuzz.zig` {
     -ContextType(Word) type
 }
 link `ewah_fuzz.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/ewah_fuzz.zig"
-class Event["Event [union]"] {
+class Event["Event [uni]"] {
     +commit: struct
     +checkpoint
     +state_machine_prefetch
@@ -574,7 +574,7 @@ class Event["Event [union]"] {
     -fiber(event) Fiber
 }
 link Event "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tracer.zig#L48"
-class Fiber["Fiber [union]"] {
+class Fiber["Fiber [uni]"] {
     -main
     -tree: struct
     -tree_compaction: struct
@@ -584,12 +584,12 @@ class Fiber["Fiber [union]"] {
     +format(fiber, fmt, options, writer) !void
 }
 link Fiber "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tracer.zig#L178"
-class LevelA["LevelA [struct]"] {
+class LevelA["LevelA [str]"] {
     -level_b: u8
     +format(level_a, fmt, options, writer) !void
 }
 link LevelA "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tracer.zig#L228"
-class PlotId["PlotId [union]"] {
+class PlotId["PlotId [uni]"] {
     +queue_count: struct
     +cache_hits: struct
     +cache_misses: struct
@@ -598,7 +598,7 @@ class PlotId["PlotId [union]"] {
     +format(plot_id, fmt, options, writer) !void
 }
 link PlotId "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tracer.zig#L246"
-class TracerNone["TracerNone [struct]"] {
+class TracerNone["TracerNone [str]"] {
     +init(allocator) !void
     +deinit(allocator) void
     +start(slot, event, src) void
@@ -606,7 +606,7 @@ class TracerNone["TracerNone [struct]"] {
     +plot(plot_id, value) void
 }
 link TracerNone "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tracer.zig#L286"
-class TracedAllocator["TracedAllocator [struct]"] {
+class TracedAllocator["TracedAllocator [str]"] {
     +op: u64
     +tree_name: []const u8
     +tree_name: []const u8
@@ -635,7 +635,7 @@ class TracedAllocator["TracedAllocator [struct]"] {
     -freeFn(self, buf, buf_align, ret_addr) void
 }
 link TracedAllocator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tracer.zig#L464"
-class TracerTracy["TracerTracy [struct]"] {
+class TracerTracy["TracerTracy [str]"] {
     +Interns(Key) type
     +init(allocator_) !void
     +deinit(allocator_) void
@@ -655,7 +655,7 @@ class `tracer.zig`
 `tracer.zig` <-- TracerNone
 `tracer.zig` <-- TracerTracy
 link `tracer.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tracer.zig"
-class Account["Account [struct]"] {
+class Account["Account [str]"] {
     +id: u128
     +user_data: u128
     +reserved: [48]u8
@@ -671,14 +671,14 @@ class Account["Account [struct]"] {
     +credits_exceed_debits(self, amount) bool
 }
 link Account "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle.zig#L7"
-class AccountFlags["AccountFlags [struct]"] {
+class AccountFlags["AccountFlags [str]"] {
     +linked: bool
     +debits_must_not_exceed_credits: bool
     +credits_must_not_exceed_debits: bool
     +padding: u13
 }
 link AccountFlags "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle.zig#L40"
-class Transfer["Transfer [struct]"] {
+class Transfer["Transfer [str]"] {
     +id: u128
     +debit_account_id: u128
     +credit_account_id: u128
@@ -693,7 +693,7 @@ class Transfer["Transfer [struct]"] {
     +timestamp: u64
 }
 link Transfer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle.zig#L62"
-class TransferFlags["TransferFlags [struct]"] {
+class TransferFlags["TransferFlags [str]"] {
     +linked: bool
     +pending: bool
     +post_pending_transfer: bool
@@ -703,7 +703,7 @@ class TransferFlags["TransferFlags [struct]"] {
     +padding: u10
 }
 link TransferFlags "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle.zig#L87"
-class CreateAccountResult["CreateAccountResult [enum]"] {
+class CreateAccountResult["CreateAccountResult [enu]"] {
     +ok
     +linked_event_failed
     +linked_event_chain_open
@@ -726,7 +726,7 @@ class CreateAccountResult["CreateAccountResult [enum]"] {
     +exists
 }
 link CreateAccountResult "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle.zig#L105"
-class CreateTransferResult["CreateTransferResult [enum]"] {
+class CreateTransferResult["CreateTransferResult [enu]"] {
     +ok
     +linked_event_failed
     +linked_event_chain_open
@@ -784,12 +784,12 @@ class CreateTransferResult["CreateTransferResult [enum]"] {
     +exceeds_debits
 }
 link CreateTransferResult "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle.zig#L142"
-class CreateAccountsResult["CreateAccountsResult [struct]"] {
+class CreateAccountsResult["CreateAccountsResult [str]"] {
     +index: u32
     +result: CreateAccountResult
 }
 link CreateAccountsResult "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle.zig#L222"
-class CreateTransfersResult["CreateTransfersResult [struct]"] {
+class CreateTransfersResult["CreateTransfersResult [str]"] {
     +index: u32
     +result: CreateTransferResult
 }
@@ -804,7 +804,7 @@ class `tigerbeetle.zig`
 `tigerbeetle.zig` <-- CreateAccountsResult
 `tigerbeetle.zig` <-- CreateTransfersResult
 link `tigerbeetle.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle.zig"
-class Message["Message [struct]"] {
+class Message["Message [str]"] {
     +header: *Header
     +buffer: *align(constants.sector_size)
     +references: u32
@@ -813,7 +813,7 @@ class Message["Message [struct]"] {
     +body(message) []align(@sizeOf(Header)) u8
 }
 link Message "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/message_pool.zig#L65"
-class MessagePool["MessagePool [struct]"] {
+class MessagePool["MessagePool [str]"] {
     +free_list: ?*Message
     +messages_max: usize
     +init(allocator, process_type) error[OutOfMemory]!MessagePool
@@ -827,7 +827,7 @@ link MessagePool "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/messa
 class `message_pool.zig`
 `message_pool.zig` <-- MessagePool
 link `message_pool.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/message_pool.zig"
-class Options["Options [struct]"] {
+class Options["Options [str]"] {
     +cluster: Cluster.Options
     +workload: StateMachine.Workload.Options
     +replica_crash_probability: f64
@@ -840,7 +840,7 @@ class Options["Options [struct]"] {
     +request_idle_off_probability: u8
 }
 link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/simulator.zig#L314"
-class Simulator["Simulator [struct]"] {
+class Simulator["Simulator [str]"] {
     +random: std.rand.Random
     +options: Options
     +cluster: *Cluster
@@ -880,7 +880,7 @@ class `simulator.zig` {
 }
 `simulator.zig` <-- Simulator
 link `simulator.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/simulator.zig"
-class Process["Process [union]"] {
+class Process["Process [uni]"] {
     -replica: u8
     -client: u128
 }
@@ -889,13 +889,13 @@ class `message_bus.zig` {
     -MessageBusType(process_type) type
 }
 link `message_bus.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/message_bus.zig"
-class BufferCompletion["BufferCompletion [struct]"] {
+class BufferCompletion["BufferCompletion [str]"] {
     -next: ?*BufferCompletion
     -buffer: [256]u8
     -completion: IO.Completion
 }
 link BufferCompletion "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/statsd.zig#L6"
-class StatsD["StatsD [struct]"] {
+class StatsD["StatsD [str]"] {
     +socket: std.os.socket_t
     +io: *IO
     +buffer_completions: []BufferCompletion
@@ -921,7 +921,7 @@ class `ring_buffer.zig` {
     -test_low_level_interface(Ring, ring) !void
 }
 link `ring_buffer.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/ring_buffer.zig"
-class Foo["Foo [struct]"] {
+class Foo["Foo [str]"] {
     -in: ?*T
     -out: ?*T
     -count: u64
@@ -940,22 +940,22 @@ class `fifo.zig` {
     +FIFO(T) type
 }
 link `fifo.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/fifo.zig"
-class CopyPrecision["CopyPrecision [enum]"] {
+class CopyPrecision["CopyPrecision [enu]"] {
     +exact
     +inexact
 }
 link CopyPrecision "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/stdx.zig#L51"
-class Cut["Cut [struct]"] {
+class Cut["Cut [str]"] {
     -prefix: []const u8
     -suffix: []const u8
 }
 link Cut "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/stdx.zig#L157"
-class TimeIt["TimeIt [struct]"] {
+class TimeIt["TimeIt [str]"] {
     -inner: std.time.Timer
     +lap(self, label) void
 }
 link TimeIt "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/stdx.zig#L208"
-class U["U [union]"] {
+class U["U [uni]"] {
     -a: u32
     -b: u128
     -c: void
@@ -992,7 +992,7 @@ class `stdx.zig` {
 `stdx.zig` <-- Cut
 `stdx.zig` <-- TimeIt
 link `stdx.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/stdx.zig"
-class BitSetConfig["BitSetConfig [struct]"] {
+class BitSetConfig["BitSetConfig [str]"] {
     -words: usize
     -run_length_e: usize
     -literals_length_e: usize
@@ -1004,7 +1004,7 @@ class `ewah_benchmark.zig` {
 }
 `ewah_benchmark.zig` <-- BitSetConfig
 link `ewah_benchmark.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/ewah_benchmark.zig"
-class Read["Read [struct]"] {
+class Read["Read [str]"] {
     +always_synchronous
     +always_asynchronous
     +completion: IO.Completion
@@ -1015,22 +1015,22 @@ class Read["Read [struct]"] {
     -target(read) []u8
 }
 link Read "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/storage.zig#L19"
-class Write["Write [struct]"] {
+class Write["Write [str]"] {
     +completion: IO.Completion
     +callback: *const fn (write: *Storage.Write)
     +buffer: []const u8
     +offset: u64
 }
 link Write "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/storage.zig#L64"
-class NextTick["NextTick [struct]"] {
+class NextTick["NextTick [str]"] {
     +next: ?*NextTick
     +source: NextTickSource
     +callback: *const fn (next_tick: *NextTick)
 }
 link NextTick "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/storage.zig#L71"
-class NextTickSource["NextTickSource [enum]"]
+class NextTickSource["NextTickSource [enu]"]
 link NextTickSource "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/storage.zig#L77"
-class Storage["Storage [struct]"] {
+class Storage["Storage [str]"] {
     +lsm
     +vsr
     +io: *IO
@@ -1061,21 +1061,21 @@ link Storage "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/storage.z
 class `storage.zig`
 `storage.zig` <-- Storage
 link `storage.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/storage.zig"
-class Report["Report [struct]"] {
+class Report["Report [str]"] {
     -checksum: [16]u8
     -bug: u8
     -seed: [8]u8
     -commit: [20]u8
 }
 link Report "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vopr.zig#L61"
-class Flags["Flags [struct]"] {
+class Flags["Flags [str]"] {
     -seed: ?u64
     -send_address: ?net.Address
     -build_mode: std.builtin.Mode
     -simulations: u32
 }
 link Flags "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vopr.zig#L68"
-class Bug["Bug [enum]"] {
+class Bug["Bug [enu]"] {
     -crash
     -liveness
     -correctness
@@ -1097,7 +1097,7 @@ class `vopr.zig` {
 `vopr.zig` <-- Flags
 `vopr.zig` <-- Bug
 link `vopr.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vopr.zig"
-class Benchmark["Benchmark [struct]"] {
+class Benchmark["Benchmark [str]"] {
     -io: *IO
     -message_pool: *MessagePool
     -client: *Client
@@ -1141,7 +1141,7 @@ class `benchmark.zig` {
 }
 `benchmark.zig` <-- Benchmark
 link `benchmark.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/benchmark.zig"
-class StateMachineConfig["StateMachineConfig [struct]"] {
+class StateMachineConfig["StateMachineConfig [str]"] {
     +message_body_size_max: comptime_int
     +lsm_batch_multiple: comptime_int
     +vsr_operations_reserved: u8
@@ -1150,24 +1150,24 @@ link StateMachineConfig "https://github.com/tigerbeetle/tigerbeetle/blob/main/sr
 class `constants.zig`
 `constants.zig` <-- StateMachineConfig
 link `constants.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/constants.zig"
-class StringContext["StringContext [struct]"] {
+class StringContext["StringContext [str]"] {
     +hash(self, s) u64
     +eql(self, a, b) bool
 }
 link StringContext "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/hash_map.zig#L79"
-class StringIndexContext["StringIndexContext [struct]"] {
+class StringIndexContext["StringIndexContext [str]"] {
     +bytes: *std.ArrayListUnmanaged(u8)
     +eql(self, a, b) bool
     +hash(self, x) u64
 }
 link StringIndexContext "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/hash_map.zig#L98"
-class StringIndexAdapter["StringIndexAdapter [struct]"] {
+class StringIndexAdapter["StringIndexAdapter [str]"] {
     +bytes: *std.ArrayListUnmanaged(u8)
     +eql(self, a_slice, b) bool
     +hash(self, adapted_key) u64
 }
 link StringIndexAdapter "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/hash_map.zig#L112"
-class AdaptedContext["AdaptedContext [struct]"] {
+class AdaptedContext["AdaptedContext [str]"] {
     -unmanaged: Unmanaged
     -allocator: Allocator
     -ctx: Context
@@ -1343,7 +1343,7 @@ class `hash_map.zig` {
 `hash_map.zig` <-- StringIndexContext
 `hash_map.zig` <-- StringIndexAdapter
 link `hash_map.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/hash_map.zig"
-class TestContext["TestContext [struct]"] {
+class TestContext["TestContext [str]"] {
     -storage: Storage
     -superblock: SuperBlock
     -grid: Grid
@@ -1352,7 +1352,7 @@ class TestContext["TestContext [struct]"] {
     -deinit(ctx, allocator) void
 }
 link TestContext "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine.zig#L1446"
-class TestAction["TestAction [union]"] {
+class TestAction["TestAction [uni]"] {
     -setup: struct
     -commit: TestContext.StateMachine.Operation
     -account: TestCreateAccount
@@ -1361,7 +1361,7 @@ class TestAction["TestAction [union]"] {
     -lookup_transfer: struct
 }
 link TestAction "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine.zig#L1510"
-class TestCreateAccount["TestCreateAccount [struct]"] {
+class TestCreateAccount["TestCreateAccount [str]"] {
     -id: u128
     -user_data: u128
     -@"0"
@@ -1385,7 +1385,7 @@ class TestCreateAccount["TestCreateAccount [struct]"] {
     -event(a) Account
 }
 link TestCreateAccount "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine.zig#L1542"
-class TestCreateTransfer["TestCreateTransfer [struct]"] {
+class TestCreateTransfer["TestCreateTransfer [str]"] {
     -id: u128
     -debit_account_id: u128
     -credit_account_id: u128

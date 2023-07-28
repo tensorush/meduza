@@ -15,7 +15,7 @@ title: Tigerbeetle database (tigerbeetle)
     }
 }%%
 classDiagram
-class Start["Start [struct]"] {
+class Start["Start [str]"] {
     +args_allocated: std.process.ArgIterator
     +addresses: []net.Address
     +cache_accounts: u32
@@ -26,7 +26,7 @@ class Start["Start [struct]"] {
     +path: [:0]const u8
 }
 link Start "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/cli.zig#L97"
-class Command["Command [union]"] {
+class Command["Command [uni]"] {
     +format: struct
     +start: Start
     +version: struct
@@ -50,7 +50,7 @@ class `tigerbeetle/cli.zig` {
 }
 `tigerbeetle/cli.zig` <-- Command
 link `tigerbeetle/cli.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/cli.zig"
-class Command["Command [struct]"] {
+class Command["Command [str]"] {
     -dir_fd: os.fd_t
     -fd: os.fd_t
     -io: IO

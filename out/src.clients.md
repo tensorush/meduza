@@ -17,7 +17,7 @@ title: Tigerbeetle database (clients)
 classDiagram
 class `clients/docs_samples.zig`
 link `clients/docs_samples.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_samples.zig"
-class Docs["Docs [struct]"] {
+class Docs["Docs [str]"] {
     +directory: String
     +name: String
     +markdown_name: String
@@ -69,7 +69,7 @@ class Docs["Docs [struct]"] {
     +test_main_suffix: Code
 }
 link Docs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_types.zig#L13"
-class Sample["Sample [struct]"] {
+class Sample["Sample [str]"] {
     +proper_name: String
     +directory: String
     +short_description: String
@@ -87,7 +87,7 @@ class `clients/run_with_tb.zig` {
     +main() !void
 }
 link `clients/run_with_tb.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/run_with_tb.zig"
-class MarkdownWriter["MarkdownWriter [struct]"] {
+class MarkdownWriter["MarkdownWriter [str]"] {
     -buf: *std.ArrayList(u8)
     -writer: std.ArrayList(u8)
     -init(buf) MarkdownWriter
@@ -101,7 +101,7 @@ class MarkdownWriter["MarkdownWriter [struct]"] {
     -save(mw, filename) !void
 }
 link MarkdownWriter "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_generate.zig#L22"
-class Generator["Generator [struct]"] {
+class Generator["Generator [str]"] {
     -arena: *std.heap.ArenaAllocator
     -language: Docs
     -test_file_name: []const u8
@@ -127,7 +127,7 @@ class `clients/docs_generate.zig` {
 `clients/docs_generate.zig` <-- MarkdownWriter
 `clients/docs_generate.zig` <-- Generator
 link `clients/docs_generate.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_generate.zig"
-class TmpDir["TmpDir [struct]"] {
+class TmpDir["TmpDir [str]"] {
     +dir: std.testing.TmpDir
     +path: []const u8
     +init(arena) !TmpDir

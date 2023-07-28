@@ -15,12 +15,12 @@ title: Tigerbeetle database (state_machine)
     }
 }%%
 classDiagram
-class InFlight["InFlight [union]"] {
+class InFlight["InFlight [uni]"] {
     -create_accounts: [accounts_batch_size_max]CreateAccountResultSet
     -create_transfers: [transfers_batch_size_max]CreateTransferResultSet
 }
 link InFlight "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine/auditor.zig#L29"
-class PendingTransfer["PendingTransfer [struct]"] {
+class PendingTransfer["PendingTransfer [str]"] {
     -client_index: usize
     -client_request: usize
     -amount: u64
@@ -28,12 +28,12 @@ class PendingTransfer["PendingTransfer [struct]"] {
     -credit_account_index: usize
 }
 link PendingTransfer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine/auditor.zig#L40"
-class PendingExpiry["PendingExpiry [struct]"] {
+class PendingExpiry["PendingExpiry [str]"] {
     -transfer: u128
     -timestamp: u64
 }
 link PendingExpiry "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine/auditor.zig#L46"
-class Options["Options [struct]"] {
+class Options["Options [str]"] {
     +accounts_max: usize
     +account_id_permutation: IdPermutation
     +client_count: usize
@@ -41,7 +41,7 @@ class Options["Options [struct]"] {
     +in_flight_max: usize
 }
 link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine/auditor.zig#L61"
-class AccountingAuditor["AccountingAuditor [struct]"] {
+class AccountingAuditor["AccountingAuditor [str]"] {
     +random: std.rand.Random
     +options: Options
     +timestamp: u64
@@ -79,20 +79,20 @@ class `state_machine/auditor.zig` {
 `state_machine/auditor.zig` <-- PendingExpiry
 `state_machine/auditor.zig` <-- AccountingAuditor
 link `state_machine/auditor.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine/auditor.zig"
-class TransferOutcome["TransferOutcome [enum]"] {
+class TransferOutcome["TransferOutcome [enu]"] {
     -success
     -failure
     -unknown
 }
 link TransferOutcome "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine/workload.zig#L34"
-class Method["Method [enum]"] {
+class Method["Method [enu]"] {
     -single_phase
     -pending
     -post_pending
     -void_pending
 }
 link Method "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine/workload.zig#L61"
-class TransferPlan["TransferPlan [struct]"] {
+class TransferPlan["TransferPlan [str]"] {
     -valid: bool
     -limit: bool
     -method: Method
@@ -100,12 +100,12 @@ class TransferPlan["TransferPlan [struct]"] {
 }
 TransferPlan <-- Method
 link TransferPlan "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine/workload.zig#L48"
-class TransferTemplate["TransferTemplate [struct]"] {
+class TransferTemplate["TransferTemplate [str]"] {
     -ledger: u32
     -result: accounting_auditor.CreateTransferResultSet
 }
 link TransferTemplate "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine/workload.zig#L78"
-class TransferBatch["TransferBatch [struct]"] {
+class TransferBatch["TransferBatch [str]"] {
     -min: usize
     -max: usize
     -compare(_, a, b) std.math.Order

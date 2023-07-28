@@ -15,11 +15,11 @@ title: Tigerbeetle database (clients/node/src)
     }
 }%%
 classDiagram
-class TranslationError["TranslationError [error]"] {
+class TranslationError["TranslationError [err]"] {
     -ExceptionThrown
 }
 link TranslationError "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/translate.zig#L21"
-class UserData["UserData [struct]"] {
+class UserData["UserData [str]"] {
     +env: c.napi_env
     +callback_reference: c.napi_ref
 }
@@ -65,7 +65,7 @@ class `clients/node/src/translate.zig` {
 link `clients/node/src/translate.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/translate.zig"
 class `clients/node/src/c.zig`
 link `clients/node/src/c.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/c.zig"
-class Globals["Globals [struct]"] {
+class Globals["Globals [str]"] {
     -allocator: std.mem.Allocator
     -io: IO
     -napi_undefined: c.napi_value
@@ -74,7 +74,7 @@ class Globals["Globals [struct]"] {
     +destroy(env, data, hint) callconv(.C) void
 }
 link Globals "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/node.zig#L70"
-class Context["Context [struct]"] {
+class Context["Context [str]"] {
     -io: *IO
     -addresses: []std.net.Address
     -client: Client

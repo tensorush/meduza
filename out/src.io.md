@@ -15,7 +15,7 @@ title: Tigerbeetle database (io)
     }
 }%%
 classDiagram
-class Completion["Completion [struct]"] {
+class Completion["Completion [str]"] {
     +io: *IO
     +result: i32
     +next: ?*Completion
@@ -26,7 +26,7 @@ class Completion["Completion [struct]"] {
     -complete(completion, callback_tracer_slot) void
 }
 link Completion "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/linux.zig#L244"
-class Operation["Operation [union]"] {
+class Operation["Operation [uni]"] {
     -accept: struct
     -close: struct
     -connect: struct
@@ -37,7 +37,7 @@ class Operation["Operation [union]"] {
     -write: struct
 }
 link Operation "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/linux.zig#L546"
-class IO["IO [struct]"] {
+class IO["IO [str]"] {
     +ring: IO_Uring
     +unqueued: FIFO(Completion)
     +completed: FIFO(Completion)
@@ -74,14 +74,14 @@ link IO "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/linux.zig#L
 class `io/linux.zig`
 `io/linux.zig` <-- IO
 link `io/linux.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/linux.zig"
-class Completion["Completion [struct]"] {
+class Completion["Completion [str]"] {
     +next: ?*Completion
     +context: ?*anyopaque
     +callback: *const fn (*IO, *Completion)
     +operation: Operation
 }
 link Completion "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/darwin.zig#L190"
-class Operation["Operation [union]"] {
+class Operation["Operation [uni]"] {
     -accept: struct
     -close: struct
     -connect: struct
@@ -92,7 +92,7 @@ class Operation["Operation [union]"] {
     -write: struct
 }
 link Operation "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/darwin.zig#L197"
-class IO["IO [struct]"] {
+class IO["IO [str]"] {
     +kq: os.fd_t
     +time: Time
     +io_inflight: usize
@@ -127,19 +127,19 @@ link IO "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/darwin.zig#
 class `io/darwin.zig`
 `io/darwin.zig` <-- IO
 link `io/darwin.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/darwin.zig"
-class FlushMode["FlushMode [enum]"] {
+class FlushMode["FlushMode [enu]"] {
     -blocking
     -non_blocking
 }
 link FlushMode "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/windows.zig#L59"
-class Completion["Completion [struct]"] {
+class Completion["Completion [str]"] {
     +next: ?*Completion
     +context: ?*anyopaque
     +callback: *const fn (Context)
     +operation: Operation
 }
 link Completion "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/windows.zig#L160"
-class IO["IO [struct]"] {
+class IO["IO [str]"] {
     +iocp: os.windows.HANDLE
     +timer: Time
     +io_pending: usize
@@ -175,23 +175,23 @@ class `io/windows.zig` {
 }
 `io/windows.zig` <-- IO
 link `io/windows.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/windows.zig"
-class Socket["Socket [struct]"] {
+class Socket["Socket [str]"] {
     -fd: os.socket_t
     -completion: IO.Completion
 }
 link Socket "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/benchmark.zig#L104"
-class Pipe["Pipe [struct]"] {
+class Pipe["Pipe [str]"] {
     -socket: Socket
     -buffer: []u8
     -transferred: usize
 }
 link Pipe "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/benchmark.zig#L108"
-class TransferType["TransferType [enum]"] {
+class TransferType["TransferType [enu]"] {
     -read
     -write
 }
 link TransferType "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/benchmark.zig#L143"
-class Context["Context [struct]"] {
+class Context["Context [str]"] {
     -io: IO
     -tx: Pipe
     -rx: Pipe

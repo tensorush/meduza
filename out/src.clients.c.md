@@ -15,7 +15,7 @@ title: Tigerbeetle database (clients/c)
     }
 }%%
 classDiagram
-class tb_status_t["tb_status_t [enum]"] {
+class tb_status_t["tb_status_t [enu]"] {
     +success
     +unexpected
     +out_of_memory
@@ -26,7 +26,7 @@ class tb_status_t["tb_status_t [enum]"] {
     +network_subsystem
 }
 link tb_status_t "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/tb_client.zig#L9"
-class ffi["ffi [struct]"] {
+class ffi["ffi [str]"] {
     +c_init(out_client, cluster_id, addresses_ptr, addresses_len, packets_count, on_completion_ctx, on_completion_fn) callconv(.C) tb_status_t
     +c_init_echo(out_client, cluster_id, addresses_ptr, addresses_len, packets_count, on_completion_ctx, on_completion_fn) callconv(.C) tb_status_t
 }
@@ -60,7 +60,7 @@ class `clients/c/tb_client_header.zig` {
     +main() !void
 }
 link `clients/c/tb_client_header.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/tb_client_header.zig"
-class Completion["Completion [struct]"] {
+class Completion["Completion [str]"] {
     -pending: usize
     -mutex: Mutex
     -cond: Condition

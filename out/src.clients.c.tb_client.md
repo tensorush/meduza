@@ -15,7 +15,7 @@ title: Tigerbeetle database (clients/c/tb_client)
     }
 }%%
 classDiagram
-class Signal["Signal [struct]"] {
+class Signal["Signal [str]"] {
     +io: *IO
     +server_socket: os.socket_t
     +accept_socket: os.socket_t
@@ -46,28 +46,28 @@ class `clients/c/tb_client/thread.zig` {
     +ThreadType(Context) type
 }
 link `clients/c/tb_client/thread.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/tb_client/thread.zig"
-class Status["Status [enum]"] {
+class Status["Status [enu]"] {
     +ok
     +too_much_data
     +invalid_operation
     +invalid_data_size
 }
 link Status "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/tb_client/packet.zig#L13"
-class SubmissionStack["SubmissionStack [struct]"] {
+class SubmissionStack["SubmissionStack [str]"] {
     +pushed: Atomic(?*Packet)
     +popped: ?*Packet
     +push(self, packet) void
     +pop(self) ?*Packet
 }
 link SubmissionStack "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/tb_client/packet.zig#L22"
-class ConcurrentStack["ConcurrentStack [struct]"] {
+class ConcurrentStack["ConcurrentStack [str]"] {
     +mutex: std.Thread.Mutex
     +head: ?*Packet
     +push(self, packet) void
     +pop(self) ?*Packet
 }
 link ConcurrentStack "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/tb_client/packet.zig#L49"
-class Packet["Packet [struct]"] {
+class Packet["Packet [str]"] {
     +next: ?*Packet
     +user_data: ?*anyopaque
     +operation: u8
@@ -82,14 +82,14 @@ link Packet "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/
 class `clients/c/tb_client/packet.zig`
 `clients/c/tb_client/packet.zig` <-- Packet
 link `clients/c/tb_client/packet.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/tb_client/packet.zig"
-class ContextImplementation["ContextImplementation [struct]"] {
+class ContextImplementation["ContextImplementation [str]"] {
     +acquire_packet_fn: *const fn (*ContextImplementation, out: *?*Packet)
     +release_packet_fn: *const fn (*ContextImplementation, *Packet)
     +submit_fn: *const fn (*ContextImplementation, *Packet)
     +deinit_fn: *const fn (*ContextImplementation)
 }
 link ContextImplementation "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/tb_client/context.zig#L29"
-class PacketAcquireStatus["PacketAcquireStatus [enum]"] {
+class PacketAcquireStatus["PacketAcquireStatus [enu]"] {
     +ok
     +concurrency_max_exceeded
     +shutdown

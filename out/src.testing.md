@@ -15,7 +15,7 @@ title: Tigerbeetle database (testing)
     }
 }%%
 classDiagram
-class InMemoryAOF["InMemoryAOF [struct]"] {
+class InMemoryAOF["InMemoryAOF [str]"] {
     -backing_store: []align(constants.sector_size)
     -index: usize
     +seekTo(self, to) !void
@@ -23,7 +23,7 @@ class InMemoryAOF["InMemoryAOF [struct]"] {
     +close() void
 }
 link InMemoryAOF "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/aof.zig#L15"
-class AOF["AOF [struct]"] {
+class AOF["AOF [str]"] {
     +index: usize
     +backing_store: []align(constants.sector_size)
     +validation_target: *AOFEntry
@@ -40,14 +40,14 @@ class `testing/aof.zig`
 `testing/aof.zig` <-- InMemoryAOF
 `testing/aof.zig` <-- AOF
 link `testing/aof.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/aof.zig"
-class OffsetType["OffsetType [enum]"] {
+class OffsetType["OffsetType [enu]"] {
     +linear
     +periodic
     +step
     +non_ideal
 }
 link OffsetType "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/time.zig#L4"
-class Time["Time [struct]"] {
+class Time["Time [str]"] {
     +resolution: u64
     +offset_type: OffsetType
     +offset_coefficient_A: i64
@@ -66,7 +66,7 @@ class `testing/time.zig`
 `testing/time.zig` <-- OffsetType
 `testing/time.zig` <-- Time
 link `testing/time.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/time.zig"
-class Case["Case [struct]"] {
+class Case["Case [str]"] {
     +hash: u64
     +b64: []const u8
 }
@@ -83,7 +83,7 @@ class `testing/hash_log.zig` {
     +emit_autohash(hashable, strategy) void
 }
 link `testing/hash_log.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/hash_log.zig"
-class FuzzArgs["FuzzArgs [struct]"] {
+class FuzzArgs["FuzzArgs [str]"] {
     +seed: u64
     +events_max: ?usize
 }
@@ -97,12 +97,12 @@ class `testing/fuzz.zig` {
 }
 `testing/fuzz.zig` <-- FuzzArgs
 link `testing/fuzz.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/fuzz.zig"
-class ReplicaHealth["ReplicaHealth [enum]"] {
+class ReplicaHealth["ReplicaHealth [enu]"] {
     +up
     +down
 }
 link ReplicaHealth "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster.zig#L29"
-class Failure["Failure [enum]"] {
+class Failure["Failure [enu]"] {
     +crash
     +liveness
     +correctness
@@ -130,14 +130,14 @@ class `testing/table.zig` {
     -test_parse(Row, rows_expect, string) !void
 }
 link `testing/table.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/table.zig"
-class PendingReply["PendingReply [struct]"] {
+class PendingReply["PendingReply [str]"] {
     -client_index: usize
     -request: *Message
     -reply: *Message
     -compare(context, a, b) std.math.Order
 }
 link PendingReply "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/reply_sequence.zig#L18"
-class ReplySequence["ReplySequence [struct]"] {
+class ReplySequence["ReplySequence [str]"] {
     +message_pool: MessagePool
     +stalled_op: u64
     +stalled_queue: PendingReplyQueue
@@ -155,7 +155,7 @@ class `testing/reply_sequence.zig`
 `testing/reply_sequence.zig` <-- PendingReply
 `testing/reply_sequence.zig` <-- ReplySequence
 link `testing/reply_sequence.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/reply_sequence.zig"
-class PacketSimulatorOptions["PacketSimulatorOptions [struct]"] {
+class PacketSimulatorOptions["PacketSimulatorOptions [str]"] {
     +node_count: u8
     +client_count: u8
     +seed: u64
@@ -175,19 +175,19 @@ class PacketSimulatorOptions["PacketSimulatorOptions [struct]"] {
     +path_clog_probability: u8
 }
 link PacketSimulatorOptions "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/packet_simulator.zig#L10"
-class Path["Path [struct]"] {
+class Path["Path [str]"] {
     +source: u8
     +target: u8
 }
 link Path "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/packet_simulator.zig#L49"
-class PartitionMode["PartitionMode [enum]"] {
+class PartitionMode["PartitionMode [enu]"] {
     +none
     +uniform_size
     +uniform_partition
     +isolate_single
 }
 link PartitionMode "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/packet_simulator.zig#L61"
-class PartitionSymmetry["PartitionSymmetry [enum]"] {
+class PartitionSymmetry["PartitionSymmetry [enu]"] {
     +symmetric
     +asymmetric
 }
@@ -200,7 +200,7 @@ class `testing/packet_simulator.zig` {
 `testing/packet_simulator.zig` <-- PartitionMode
 `testing/packet_simulator.zig` <-- PartitionSymmetry
 link `testing/packet_simulator.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/packet_simulator.zig"
-class Options["Options [struct]"] {
+class Options["Options [str]"] {
     +seed: u64
     +replica_index: ?u8
     +read_latency_min: u64
@@ -213,7 +213,7 @@ class Options["Options [struct]"] {
     +fault_atlas: ?*const ClusterFaultAtlas
 }
 link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L56"
-class Read["Read [struct]"] {
+class Read["Read [str]"] {
     +always_synchronous
     +always_asynchronous
     +callback: *const fn (read: *Storage.Read)
@@ -225,7 +225,7 @@ class Read["Read [struct]"] {
     -less_than(context, a, b) math.Order
 }
 link Read "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L94"
-class Write["Write [struct]"] {
+class Write["Write [str]"] {
     +callback: *const fn (write: *Storage.Write)
     +buffer: []const u8
     +zone: vsr.Zone
@@ -235,20 +235,20 @@ class Write["Write [struct]"] {
     -less_than(context, a, b) math.Order
 }
 link Write "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L111"
-class NextTick["NextTick [struct]"] {
+class NextTick["NextTick [str]"] {
     +next: ?*NextTick
     +source: NextTickSource
     +callback: *const fn (next_tick: *NextTick)
 }
 link NextTick "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L128"
-class NextTickSource["NextTickSource [enum]"]
+class NextTickSource["NextTickSource [enu]"]
 link NextTickSource "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L134"
-class MessageRaw["MessageRaw [struct]"] {
+class MessageRaw["MessageRaw [str]"] {
     -header: vsr.Header
     -body: [constants.message_size_max - @sizeOf(vsr.Header)
 }
 link MessageRaw "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L524"
-class Storage["Storage [struct]"] {
+class Storage["Storage [str]"] {
     +lsm
     +vsr
     +allocator: mem.Allocator
@@ -296,7 +296,7 @@ Storage <-- NextTick
 Storage <-- NextTickSource
 Storage <-- MessageRaw
 link Storage "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L54"
-class Area["Area [union]"] {
+class Area["Area [uni]"] {
     +zone: superblock.SuperBlockZone
     +copy: u8
     +superblock: struct
@@ -311,7 +311,7 @@ class Area["Area [union]"] {
     -sectors(area) SectorRange
 }
 link Area "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L617"
-class SectorRange["SectorRange [struct]"] {
+class SectorRange["SectorRange [str]"] {
     -min: usize
     -max: usize
     -from_zone(zone, offset_in_zone, size) SectorRange
@@ -321,7 +321,7 @@ class SectorRange["SectorRange [struct]"] {
     -intersect(a, b) ?SectorRange
 }
 link SectorRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L655"
-class Options["Options [struct]"] {
+class Options["Options [str]"] {
     +faulty_superblock: bool
     +faulty_wal_headers: bool
     +faulty_wal_prepares: bool
@@ -329,7 +329,7 @@ class Options["Options [struct]"] {
     +faulty_grid: bool
 }
 link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L702"
-class ClusterFaultAtlas["ClusterFaultAtlas [struct]"] {
+class ClusterFaultAtlas["ClusterFaultAtlas [str]"] {
     +options: Options
     +faulty_superblock_areas: FaultySuperBlockAreas
     +faulty_wal_header_sectors: [constants.members_max]FaultyWALHeaders
@@ -345,7 +345,7 @@ class ClusterFaultAtlas["ClusterFaultAtlas [struct]"] {
 }
 ClusterFaultAtlas <-- Options
 link ClusterFaultAtlas "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L701"
-class StackTrace["StackTrace [struct]"] {
+class StackTrace["StackTrace [str]"] {
     -addresses: [64]usize
     -index: usize
     -capture() StackTrace
@@ -366,7 +366,7 @@ class `testing/state_machine.zig` {
     -WorkloadType(StateMachine) type
 }
 link `testing/state_machine.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/state_machine.zig"
-class IdPermutation["IdPermutation [union]"] {
+class IdPermutation["IdPermutation [uni]"] {
     +identity: void
     +inversion: void
     +zigzag: void
@@ -382,7 +382,7 @@ class `testing/id.zig` {
 }
 `testing/id.zig` <-- IdPermutation
 link `testing/id.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/id.zig"
-class Snap["Snap [struct]"] {
+class Snap["Snap [str]"] {
     +location: SourceLocation
     +text: []const u8
     +update_this: bool
@@ -394,7 +394,7 @@ class Snap["Snap [struct]"] {
     +diff(snapshot, got) !void
 }
 link Snap "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/snaptest.zig#L62"
-class Range["Range [struct]"] {
+class Range["Range [str]"] {
     -start: usize
     -end: usize
 }

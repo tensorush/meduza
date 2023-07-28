@@ -51,7 +51,7 @@ class `clients/java/src/jni_tests.zig` {
     test "JNI: primitive arrays"()
 }
 link `clients/java/src/jni_tests.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni_tests.zig"
-class JNIResultType["JNIResultType [enum]"] {
+class JNIResultType["JNIResultType [enu]"] {
     +ok
     +unknown
     +thread_detached
@@ -62,12 +62,12 @@ class JNIResultType["JNIResultType [enum]"] {
     +_
 }
 link JNIResultType "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni.zig#L31"
-class JBoolean["JBoolean [enum]"] {
+class JBoolean["JBoolean [enu]"] {
     +jni_true
     +jni_false
 }
 link JBoolean "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni.zig#L60"
-class JValue["JValue [union]"] {
+class JValue["JValue [uni]"] {
     +object: JObject
     +boolean: JBoolean
     +byte: JByte
@@ -80,13 +80,13 @@ class JValue["JValue [union]"] {
     +to_jvalue(value) JValue
 }
 link JValue "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni.zig#L97"
-class JArrayReleaseMode["JArrayReleaseMode [enum]"] {
+class JArrayReleaseMode["JArrayReleaseMode [enu]"] {
     +default
     +commit
     +abort
 }
 link JArrayReleaseMode "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni.zig#L126"
-class JObjectRefType["JObjectRefType [enum]"] {
+class JObjectRefType["JObjectRefType [enu]"] {
     +invalid
     +local
     +global
@@ -94,13 +94,13 @@ class JObjectRefType["JObjectRefType [enum]"] {
     +_
 }
 link JObjectRefType "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni.zig#L138"
-class JNINativeMethod["JNINativeMethod [struct]"] {
+class JNINativeMethod["JNINativeMethod [str]"] {
     +name: [*:0]const u8
     +signature: [*:0]const u8
     +fn_ptr: ?*anyopaque
 }
 link JNINativeMethod "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni.zig#L147"
-class FunctionTable["FunctionTable [enum]"] {
+class FunctionTable["FunctionTable [enu]"] {
     -get_version
     -define_class
     -find_class
@@ -271,7 +271,7 @@ class FunctionTable["FunctionTable [enum]"] {
     -get_module
 }
 link FunctionTable "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni.zig#L156"
-class JNIEnv["JNIEnv [opaque]"] {
+class JNIEnv["JNIEnv [opa]"] {
     +get_version(env) JInt
     +define_class(env, name, loader, buf, buf_len) JClass
     +find_class(env, name) JClass
@@ -443,25 +443,25 @@ class JNIEnv["JNIEnv [opaque]"] {
 }
 JNIEnv <-- FunctionTable
 link JNIEnv "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni.zig#L153"
-class JavaVMOption["JavaVMOption [struct]"] {
+class JavaVMOption["JavaVMOption [str]"] {
     +option_string: [*:0]const u8
     +extra_info: ?*anyopaque
 }
 link JavaVMOption "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni.zig#L3072"
-class JavaVMInitArgs["JavaVMInitArgs [struct]"] {
+class JavaVMInitArgs["JavaVMInitArgs [str]"] {
     +version: JInt
     +options_len: JInt
     +options: ?[*]JavaVMOption
     +ignore_unrecognized: JBoolean
 }
 link JavaVMInitArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni.zig#L3079"
-class JavaVMAttachArgs["JavaVMAttachArgs [struct]"] {
+class JavaVMAttachArgs["JavaVMAttachArgs [str]"] {
     +version: JInt
     +name: [*:0]const u8
     +group: JObject
 }
 link JavaVMAttachArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni.zig#L3087"
-class FunctionTable["FunctionTable [enum]"] {
+class FunctionTable["FunctionTable [enu]"] {
     -destroy_java_vm
     -attach_current_thread
     -detach_current_thread
@@ -469,7 +469,7 @@ class FunctionTable["FunctionTable [enum]"] {
     -attach_current_thread_as_daemon
 }
 link FunctionTable "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni.zig#L3098"
-class JavaVM["JavaVM [opaque]"] {
+class JavaVM["JavaVM [opa]"] {
     +destroy_java_vm(vm) JNIResultType
     +attach_current_thread(vm, env, args) JNIResultType
     +detach_current_thread(vm) JNIResultType
@@ -493,12 +493,12 @@ class `clients/java/src/jni.zig` {
 `clients/java/src/jni.zig` <-- JavaVMAttachArgs
 `clients/java/src/jni.zig` <-- JavaVM
 link `clients/java/src/jni.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni.zig"
-class Context["Context [struct]"] {
+class Context["Context [str]"] {
     -jvm: *jni.JavaVM
     -client: tb.tb_client_t
 }
 link Context "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/client.zig#L27"
-class NativeClient["NativeClient [struct]"] {
+class NativeClient["NativeClient [str]"] {
     -on_load(vm) jni.JInt
     -on_unload(vm) void
     -client_init(echo_client, env, cluster_id, addresses_obj, max_concurrency) ?*Context
@@ -507,7 +507,7 @@ class NativeClient["NativeClient [struct]"] {
     -on_completion(context_ptr, client, packet, result_ptr, result_len) callconv(.C) void
 }
 link NativeClient "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/client.zig#L33"
-class Exports["Exports [struct]"] {
+class Exports["Exports [str]"] {
     -on_load(vm) callconv(jni.JNICALL) jni.JInt
     -on_unload(vm) callconv(jni.JNICALL) void
     -client_init(env, class, cluster_id, addresses, max_concurrency) callconv(jni.JNICALL) jni.JLong
@@ -516,7 +516,7 @@ class Exports["Exports [struct]"] {
     -submit(env, class, context_handle, request_obj) callconv(jni.JNICALL) jni.JInt
 }
 link Exports "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/client.zig#L185"
-class ReflectionHelper["ReflectionHelper [struct]"] {
+class ReflectionHelper["ReflectionHelper [str]"] {
     +load(env) void
     +unload(env) void
     +initialization_exception_throw(env, status) void
@@ -528,7 +528,7 @@ class ReflectionHelper["ReflectionHelper [struct]"] {
 }
 ReflectionHelper <-- Exports
 link ReflectionHelper "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/client.zig#L268"
-class JNIHelper["JNIHelper [struct]"] {
+class JNIHelper["JNIHelper [str]"] {
     +get_env(vm) *jni.JNIEnv
     +attach_current_thread(jvm) *jni.JNIEnv
     +get_java_vm(env) *jni.JavaVM
