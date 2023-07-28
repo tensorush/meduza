@@ -55,7 +55,7 @@ const Func = struct {
     rt_end: std.zig.Ast.ByteOffset,
     is_pub: bool,
 
-    inline fn print(self: Func, src: []const u8, writer: anytype) (@TypeOf(writer).Error)!void {
+    inline fn print(self: Func, src: []const u8, writer: anytype) @TypeOf(writer).Error!void {
         try writer.writeAll(INDENTATION_LEVEL_1[0..]);
 
         const fn_proto_name = src[self.args.get(0).start..self.args.get(0).end];
@@ -94,7 +94,7 @@ const Decl = struct {
         tst,
     };
 
-    inline fn print(self: Decl, is_pub: bool, src: []const u8, writer: anytype) (@TypeOf(writer).Error)!void {
+    inline fn print(self: Decl, is_pub: bool, src: []const u8, writer: anytype) @TypeOf(writer).Error!void {
         try writer.writeAll(INDENTATION_LEVEL_1[0..]);
 
         switch (self.tag) {
