@@ -1,6 +1,6 @@
 .{
     .name = "meduza",
-    .version = "1.6.1",
+    .version = "1.6.2",
     .dependencies = .{
         .clap = .{
             .url = "https://github.com/Hejsil/zig-clap/archive/bdb5853.tar.gz",

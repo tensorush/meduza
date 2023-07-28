@@ -17,9 +17,7 @@ const PARSERS = .{
     .STR = clap.parsers.string,
 };
 
-const Error = meduza.Error || std.process.ArgIterator.InitError;
-
-pub fn main() Error!void {
+pub fn main() anyerror!void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer if (gpa.deinit() == .leak) {
         @panic("PANIC: Memory leak has occurred!");
@@ -29,7 +27,11 @@ pub fn main() Error!void {
     defer arena.deinit();
     var allocator = arena.allocator();
 
-    var res = clap.parse(clap.Help, &PARAMS, PARSERS, .{}) catch unreachable;
+    var diag = clap.Diagnostic{};
+    var res = clap.parse(clap.Help, &PARAMS, PARSERS, .{ .diagnostic = &diag }) catch |err| {
+        diag.report(std.io.getStdErr().writer(), err) catch {};
+        return err;
+    };
     defer res.deinit();
 
     var remote_src_dir_path: []const u8 = "https://github.com/tensorush/meduza/blob/main/src";

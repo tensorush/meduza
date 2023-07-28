@@ -1,8 +1,6 @@
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
-    const root_source_file = std.Build.FileSource.relative("src/main.zig");
-
     // Dependencies
     const clap_dep = b.dependency("clap", .{});
     const clap_mod = clap_dep.module("clap");
@@ -12,10 +10,10 @@ pub fn build(b: *std.Build) void {
 
     const meduza = b.addExecutable(.{
         .name = "meduza",
-        .root_source_file = root_source_file,
+        .root_source_file = std.Build.FileSource.relative("src/main.zig"),
         .target = b.standardTargetOptions(.{}),
         .optimize = b.standardOptimizeOption(.{}),
-        .version = .{ .major = 1, .minor = 6, .patch = 1 },
+        .version = .{ .major = 1, .minor = 6, .patch = 2 },
     });
     meduza.addModule("clap", clap_mod);
     b.installArtifact(meduza);
@@ -32,7 +30,7 @@ pub fn build(b: *std.Build) void {
     const lints_step = b.step("lint", "Run lints");
 
     const lints = b.addFmt(.{
-        .paths = &[_][]const u8{ "src", "build.zig" },
+        .paths = &.{ "src", "build.zig" },
         .check = true,
     });
 
