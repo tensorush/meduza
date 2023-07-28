@@ -693,7 +693,7 @@ inline fn printDecls(
     if (decls.len > 0 or funcs.len > 0) {
         try writer.writeAll(" {\n");
 
-        // Print nested container simple declarations
+        // Print simple declarations
         for (decls.constSlice()) |decl| {
             try decl.print(is_pub, src, writer);
         }
@@ -702,7 +702,7 @@ inline fn printDecls(
             try decls.resize(0);
         }
 
-        // Print nested container function declarations
+        // Print function declarations
         for (funcs.constSlice()) |func| {
             try func.print(src, writer);
         }
