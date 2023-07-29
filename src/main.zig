@@ -8,7 +8,8 @@ const PARAMS = clap.parseParamsComptime(
     \\-t, --title <STR>    Title of the Zig codebase.
     \\-o, --out <STR>      Output directory path.
     \\-e, --ext <EXT>      Output file extension.
-    \\-h, --help           Help menu.
+    \\-i, --info           Log info-level tips.
+    \\-h, --help           Print help menu.
     \\
 );
 
@@ -39,6 +40,7 @@ pub fn main() anyerror!void {
     var local_src_dir_path: []const u8 = "src";
     var out_dir_path: []const u8 = "out";
     var extension = meduza.Ext.md;
+    var do_info_log = false;
 
     if (res.args.remote) |remote| {
         remote_src_dir_path = remote;
@@ -60,9 +62,13 @@ pub fn main() anyerror!void {
         extension = ext;
     }
 
+    if (res.args.info != 0) {
+        do_info_log = true;
+    }
+
     if (res.args.help != 0) {
         return clap.help(std.io.getStdErr().writer(), clap.Help, &PARAMS, .{});
     }
 
-    try meduza.generate(allocator, remote_src_dir_path, local_src_dir_path, codebase_title, out_dir_path, extension);
+    try meduza.generate(allocator, remote_src_dir_path, local_src_dir_path, codebase_title, out_dir_path, extension, do_info_log);
 }

@@ -115,6 +115,7 @@ pub fn generate(
     codebase_title: []const u8,
     out_dir_path: []const u8,
     extension: Ext,
+    do_info_log: bool,
 ) Error!void {
     const cur_dir = std.fs.cwd();
 
@@ -307,14 +308,16 @@ pub fn generate(
                         switch (byte.*) {
                             // Skip multi-line return type declaration expressions
                             '\n' => {
-                                var line_num: u32 = 2;
-                                for (src[0..j]) |b| {
-                                    if (b == '\n') {
-                                        line_num += 1;
-                                    }
-                                }
-                                log.info("  - Consider making a single line or referencing a type declaration instead: {s}/{s}#L{d}\"", .{ remote_src_dir_path, entry.path, line_num });
                                 rt_end = @intCast(j - 2);
+                                if (do_info_log) {
+                                    var line_num: u32 = 2;
+                                    for (src[0..j]) |b| {
+                                        if (b == '\n') {
+                                            line_num += 1;
+                                        }
+                                    }
+                                    log.info("  - Consider making a single line or referencing a type declaration instead: {s}/{s}#L{d}\"", .{ remote_src_dir_path, entry.path, line_num });
+                                }
                                 break;
                             },
                             // Change left brace to left bracket for Mermaid to render correctly

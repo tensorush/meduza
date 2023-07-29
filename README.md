@@ -54,7 +54,7 @@
 
 - Generate one diagram for each of your codebase's source directories.
 
-- Learn how to improve code readability for your codebase from logged tips.
+- Learn how to improve code readability from logged tips (enable with `-i`).
 
 - Convert `.md` or `.mmd` diagram to `.svg` with Mermaid CLI ([see CD pipeline](https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml#L52)).
 

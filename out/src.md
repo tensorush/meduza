@@ -76,13 +76,12 @@ class CliArgs["CliArgs [uni]"] {
     -bytes: u32
     -memcpy: struct
     -funcsize
-    -parse(arena) !CliArgs
 }
-link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/copyhound.zig#L41"
+link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/copyhound.zig#L40"
 class T["T [str]"] {
     -check(line, want) !void
 }
-link T "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/copyhound.zig#L214"
+link T "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/copyhound.zig#L170"
 class `copyhound.zig` {
     test "extract_function_name"()
     test "extract_memcpy_size"()
@@ -839,7 +838,7 @@ class Options["Options [str]"] {
     +request_idle_on_probability: u8
     +request_idle_off_probability: u8
 }
-link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/simulator.zig#L314"
+link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/simulator.zig#L313"
 class Simulator["Simulator [str]"] {
     +random: std.rand.Random
     +options: Options
@@ -866,7 +865,7 @@ class Simulator["Simulator [str]"] {
     -restart_replica(simulator, replica_index, fault) void
 }
 Simulator <-- Options
-link Simulator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/simulator.zig#L313"
+link Simulator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/simulator.zig#L312"
 class `simulator.zig` {
     +main() !void
     -fatal(failure, fmt_string, args) noreturn
@@ -921,6 +920,18 @@ class `ring_buffer.zig` {
     -test_low_level_interface(Ring, ring) !void
 }
 link `ring_buffer.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/ring_buffer.zig"
+class `flags.zig` {
+    test field_to_flag()
+    +fatal(fmt_string, args) noreturn
+    +parse_commands(args, Commands) Commands
+    +parse_flags(args, Flags) Flags
+    -parse_flag(T, flag, arg) T
+    -parse_flag_value(flag, arg) [:0]const u8
+    -parse_flag_value_int(T, flag, value) T
+    -field_to_flag(field) []const u8
+    -default_value(field) ?field.field_type
+}
+link `flags.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/flags.zig"
 class Foo["Foo [str]"] {
     -in: ?*T
     -out: ?*T
@@ -1097,25 +1108,34 @@ class `vopr.zig` {
 `vopr.zig` <-- Flags
 `vopr.zig` <-- Bug
 link `vopr.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vopr.zig"
+class CliArgs["CliArgs [str]"] {
+    -account_count: usize
+    -transfer_count: usize
+    -transfer_count_per_second: usize
+    -print_batch_timings: bool
+    -enable_statsd: bool
+    -addresses: []const u8
+}
+link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/benchmark.zig#L56"
 class Benchmark["Benchmark [str]"] {
     -io: *IO
     -message_pool: *MessagePool
     -client: *Client
-    -batch_accounts: std.ArrayList(tb.Account)
+    -batch_accounts: std.ArrayListUnmanaged(tb.Account)
     -account_count: usize
     -account_index: usize
     -rng: std.rand.DefaultPrng
     -timer: std.time.Timer
-    -batch_latency_ns: std.ArrayList(u64)
-    -transfer_latency_ns: std.ArrayList(u64)
-    -batch_transfers: std.ArrayList(tb.Transfer)
+    -batch_latency_ns: std.ArrayListUnmanaged(u64)
+    -transfer_latency_ns: std.ArrayListUnmanaged(u64)
+    -batch_transfers: std.ArrayListUnmanaged(tb.Transfer)
     -batch_start_ns: usize
     -transfers_sent: usize
     -tranfer_index: usize
     -transfer_count: usize
     -transfer_count_per_second: usize
     -transfer_arrival_rate_ns: usize
-    -transfer_start_ns: std.ArrayList(u64)
+    -transfer_start_ns: std.ArrayListUnmanaged(u64)
     -batch_index: usize
     -transfer_index: usize
     -transfer_next_arrival_ns: usize
@@ -1131,7 +1151,7 @@ class Benchmark["Benchmark [str]"] {
     -send(b, callback, operation, payload) void
     -send_complete(user_data, operation, result) void
 }
-link Benchmark "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/benchmark.zig#L223"
+link Benchmark "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/benchmark.zig#L229"
 class `benchmark.zig` {
     +main() !void
     -parse_arg_addresses(allocator, args, arg, arg_name, arg_value) !bool
@@ -1139,6 +1159,7 @@ class `benchmark.zig` {
     -parse_arg_bool(args, arg, arg_name, arg_value) !bool
     -print_deciles(stdout, label, latencies) void
 }
+`benchmark.zig` <-- CliArgs
 `benchmark.zig` <-- Benchmark
 link `benchmark.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/benchmark.zig"
 class StateMachineConfig["StateMachineConfig [str]"] {
