@@ -55,7 +55,7 @@ const Func = struct {
     rt_end: std.zig.Ast.ByteOffset,
     is_pub: bool,
 
-    inline fn print(self: Func, src: []const u8, writer: anytype) @TypeOf(writer).Error!void {
+    fn print(self: Func, src: []const u8, writer: anytype) @TypeOf(writer).Error!void {
         try writer.writeAll(INDENTATION_LEVEL_1[0..]);
 
         const fn_proto_name = src[self.args.get(0).start..self.args.get(0).end];
@@ -94,7 +94,7 @@ const Decl = struct {
         tst,
     };
 
-    inline fn print(self: Decl, is_pub: bool, src: []const u8, writer: anytype) @TypeOf(writer).Error!void {
+    fn print(self: Decl, is_pub: bool, src: []const u8, writer: anytype) @TypeOf(writer).Error!void {
         try writer.writeAll(INDENTATION_LEVEL_1[0..]);
 
         switch (self.tag) {
@@ -659,7 +659,7 @@ pub fn generate(
     }
 }
 
-inline fn parseFunc(
+fn parseFunc(
     func: Func,
     src: []const u8,
     first_token_start: std.zig.Ast.ByteOffset,
@@ -685,7 +685,7 @@ inline fn parseFunc(
     return false;
 }
 
-inline fn printDecls(
+fn printDecls(
     is_pub: bool,
     do_resize: bool,
     src: []const u8,
@@ -720,7 +720,7 @@ inline fn printDecls(
     }
 }
 
-inline fn writePrologue(
+fn writePrologue(
     codebase_title: []const u8,
     out_file_basename: []const u8,
     extension: Ext,
@@ -775,7 +775,7 @@ inline fn writePrologue(
     try writer.writeAll("classDiagram\n");
 }
 
-inline fn writeEpilogue(extension: Ext, writer: anytype) std.fs.File.WriteError!void {
+fn writeEpilogue(extension: Ext, writer: anytype) std.fs.File.WriteError!void {
     switch (extension) {
         .html => {
             try writer.writeAll(
