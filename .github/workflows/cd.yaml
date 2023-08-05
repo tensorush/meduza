@@ -42,17 +42,17 @@ jobs:
         run: |
           curl -so node.tar.xz https://nodejs.org/dist/v18.17.0/node-v18.17.0-linux-x64.tar.xz
           tar xf node.tar.xz
-          ./node-v18.17.0-linux-x64/bin/npm install -g @mermaid-js/mermaid-cli
+          node-v18.17.0-linux-x64/bin/npm install -g @mermaid-js/mermaid-cli
 
       - name: Emit SVG
         run: |
           echo -e "{\n    \"maxTextSize\": 250000\n}" >> config.json
-          mmdc -i ./out/src.mmd -o ./out/src.svg -b black -c config.json
+          mmdc -i out/src.mmd -o out/src.svg -b black -c config.json
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v1
         with:
-          path: ./out/
+          path: out/
 
   deploy:
     needs: build
