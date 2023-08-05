@@ -40,7 +40,7 @@
 
     ```zig
     const meduza = b.dependency("meduza", .{});
-    const meduza_run = b.addRunArtifact(meduza.artifact("meduza"));
+    const meduza_run = b.addRunArtifact(meduza.artifact("exe"));
     if (b.args) |args| {
         meduza_run.addArgs(args);
     }
