@@ -5,26 +5,26 @@ pub fn build(b: *std.Build) void {
     const clap_dep = b.dependency("clap", .{});
     const clap_mod = clap_dep.module("clap");
 
-    // Meduza codebase graph generator
-    const meduza_step = b.step("meduza", "Run Meduza codebase graph generator");
+    // Executable
+    const exe_step = b.step("exe", "Run Meduza codebase graph generator");
 
-    const meduza = b.addExecutable(.{
-        .name = "meduza",
+    const exe = b.addExecutable(.{
+        .name = "exe",
         .root_source_file = std.Build.FileSource.relative("src/main.zig"),
         .target = b.standardTargetOptions(.{}),
         .optimize = b.standardOptimizeOption(.{}),
         .version = .{ .major = 1, .minor = 7, .patch = 0 },
     });
-    meduza.addModule("clap", clap_mod);
-    b.installArtifact(meduza);
+    exe.addModule("clap", clap_mod);
+    b.installArtifact(exe);
 
-    const meduza_run = b.addRunArtifact(meduza);
+    const exe_run = b.addRunArtifact(exe);
     if (b.args) |args| {
-        meduza_run.addArgs(args);
+        exe_run.addArgs(args);
     }
 
-    meduza_step.dependOn(&meduza_run.step);
-    b.default_step.dependOn(meduza_step);
+    exe_step.dependOn(&exe_run.step);
+    b.default_step.dependOn(exe_step);
 
     // Lints
     const lints_step = b.step("lint", "Run lints");

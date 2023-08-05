@@ -60,7 +60,7 @@
 
 - Generate a large diagram (`maxTextSize` > 50'000) with Mermaid CLI ([see CD pipeline](https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml#L51)).
 
-- Click on types to go to respective code lines on the remote (GitHub Mermaid prohibits this, though).
+- Click on types to go to respective code lines on the remote (GitHub Mermaid forbids this, though).
 
 #### :world_map: Legend
 
