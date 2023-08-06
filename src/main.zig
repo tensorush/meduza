@@ -26,7 +26,7 @@ pub fn main() anyerror!void {
 
     var arena = std.heap.ArenaAllocator.init(gpa.allocator());
     defer arena.deinit();
-    var allocator = arena.allocator();
+    const allocator = arena.allocator();
 
     var diag = clap.Diagnostic{};
     var res = clap.parse(clap.Help, &PARAMS, PARSERS, .{ .diagnostic = &diag }) catch |err| {
