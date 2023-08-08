@@ -15,7 +15,25 @@ title: Tigerbeetle database (tigerbeetle)
     }
 }%%
 classDiagram
+class CliArgs["CliArgs [uni]"] {
+    -format: struct
+    -start: struct
+    -version: struct
+}
+link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/cli.zig#L17"
 class Start["Start [str]"] {
+    +cluster: u32
+    +replica: u8
+    +replica_count: u8
+    +positional: struct
+    +addresses: []const u8
+    +limit_storage: flags.ByteSize
+    +cache_accounts: flags.ByteSize
+    +cache_transfers: flags.ByteSize
+    +cache_transfers_posted: flags.ByteSize
+    +cache_grid: flags.ByteSize
+    +positional: struct
+    +verbose: bool
     +args_allocated: std.process.ArgIterator
     +addresses: []net.Address
     +cache_accounts: u32
@@ -25,7 +43,7 @@ class Start["Start [str]"] {
     +cache_grid_blocks: u32
     +path: [:0]const u8
 }
-link Start "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/cli.zig#L97"
+link Start "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/cli.zig#L123"
 class Command["Command [uni]"] {
     +format: struct
     +start: Start
@@ -33,21 +51,13 @@ class Command["Command [uni]"] {
     +deinit(command, allocator) void
 }
 Command <-- Start
-link Command "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/cli.zig#L96"
+link Command "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/cli.zig#L122"
 class `tigerbeetle/cli.zig` {
-    test "parse_size"()
     +parse_args(allocator) !Command
-    +fatal(fmt_string, args) noreturn
-    -parse_flag(flag, arg) [:0]const u8
-    -parse_cluster(raw_cluster) u32
     -parse_addresses(allocator, raw_addresses) []net.Address
-    -parse_storage_size(size_string) u64
-    -parse_cache_size_to_count(T, SetAssociativeCache, size_string, default_size) u32
-    -parse_size(string) u64
-    -parse_size_unit(value, suffixes) bool
-    -parse_replica(replica_count, raw_replica) u8
-    -parse_replica_count(raw_count) u8
+    -parse_cache_size_to_count(T, SetAssociativeCache, size) u32
 }
+`tigerbeetle/cli.zig` <-- CliArgs
 `tigerbeetle/cli.zig` <-- Command
 link `tigerbeetle/cli.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/cli.zig"
 class Command["Command [str]"] {

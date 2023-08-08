@@ -308,7 +308,7 @@ class HeaderIterator["HeaderIterator [str]"] {
     -send_sync_trailer(self, command, parameters) void
     -next(iterator) ?*const Header
 }
-link HeaderIterator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8739"
+link HeaderIterator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8738"
 class DVCQuorum["DVCQuorum [str]"] {
     -verify(dvc_quorum) void
     -verify_message(message) void
@@ -324,7 +324,7 @@ class DVCQuorum["DVCQuorum [str]"] {
     -quorum_headers(dvc_quorum, options) union(enum)
 }
 DVCQuorum <-- HeaderIterator
-link DVCQuorum "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8413"
+link DVCQuorum "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8412"
 class PipelineQueue["PipelineQueue [str]"] {
     -prepare_queue: PrepareQueue
     -request_queue: RequestQueue
@@ -339,7 +339,7 @@ class PipelineQueue["PipelineQueue [str]"] {
     -push_request(pipeline, request) void
     -push_prepare(pipeline, message) void
 }
-link PipelineQueue "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8856"
+link PipelineQueue "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8855"
 class PipelineCache["PipelineCache [str]"] {
     -prepares: [prepares_max]?*Message
     -init_from_queue(queue) PipelineCache
@@ -349,7 +349,7 @@ class PipelineCache["PipelineCache [str]"] {
     -prepare_by_op_and_checksum(pipeline, op, checksum) ?*Message
     -insert(pipeline, prepare) ?*Message
 }
-link PipelineCache "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L9022"
+link PipelineCache "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L9021"
 class `vsr/replica.zig` {
     +ReplicaType(StateMachine, MessageBus, Storage, Time, AOF) type
     -message_body_as_view_headers(message) vsr.Headers.ViewChangeSlice
@@ -548,14 +548,14 @@ class Caller["Caller [enu]"] {
     -updates_vsr_headers(caller) bool
     -updates_trailers(caller) bool
 }
-link Caller "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1634"
+link Caller "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1633"
 class Trailer["Trailer [enu]"] {
     +manifest
     +free_set
     +client_sessions
     +zone(trailer) SuperBlockZone
 }
-link Trailer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1680"
+link Trailer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1679"
 class SuperBlockZone["SuperBlockZone [enu]"] {
     +header
     +manifest
@@ -565,7 +565,7 @@ class SuperBlockZone["SuperBlockZone [enu]"] {
     +start_for_copy(zone, copy) u64
     +size_max(zone) u64
 }
-link SuperBlockZone "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1694"
+link SuperBlockZone "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1693"
 class `vsr/superblock.zig` {
     test "SuperBlockHeader"()
     +SuperBlockType(Storage) type
@@ -623,9 +623,9 @@ class TestContext["TestContext [str]"] {
 }
 link TestContext "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1038"
 class Role["Role [enu]"]
-link Role "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1330"
+link Role "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1328"
 class LinkDirection["LinkDirection [enu]"]
-link LinkDirection "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1425"
+link LinkDirection "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1423"
 class TestReplicas["TestReplicas [str]"] {
     -context: *TestContext
     -cluster: *Cluster
@@ -667,7 +667,7 @@ class TestReplicas["TestReplicas [str]"] {
 }
 TestReplicas <-- Role
 TestReplicas <-- LinkDirection
-link TestReplicas "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1210"
+link TestReplicas "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1208"
 class TestClients["TestClients [str]"] {
     -context: *TestContext
     -cluster: *Cluster
@@ -676,7 +676,7 @@ class TestClients["TestClients [str]"] {
     +request(t, requests, expect_replies) !void
     +replies(t) usize
 }
-link TestClients "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1502"
+link TestClients "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1498"
 class `vsr/replica_test.zig` {
     test "Cluster: recovery: WAL prepare corruption (R=3, corrupt right of head)"()
     test "Cluster: recovery: WAL prepare corruption (R=3, corrupt left of head, 3/3 corrupt)"()
@@ -695,8 +695,8 @@ class `vsr/replica_test.zig` {
     test "Cluster: network: partition 1-2 (isolate primary, asymmetric, send-only)"()
     test "Cluster: network: partition 1-2 (isolate primary, asymmetric, receive-only)"()
     test "Cluster: network: partition client-primary (symmetric)"()
-    test "Cluster: network: partititon client-primary (asymmetric, drop requests)"()
-    test "Cluster: network: partititon client-primary (asymmetric, drop replies)"()
+    test "Cluster: network: partition client-primary (asymmetric, drop requests)"()
+    test "Cluster: network: partition client-primary (asymmetric, drop replies)"()
     test "Cluster: repair: partition 2-1, then backup fast-forward 1 checkpoint"()
     test "Cluster: repair: view-change, new-primary lagging behind checkpoint, forfeit"()
     test "Cluster: repair: crash, corrupt committed pipeline op, repair it, view-change; dont nack"()
