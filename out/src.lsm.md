@@ -37,22 +37,6 @@ class `lsm/table_data_iterator.zig` {
     +TableDataIteratorType(Storage) type
 }
 link `lsm/table_data_iterator.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/table_data_iterator.zig"
-class BlockType["BlockType [enu]"] {
-    +reserved
-    +manifest
-    +index
-    +filter
-    +data
-    +from(vsr_operation) BlockType
-    +operation(block_type) vsr.Operation
-}
-link BlockType "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/grid.zig#L24"
-class `lsm/grid.zig` {
-    +allocate_block(allocator) error[OutOfMemory]!*align(constants.sector_size) [constants.block_size]u8
-    +GridType(Storage) type
-}
-`lsm/grid.zig` <-- BlockType
-link `lsm/grid.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/grid.zig"
 class Config["Config [str]"] {
     +lower_bound
     +upper_bound
@@ -160,7 +144,7 @@ class Value["Value [str]"] {
     -value: u63
     -tombstone: u1
 }
-link Value "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/tree_fuzz.zig#L36"
+link Value "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/tree_fuzz.zig#L37"
 class Key["Key [str]"] {
     -id: u64
     -compare_keys(a, b) std.math.Order
@@ -169,14 +153,14 @@ class Key["Key [str]"] {
     -tombstone_from_key(key) Key.Value
 }
 Key <-- Value
-link Key "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/tree_fuzz.zig#L33"
+link Key "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/tree_fuzz.zig#L34"
 class FuzzOp["FuzzOp [uni]"] {
     -compact: struct
     -put: Key.Value
     -remove: Key.Value
     -get: Key
 }
-link FuzzOp "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/tree_fuzz.zig#L72"
+link FuzzOp "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/tree_fuzz.zig#L73"
 class `lsm/tree_fuzz.zig` {
     -EnvironmentType(table_usage) type
     -random_id(random, Int) Int
@@ -193,7 +177,7 @@ link `lsm/composite_key.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/ma
 class `lsm/compaction.zig` {
     +CompactionType(Table, Tree, Storage) type
     -snapshot_max_for_table_input(op_min) u64
-    -snapshot_min_for_table_output(op_min) u64
+    +snapshot_min_for_table_output(op_min) u64
 }
 link `lsm/compaction.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/compaction.zig"
 class Direction["Direction [enu]"] {
@@ -300,19 +284,29 @@ class `lsm/table.zig` {
 }
 `lsm/table.zig` <-- TableUsage
 link `lsm/table.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/table.zig"
+class BlockType["BlockType [enu]"] {
+    +reserved
+    +manifest
+    +index
+    +filter
+    +data
+    +from(vsr_operation) BlockType
+    +operation(block_type) vsr.Operation
+}
+link BlockType "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L72"
 class Context["Context [str]"] {
     +filter_block_count: u32
     +filter_block_count_max: u32
     +data_block_count: u32
     +data_block_count_max: u32
 }
-link Context "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L79"
+link Context "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L100"
 class Parameters["Parameters [str]"] {
     -key_size: u32
     -filter_block_count_max: u32
     -data_block_count_max: u32
 }
-link Parameters "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L109"
+link Parameters "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L130"
 class TableIndex["TableIndex [str]"] {
     +key_size: u32
     +filter_block_count_max: u32
@@ -346,12 +340,12 @@ class TableIndex["TableIndex [str]"] {
 }
 TableIndex <-- Context
 TableIndex <-- Parameters
-link TableIndex "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L69"
+link TableIndex "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L90"
 class Context["Context [str]"] {
     +data_block_count_max: u32
     +reserved: [12]u8
 }
-link Context "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L276"
+link Context "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L297"
 class TableFilter["TableFilter [str]"] {
     +data_block_count_max: u32
     +filter_offset: u32
@@ -364,14 +358,14 @@ class TableFilter["TableFilter [str]"] {
     +block_filter_const(filter, filter_block) []const u8
 }
 TableFilter <-- Context
-link TableFilter "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L274"
+link TableFilter "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L295"
 class Context["Context [str]"] {
     +key_count: u32
     +key_layout_size: u32
     +value_count_max: u32
     +value_size: u32
 }
-link Context "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L341"
+link Context "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L362"
 class TableData["TableData [str]"] {
     +key_count: u32
     +value_size: u32
@@ -389,10 +383,11 @@ class TableData["TableData [str]"] {
     +block_values_used_bytes(schema, data_block) []align(16) const u8
 }
 TableData <-- Context
-link TableData "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L339"
+link TableData "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L360"
 class `lsm/schema.zig` {
     +header_from_block(block) *const vsr.Header
 }
+`lsm/schema.zig` <-- BlockType
 `lsm/schema.zig` <-- TableIndex
 `lsm/schema.zig` <-- TableFilter
 `lsm/schema.zig` <-- TableData
@@ -483,7 +478,7 @@ class IdTreeValue["IdTreeValue [str]"] {
     -tombstone(value) bool
     -tombstone_from_key(id) IdTreeValue
 }
-link IdTreeValue "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/groove.zig#L47"
+link IdTreeValue "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/groove.zig#L48"
 class `lsm/groove.zig` {
     test "Groove"()
     -ObjectTreeHelpers(Object) type
@@ -588,13 +583,15 @@ class `lsm/table_mutable.zig` {
 }
 link `lsm/table_mutable.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/table_mutable.zig"
 class `lsm/tree.zig` {
+    test "is_composite_key"()
     test "table_count_max_for_level/tree"()
     test "TreeType"()
     +TreeType(TreeTable, Storage) type
     +compaction_op_min(op) u64
-    -lookup_snapshot_max_for_checkpoint(op_checkpoint) u64
     +table_count_max_for_tree(growth_factor, levels_count) u32
     +table_count_max_for_level(growth_factor, level) u32
+    +key_fingerprint(key) Fingerprint
+    -is_composite_key(Key) bool
 }
 link `lsm/tree.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/tree.zig"
 class ManifestEvent["ManifestEvent [uni]"] {
@@ -698,7 +695,7 @@ class `lsm/manifest_log_fuzz.zig` {
 link `lsm/manifest_log_fuzz.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/manifest_log_fuzz.zig"
 class Fingerprint["Fingerprint [str]"] {
     +hash: u32
-    +mask: meta.Vector(8, u32)
+    +mask: @Vector(8, u32)
     +create(hash) Fingerprint
 }
 link Fingerprint "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/bloom_filter.zig#L10"
@@ -725,57 +722,6 @@ class `lsm/segmented_array_fuzz.zig` {
     +main() !void
 }
 link `lsm/segmented_array_fuzz.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/segmented_array_fuzz.zig"
-class State["State [enu]"] {
-    -uninit
-    -init
-    -formatted
-    -superblock_open
-    -forest_open
-    -forest_compacting
-    -forest_checkpointing
-    -superblock_checkpointing
-}
-link State "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/test.zig#L40"
-class Visibility["Visibility [enu]"] {
-    -visible
-    -invisible
-}
-link Visibility "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/test.zig#L238"
-class Environment["Environment [str]"] {
-    -state: State
-    -dir_fd: os.fd_t
-    -fd: os.fd_t
-    -io: IO
-    -storage: Storage
-    -superblock: SuperBlock
-    -superblock_context: SuperBlock.Context
-    -grid: Grid
-    -forest: Forest
-    -forest_exists: bool
-    -init(env, must_create) !void
-    -deinit(env) void
-    -tick(env) !void
-    +format() !void
-    -superblock_format_callback(superblock_context) void
-    +open(env) !void
-    -superblock_open_callback(superblock_context) void
-    -forest_open_callback(forest) void
-    +checkpoint(env) !void
-    -forest_checkpoint_callback(forest) void
-    -superblock_checkpoint_callback(superblock_context) void
-    +compact(env, op) !void
-    -forest_compact_callback(forest) void
-    +assert_visibility(env, visibility, groove, objects, commit_entries_max) !void
-    -run() !void
-}
-Environment <-- State
-Environment <-- Visibility
-link Environment "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/test.zig#L23"
-class `lsm/test.zig` {
-    +main() !void
-}
-`lsm/test.zig` <-- Environment
-link `lsm/test.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/test.zig"
 class `lsm/manifest_log.zig` {
     +ManifestLogType(Storage, TableInfo) type
     -ManifestLogBlockType(Storage, TableInfo) type

@@ -923,7 +923,7 @@ link `ring_buffer.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src
 class ByteSize["ByteSize [str]"] {
     +bytes: u64
 }
-link ByteSize "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/flags.zig#L312"
+link ByteSize "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/flags.zig#L301"
 class CliArgs["CliArgs [uni]"] {
     -empty
     -prefix: struct
@@ -931,7 +931,7 @@ class CliArgs["CliArgs [uni]"] {
     -required: struct
     -values: struct
 }
-link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/flags.zig#L440"
+link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/flags.zig#L475"
 class T["T [str]"] {
     -gpa: std.mem.Allocator
     -tmp_dir: std.testing.TmpDir
@@ -942,7 +942,7 @@ class T["T [str]"] {
     -deinit(t) void
     -check(t, cli, want) !void
 }
-link T "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/flags.zig#L513"
+link T "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/flags.zig#L552"
 class `flags.zig` {
     test parse_value_size()
     test flag_name()
@@ -954,8 +954,10 @@ class `flags.zig` {
     -parse_flag(T, flag, arg) T
     -parse_flag_split_value(flag, arg) [:0]const u8
     -parse_value(T, flag, value) T
-    -parse_value_int(T, flag, value) T
     -parse_value_size(flag, value) ByteSize
+    -parse_value_int(T, flag, value) T
+    -parse_value_enum(E, flag, value) E
+    -fields_to_comma_list(E) []const u8
     -flag_name(field) []const u8
     -flag_name_positional(field) []const u8
     -default_value(field) ?field.field_type

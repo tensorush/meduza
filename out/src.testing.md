@@ -398,7 +398,7 @@ class Range["Range [str]"] {
     -start: usize
     -end: usize
 }
-link Range "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/snaptest.zig#L175"
+link Range "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/snaptest.zig#L179"
 class `testing/snaptest.zig` {
     -snap_range(text, src_line) Range
     -is_multiline_string(line) bool

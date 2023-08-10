@@ -371,6 +371,11 @@ class `vsr/replica_format.zig` {
     -ReplicaFormatType(Storage) type
 }
 link `vsr/replica_format.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_format.zig"
+class `vsr/grid.zig` {
+    +allocate_block(allocator) error[OutOfMemory]!*align(constants.sector_size) [constants.block_size]u8
+    +GridType(Storage) type
+}
+link `vsr/grid.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/grid.zig"
 class Environment["Environment [str]"] {
     -sequence_states: SequenceStates
     -members: vsr.Members
