@@ -247,7 +247,7 @@ class MessageRaw["MessageRaw [str]"] {
     -header: vsr.Header
     -body: [constants.message_size_max - @sizeOf(vsr.Header)
 }
-link MessageRaw "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L524"
+link MessageRaw "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L518"
 class Storage["Storage [str]"] {
     +lsm
     +vsr
@@ -310,7 +310,7 @@ class Area["Area [uni]"] {
     +grid: struct
     -sectors(area) SectorRange
 }
-link Area "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L617"
+link Area "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L605"
 class SectorRange["SectorRange [str]"] {
     -min: usize
     -max: usize
@@ -320,7 +320,7 @@ class SectorRange["SectorRange [str]"] {
     -next(range) ?usize
     -intersect(a, b) ?SectorRange
 }
-link SectorRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L655"
+link SectorRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L643"
 class Options["Options [str]"] {
     +faulty_superblock: bool
     +faulty_wal_headers: bool
@@ -328,7 +328,7 @@ class Options["Options [str]"] {
     +faulty_client_replies: bool
     +faulty_grid: bool
 }
-link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L702"
+link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L690"
 class ClusterFaultAtlas["ClusterFaultAtlas [str]"] {
     +options: Options
     +faulty_superblock_areas: FaultySuperBlockAreas
@@ -344,14 +344,14 @@ class ClusterFaultAtlas["ClusterFaultAtlas [str]"] {
     -faulty_sectors(chunk_count, chunk_size, zone, faulty_chunks, offset_in_zone, size) ?SectorRange
 }
 ClusterFaultAtlas <-- Options
-link ClusterFaultAtlas "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L701"
+link ClusterFaultAtlas "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L689"
 class StackTrace["StackTrace [str]"] {
     -addresses: [64]usize
     -index: usize
     -capture() StackTrace
     +format(self, fmt, options, writer) !void
 }
-link StackTrace "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L949"
+link StackTrace "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L937"
 class `testing/storage.zig` {
     -verify_alignment(buffer) void
 }

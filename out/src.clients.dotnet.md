@@ -41,7 +41,7 @@ class `clients/dotnet/dotnet_bindings.zig` {
 `clients/dotnet/dotnet_bindings.zig` <-- TypeMapping
 link `clients/dotnet/dotnet_bindings.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/dotnet/dotnet_bindings.zig"
 class `clients/dotnet/docs.zig` {
-    -current_commit_pre_install_hook(arena, sample_dir, _) !void
+    -current_commit_post_install_hook(arena, sample_directory, root) !void
 }
 link `clients/dotnet/docs.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/dotnet/docs.zig"
 ```

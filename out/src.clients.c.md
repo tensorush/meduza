@@ -67,7 +67,7 @@ class Completion["Completion [str]"] {
     +complete(self) void
     +wait_pending(self) void
 }
-link Completion "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/test.zig#L60"
+link Completion "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/test.zig#L63"
 class `clients/c/test.zig` {
     test "c_client echo"()
     test "c_client tb_status"()

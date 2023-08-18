@@ -19,6 +19,8 @@ class `demos/demo_07_lookup_transfers.zig` {
     +main() !void
 }
 link `demos/demo_07_lookup_transfers.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/demos/demo_07_lookup_transfers.zig"
+class std_options["std_options [str]"]
+link std_options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/demos/demo.zig#L23"
 class `demos/demo.zig` {
     +request(operation, batch, on_reply) !void
     +on_create_accounts(user_data, operation, results) void
@@ -27,6 +29,7 @@ class `demos/demo.zig` {
     +on_create_transfers(user_data, operation, results) void
     -print_results(Results, results) void
 }
+`demos/demo.zig` <-- std_options
 link `demos/demo.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/demos/demo.zig"
 class `demos/demo_03_create_transfers.zig` {
     +main() !void

@@ -65,6 +65,8 @@ class `clients/node/src/translate.zig` {
 link `clients/node/src/translate.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/translate.zig"
 class `clients/node/src/c.zig`
 link `clients/node/src/c.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/c.zig"
+class std_options["std_options [str]"]
+link std_options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/node.zig#L27"
 class Globals["Globals [str]"] {
     -allocator: std.mem.Allocator
     -io: IO
@@ -73,7 +75,7 @@ class Globals["Globals [str]"] {
     +deinit(self) void
     +destroy(env, data, hint) callconv(.C) void
 }
-link Globals "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/node.zig#L70"
+link Globals "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/node.zig#L72"
 class Context["Context [str]"] {
     -io: *IO
     -addresses: []std.net.Address
@@ -81,7 +83,7 @@ class Context["Context [str]"] {
     -message_pool: MessagePool
     -create(env, allocator, io, cluster, addresses_raw) !c.napi_value
 }
-link Context "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/node.zig#L121"
+link Context "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/node.zig#L123"
 class `clients/node/src/node.zig` {
     -napi_register_module_v1(env, exports) c.napi_value
     -globalsCast(globals_raw) *Globals
@@ -98,6 +100,7 @@ class `clients/node/src/node.zig` {
     -tick(env, info) callconv(.C) c.napi_value
     -deinit(env, info) callconv(.C) c.napi_value
 }
+`clients/node/src/node.zig` <-- std_options
 `clients/node/src/node.zig` <-- Globals
 `clients/node/src/node.zig` <-- Context
 link `clients/node/src/node.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/node.zig"

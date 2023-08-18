@@ -65,6 +65,9 @@
 #### :world_map: Legend
 
 ```mermaid
+---
+title: Title (path/to/directory)
+---
 %%{
     init: {
         'theme': 'base',

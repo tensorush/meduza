@@ -118,7 +118,7 @@ class Generator["Generator [str]"] {
     -generate_main_readme(self, mw) !void
     -generate_sample_readmes(self, mw) !void
 }
-link Generator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_generate.zig#L204"
+link Generator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_generate.zig#L200"
 class CliArgs["CliArgs [str]"] {
     -language: ?[]const u8
     -validate: ?[]const u8
@@ -126,7 +126,7 @@ class CliArgs["CliArgs [str]"] {
     -no_generate: bool
     -keep_tmp: bool
 }
-link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_generate.zig#L789"
+link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_generate.zig#L787"
 class `clients/docs_generate.zig` {
     +prepare_directory(arena, language, dir) !void
     +integrate(arena, language, dir, run) !void
@@ -142,7 +142,7 @@ class TmpDir["TmpDir [str]"] {
     +init(arena) !TmpDir
     +deinit(self) void
 }
-link TmpDir "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/shutil.zig#L130"
+link TmpDir "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/shutil.zig#L131"
 class `clients/shutil.zig` {
     +exec(arena, cmd) !std.ChildProcess.ExecResult
     +run_with_env(arena, cmd, env) !void

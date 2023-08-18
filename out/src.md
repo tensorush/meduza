@@ -72,16 +72,18 @@ class `aof.zig` {
 `aof.zig` <-- AOF
 `aof.zig` <-- AOFReplayClient
 link `aof.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/aof.zig"
+class std_options["std_options [str]"]
+link std_options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/copyhound.zig#L38"
 class CliArgs["CliArgs [uni]"] {
     -bytes: u32
     -memcpy: struct
     -funcsize
 }
-link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/copyhound.zig#L40"
+link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/copyhound.zig#L42"
 class T["T [str]"] {
     -check(line, want) !void
 }
-link T "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/copyhound.zig#L170"
+link T "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/copyhound.zig#L172"
 class `copyhound.zig` {
     test "extract_function_name"()
     test "extract_memcpy_size"()
@@ -90,6 +92,7 @@ class `copyhound.zig` {
     -extract_memcpy_size(memcpy_call) ?u32
     +fatal(fmt_string, args) noreturn
 }
+`copyhound.zig` <-- std_options
 `copyhound.zig` <-- CliArgs
 link `copyhound.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/copyhound.zig"
 class `iops.zig` {
@@ -185,20 +188,20 @@ class ConfigBase["ConfigBase [enu]"] {
     +test_min
     +default
 }
-link ConfigBase "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L182"
+link ConfigBase "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L186"
 class TracerBackend["TracerBackend [enu]"] {
     +none
     +tracy
 }
-link TracerBackend "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L189"
+link TracerBackend "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L193"
 class HashLogMode["HashLogMode [enu]"] {
     +none
     +create
     +check
 }
-link HashLogMode "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L195"
+link HashLogMode "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L199"
 class configs["configs [str]"]
-link configs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L201"
+link configs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L205"
 class `config.zig` {
     -launder_type(T, value) T
 }
@@ -257,9 +260,9 @@ class `static_allocator.zig` {
     +transition_from_init_to_static(self) void
     +transition_from_static_to_deinit(self) void
     +allocator(self) mem.Allocator
-    -alloc(self, len, ptr_align, len_align, ret_addr) error[OutOfMemory]![]u8
-    -resize(self, buf, buf_align, new_len, len_align, ret_addr) ?usize
-    -free(self, buf, buf_align, ret_addr) void
+    -alloc(ctx, len, ptr_align, ret_addr) ?[*]u8
+    -resize(ctx, buf, buf_align, new_len, ret_addr) bool
+    -free(ctx, buf, buf_align, ret_addr) void
 }
 `static_allocator.zig` <-- State
 link `static_allocator.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/static_allocator.zig"
@@ -386,7 +389,7 @@ class BlockRequest["BlockRequest [str]"] {
     +block_address: u64
     +reserved: [8]u8
 }
-link BlockRequest "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L937"
+link BlockRequest "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L936"
 class ReconfigurationRequest["ReconfigurationRequest [str]"] {
     +members: Members
     +epoch: u32
@@ -396,7 +399,7 @@ class ReconfigurationRequest["ReconfigurationRequest [str]"] {
     +result: ReconfigurationResult
     +validate(request, current) ReconfigurationResult
 }
-link ReconfigurationRequest "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L949"
+link ReconfigurationRequest "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L948"
 class ReconfigurationResult["ReconfigurationResult [enu]"] {
     +reserved
     +ok
@@ -416,7 +419,7 @@ class ReconfigurationResult["ReconfigurationResult [enu]"] {
     +configuration_conflict
     +configuration_is_no_op
 }
-link ReconfigurationResult "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1038"
+link ReconfigurationResult "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1037"
 class Test["Test [str]"] {
     -members: Members
     -epoch: u32
@@ -426,7 +429,7 @@ class Test["Test [str]"] {
     -check(t, request, expected) !void
     -to_members(m) Members
 }
-link Test "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1092"
+link Test "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1091"
 class Timeout["Timeout [str]"] {
     +name: []const u8
     +id: u128
@@ -446,7 +449,7 @@ class Timeout["Timeout [str]"] {
     +tick(self) void
 }
 Timeout <-- Test
-link Timeout "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1195"
+link Timeout "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1194"
 class IdSeed["IdSeed [str]"] {
     -raw: []const u8
     -addresses: []const std.net.Address
@@ -456,24 +459,24 @@ class IdSeed["IdSeed [str]"] {
     -cluster: u32 align(1)
     -replica: u8 align(1)
 }
-link IdSeed "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1595"
+link IdSeed "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1594"
 class Headers["Headers [str]"] {
     -dvc_blank(op) Header
     +dvc_header_type(header) enum [ blank, valid ]
 }
 Headers <-- IdSeed
-link Headers "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1642"
+link Headers "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1641"
 class ViewChangeCommand["ViewChangeCommand [enu]"] {
     +do_view_change
     +start_view
 }
-link ViewChangeCommand "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1670"
+link ViewChangeCommand "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1669"
 class ViewRange["ViewRange [str]"] {
     -min: u32
     -max: u32
     +contains(range, view) bool
 }
-link ViewRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1734"
+link ViewRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1733"
 class ViewChangeHeadersSlice["ViewChangeHeadersSlice [str]"] {
     -command: ViewChangeCommand
     -slice: []const Header
@@ -482,7 +485,7 @@ class ViewChangeHeadersSlice["ViewChangeHeadersSlice [str]"] {
     +view_for_op(headers, op, log_view) ViewRange
 }
 ViewChangeHeadersSlice <-- ViewRange
-link ViewChangeHeadersSlice "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1672"
+link ViewChangeHeadersSlice "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1671"
 class ViewChangeHeadersArray["ViewChangeHeadersArray [str]"] {
     -command: ViewChangeCommand
     -array: Headers.Array
@@ -495,7 +498,7 @@ class ViewChangeHeadersArray["ViewChangeHeadersArray [str]"] {
     +append(headers, header) void
     +append_blank(headers, op) void
 }
-link ViewChangeHeadersArray "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1833"
+link ViewChangeHeadersArray "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1832"
 class `vsr.zig` {
     test "ReconfigurationRequest"()
     test "exponential_backoff_with_jitter"()
@@ -605,35 +608,6 @@ class TracerNone["TracerNone [str]"] {
     +plot(plot_id, value) void
 }
 link TracerNone "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tracer.zig#L286"
-class TracedAllocator["TracedAllocator [str]"] {
-    +op: u64
-    +tree_name: []const u8
-    +tree_name: []const u8
-    +level_b: u8
-    +tree_name: []const u8
-    +level_b: u8
-    +tree_name: []const u8
-    +level_b: u8
-    +index: usize
-    +index: usize
-    +tree_name: []const u8
-    +tree_name: []const u8
-    +level_b: u8
-    +index: usize
-    +index: usize
-    +queue_name: []const u8
-    +cache_name: []const u8
-    +cache_name: []const u8
-    +tree_name: []const u8
-    +tree_name: []const u8
-    +parent_allocator: std.mem.Allocator
-    +init(parent_allocator) TracedAllocator
-    +allocator(self) std.mem.Allocator
-    -allocFn(self, len, ptr_align, len_align, ret_addr) std.mem.Allocator.Error![]u8
-    -resizeFn(self, buf, buf_align, new_len, len_align, ret_addr) ?usize
-    -freeFn(self, buf, buf_align, ret_addr) void
-}
-link TracedAllocator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tracer.zig#L464"
 class TracerTracy["TracerTracy [str]"] {
     +Interns(Key) type
     +init(allocator_) !void
@@ -643,8 +617,13 @@ class TracerTracy["TracerTracy [str]"] {
     +end(slot, event) void
     +plot(plot_id, value) void
     +log_fn(level, scope, format, args) void
+    +messageColor(msg, color) void
+    +TracyAllocator(name) type
+    -alloc(ptr, len) void
+    -allocNamed(ptr, len, name) void
+    -free(ptr) void
+    -freeNamed(ptr, name) void
 }
-TracerTracy <-- TracedAllocator
 link TracerTracy "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tracer.zig#L313"
 class `tracer.zig`
 `tracer.zig` <-- Event
@@ -826,6 +805,8 @@ link MessagePool "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/messa
 class `message_pool.zig`
 `message_pool.zig` <-- MessagePool
 link `message_pool.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/message_pool.zig"
+class std_options["std_options [str]"]
+link std_options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/simulator.zig#L33"
 class Options["Options [str]"] {
     +cluster: Cluster.Options
     +workload: StateMachine.Workload.Options
@@ -838,7 +819,7 @@ class Options["Options [str]"] {
     +request_idle_on_probability: u8
     +request_idle_off_probability: u8
 }
-link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/simulator.zig#L313"
+link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/simulator.zig#L314"
 class Simulator["Simulator [str]"] {
     +random: std.rand.Random
     +options: Options
@@ -865,7 +846,7 @@ class Simulator["Simulator [str]"] {
     -restart_replica(simulator, replica_index, fault) void
 }
 Simulator <-- Options
-link Simulator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/simulator.zig#L312"
+link Simulator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/simulator.zig#L313"
 class `simulator.zig` {
     +main() !void
     -fatal(failure, fmt_string, args) noreturn
@@ -875,8 +856,9 @@ class `simulator.zig` {
     -random_partition_symmetry(random) PartitionSymmetry
     -random_core(random, replica_count, standby_count) Core
     +parse_seed(bytes) u64
-    +log(level, scope, format, args) void
+    -log_override(level, scope, format, args) void
 }
+`simulator.zig` <-- std_options
 `simulator.zig` <-- Simulator
 link `simulator.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/simulator.zig"
 class Process["Process [uni]"] {
@@ -931,7 +913,7 @@ class CliArgs["CliArgs [uni]"] {
     -required: struct
     -values: struct
 }
-link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/flags.zig#L475"
+link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/flags.zig#L472"
 class T["T [str]"] {
     -gpa: std.mem.Allocator
     -tmp_dir: std.testing.TmpDir
@@ -942,7 +924,7 @@ class T["T [str]"] {
     -deinit(t) void
     -check(t, cli, want) !void
 }
-link T "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/flags.zig#L552"
+link T "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/flags.zig#L549"
 class `flags.zig` {
     test parse_value_size()
     test flag_name()
@@ -960,7 +942,7 @@ class `flags.zig` {
     -fields_to_comma_list(E) []const u8
     -flag_name(field) []const u8
     -flag_name_positional(field) []const u8
-    -default_value(field) ?field.field_type
+    -default_value(field) ?field.type
 }
 `flags.zig` <-- ByteSize
 link `flags.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/flags.zig"
@@ -998,13 +980,6 @@ class TimeIt["TimeIt [str]"] {
     +lap(self, label) void
 }
 link TimeIt "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/stdx.zig#L208"
-class U["U [uni]"] {
-    -a: u32
-    -b: u128
-    -c: void
-    +scoped(scope) type
-}
-link U "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/stdx.zig#L457"
 class `stdx.zig` {
     test "div_ceil"()
     test "copy_left"()
@@ -1012,7 +987,6 @@ class `stdx.zig` {
     test "disjoint_slices"()
     test no_padding()
     test "hash_inline"()
-    test "union_field_parent_ptr"()
     +div_ceil(numerator, denominator) @TypeOf(numerator, denominator)
     +copy_left(precision, T, target, source) void
     +copy_right(precision, T, target, source) void
@@ -1029,7 +1003,6 @@ class `stdx.zig` {
     +hash_inline(value) u64
     -low_level_hash(seed, input) u64
     +update(base, diff) @TypeOf(base)
-    +union_field_parent_ptr(Union, field, child) *Union
 }
 `stdx.zig` <-- CopyPrecision
 `stdx.zig` <-- Cut
@@ -1140,6 +1113,8 @@ class `vopr.zig` {
 `vopr.zig` <-- Flags
 `vopr.zig` <-- Bug
 link `vopr.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vopr.zig"
+class std_options["std_options [str]"]
+link std_options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/benchmark.zig#L31"
 class CliArgs["CliArgs [str]"] {
     -account_count: usize
     -transfer_count: usize
@@ -1148,7 +1123,7 @@ class CliArgs["CliArgs [str]"] {
     -enable_statsd: bool
     -addresses: []const u8
 }
-link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/benchmark.zig#L56"
+link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/benchmark.zig#L58"
 class Benchmark["Benchmark [str]"] {
     -io: *IO
     -message_pool: *MessagePool
@@ -1182,7 +1157,7 @@ class Benchmark["Benchmark [str]"] {
     -send(b, callback, operation, payload) void
     -send_complete(user_data, operation, result) void
 }
-link Benchmark "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/benchmark.zig#L228"
+link Benchmark "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/benchmark.zig#L230"
 class `benchmark.zig` {
     +main() !void
     -parse_arg_addresses(allocator, args, arg, arg_name, arg_value) !bool
@@ -1190,6 +1165,7 @@ class `benchmark.zig` {
     -parse_arg_bool(args, arg, arg_name, arg_value) !bool
     -print_deciles(stdout, label, latencies) void
 }
+`benchmark.zig` <-- std_options
 `benchmark.zig` <-- CliArgs
 `benchmark.zig` <-- Benchmark
 link `benchmark.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/benchmark.zig"
@@ -1202,199 +1178,6 @@ link StateMachineConfig "https://github.com/tigerbeetle/tigerbeetle/blob/main/sr
 class `constants.zig`
 `constants.zig` <-- StateMachineConfig
 link `constants.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/constants.zig"
-class StringContext["StringContext [str]"] {
-    +hash(self, s) u64
-    +eql(self, a, b) bool
-}
-link StringContext "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/hash_map.zig#L79"
-class StringIndexContext["StringIndexContext [str]"] {
-    +bytes: *std.ArrayListUnmanaged(u8)
-    +eql(self, a, b) bool
-    +hash(self, x) u64
-}
-link StringIndexContext "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/hash_map.zig#L98"
-class StringIndexAdapter["StringIndexAdapter [str]"] {
-    +bytes: *std.ArrayListUnmanaged(u8)
-    +eql(self, a_slice, b) bool
-    +hash(self, adapted_key) u64
-}
-link StringIndexAdapter "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/hash_map.zig#L112"
-class AdaptedContext["AdaptedContext [str]"] {
-    -unmanaged: Unmanaged
-    -allocator: Allocator
-    -ctx: Context
-    -metadata: ?[*]Metadata
-    -size: Size
-    -available: Size
-    -hash(ctx, key) u64
-    -eql(ctx, a, b) bool
-    +init(allocator) Self
-    +initContext(allocator, ctx) Self
-    +deinit(self) void
-    +clearRetainingCapacity(self) void
-    +clearAndFree(self) void
-    +count(self) Size
-    +iterator(self) Iterator
-    +keyIterator(self) KeyIterator
-    +valueIterator(self) ValueIterator
-    +getOrPut(self, key) Allocator.Error!GetOrPutResult
-    +getOrPutAdapted(self, key, ctx) Allocator.Error!GetOrPutResult
-    +getOrPutAssumeCapacity(self, key) GetOrPutResult
-    +getOrPutAssumeCapacityAdapted(self, key, ctx) GetOrPutResult
-    +getOrPutValue(self, key, value) Allocator.Error!Entry
-    +ensureTotalCapacity(self, expected_count) Allocator.Error!void
-    +ensureUnusedCapacity(self, additional_count) Allocator.Error!void
-    +capacity(self) Size
-    +put(self, key, value) Allocator.Error!void
-    +putNoClobber(self, key, value) Allocator.Error!void
-    +putAssumeCapacity(self, key, value) void
-    +putAssumeCapacityNoClobber(self, key, value) void
-    +fetchPut(self, key, value) Allocator.Error!?KV
-    +fetchPutAssumeCapacity(self, key, value) ?KV
-    +fetchRemove(self, key) ?KV
-    +fetchRemoveAdapted(self, key, ctx) ?KV
-    +get(self, key) ?V
-    +getAdapted(self, key, ctx) ?V
-    +getPtr(self, key) ?*V
-    +getPtrAdapted(self, key, ctx) ?*V
-    +getKey(self, key) ?K
-    +getKeyAdapted(self, key, ctx) ?K
-    +getKeyPtr(self, key) ?*K
-    +getKeyPtrAdapted(self, key, ctx) ?*K
-    +getEntry(self, key) ?Entry
-    +getEntryAdapted(self, key, ctx) ?Entry
-    +contains(self, key) bool
-    +containsAdapted(self, key, ctx) bool
-    +remove(self, key) bool
-    +removeAdapted(self, key, ctx) bool
-    +removeByPtr(self, keyPtr) void
-    +clone(self) Allocator.Error!Self
-    +cloneWithAllocator(self, new_allocator) Allocator.Error!Self
-    +cloneWithContext(self, new_ctx) Allocator.Error!HashMap(K, V, @TypeOf(new_ctx), max_load_percentage)
-    +cloneWithAllocatorAndContext(self, new_allocator, new_ctx) Allocator.Error!HashMap(K, V, @TypeOf(new_ctx), max_load_percentage)
-    -FieldIterator(T) type
-    +promote(self, allocator) Managed
-    +promoteContext(self, allocator, ctx) Managed
-    -isUnderMaxLoadPercentage(size, cap) bool
-    +deinit(self, allocator) void
-    -capacityForSize(size) Size
-    +ensureTotalCapacity(self, allocator, new_size) Allocator.Error!void
-    +ensureTotalCapacityContext(self, allocator, new_size, ctx) Allocator.Error!void
-    +ensureUnusedCapacity(self, allocator, additional_size) Allocator.Error!void
-    +ensureUnusedCapacityContext(self, allocator, additional_size, ctx) Allocator.Error!void
-    +clearRetainingCapacity(self) void
-    +clearAndFree(self, allocator) void
-    +count(self) Size
-    -header(self) *Header
-    -keys(self) [*]K
-    -values(self) [*]V
-    +capacity(self) Size
-    +iterator(self) Iterator
-    +keyIterator(self) KeyIterator
-    +valueIterator(self) ValueIterator
-    +putNoClobber(self, allocator, key, value) Allocator.Error!void
-    +putNoClobberContext(self, allocator, key, value, ctx) Allocator.Error!void
-    +putAssumeCapacity(self, key, value) void
-    +putAssumeCapacityContext(self, key, value, ctx) void
-    +putAssumeCapacityNoClobber(self, key, value) void
-    +putAssumeCapacityNoClobberContext(self, key, value, ctx) void
-    +fetchPut(self, allocator, key, value) Allocator.Error!?KV
-    +fetchPutContext(self, allocator, key, value, ctx) Allocator.Error!?KV
-    +fetchPutAssumeCapacity(self, key, value) ?KV
-    +fetchPutAssumeCapacityContext(self, key, value, ctx) ?KV
-    +fetchRemove(self, key) ?KV
-    +fetchRemoveContext(self, key, ctx) ?KV
-    +fetchRemoveAdapted(self, key, ctx) ?KV
-    -getIndex(self, key, ctx) ?usize
-    +getEntry(self, key) ?Entry
-    +getEntryContext(self, key, ctx) ?Entry
-    +getEntryAdapted(self, key, ctx) ?Entry
-    +put(self, allocator, key, value) Allocator.Error!void
-    +putContext(self, allocator, key, value, ctx) Allocator.Error!void
-    +getKeyPtr(self, key) ?*K
-    +getKeyPtrContext(self, key, ctx) ?*K
-    +getKeyPtrAdapted(self, key, ctx) ?*K
-    +getKey(self, key) ?K
-    +getKeyContext(self, key, ctx) ?K
-    +getKeyAdapted(self, key, ctx) ?K
-    +getPtr(self, key) ?*V
-    +getPtrContext(self, key, ctx) ?*V
-    +getPtrAdapted(self, key, ctx) ?*V
-    +get(self, key) ?V
-    +getContext(self, key, ctx) ?V
-    +getAdapted(self, key, ctx) ?V
-    +getOrPut(self, allocator, key) Allocator.Error!GetOrPutResult
-    +getOrPutContext(self, allocator, key, ctx) Allocator.Error!GetOrPutResult
-    +getOrPutAdapted(self, allocator, key, key_ctx) Allocator.Error!GetOrPutResult
-    +getOrPutContextAdapted(self, allocator, key, key_ctx, ctx) Allocator.Error!GetOrPutResult
-    +getOrPutAssumeCapacity(self, key) GetOrPutResult
-    +getOrPutAssumeCapacityContext(self, key, ctx) GetOrPutResult
-    +getOrPutAssumeCapacityAdapted(self, key, ctx) GetOrPutResult
-    +getOrPutValue(self, allocator, key, value) Allocator.Error!Entry
-    +getOrPutValueContext(self, allocator, key, value, ctx) Allocator.Error!Entry
-    +contains(self, key) bool
-    +containsContext(self, key, ctx) bool
-    +containsAdapted(self, key, ctx) bool
-    -removeByIndex(self, idx) void
-    +remove(self, key) bool
-    +removeContext(self, key, ctx) bool
-    +removeAdapted(self, key, ctx) bool
-    +removeByPtr(self, keyPtr) void
-    -initMetadata(self) void
-    -load(self) Size
-    -growIfNeeded(self, allocator, new_count, ctx) Allocator.Error!void
-    +clone(self, allocator) Allocator.Error!Self
-    +cloneContext(self, allocator, new_ctx) Allocator.Error!HashMapUnmanaged(K, V, @TypeOf(new_ctx), max_load_percentage)
-    -grow(self, allocator, new_capacity, ctx) Allocator.Error!void
-    -allocate(self, allocator, new_capacity) Allocator.Error!void
-    -deallocate(self, allocator) void
-    -gdbHelper(self, hdr) void
-    -eql(self, adapted_key, test_key) bool
-    -hash(self, adapted_key) u64
-}
-link AdaptedContext "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/hash_map.zig#L2081"
-class `hash_map.zig` {
-    test "std.hash_map basic usage"()
-    test "std.hash_map ensureTotalCapacity"()
-    test "std.hash_map ensureUnusedCapacity with tombstones"()
-    test "std.hash_map clearRetainingCapacity"()
-    test "std.hash_map grow"()
-    test "std.hash_map clone"()
-    test "std.hash_map ensureTotalCapacity with existing elements"()
-    test "std.hash_map ensureTotalCapacity satisfies max load factor"()
-    test "std.hash_map remove"()
-    test "std.hash_map reverse removes"()
-    test "std.hash_map multiple removes on same metadata"()
-    test "std.hash_map put and remove loop in random order"()
-    test "std.hash_map remove one million elements in random order"()
-    test "std.hash_map put"()
-    test "std.hash_map putAssumeCapacity"()
-    test "std.hash_map repeat putAssumeCapacity/remove"()
-    test "std.hash_map getOrPut"()
-    test "std.hash_map basic hash map usage"()
-    test "std.hash_map clone"()
-    test "std.hash_map getOrPutAdapted"()
-    test "std.hash_map ensureUnusedCapacity"()
-    test "std.hash_map removeByPtr"()
-    test "std.hash_map removeByPtr 0 sized key"()
-    test "std.hash_map repeat fetchRemove"()
-    +getAutoHashFn(K, Context) (fn (Context, K) u64)
-    +getAutoEqlFn(K, Context) (fn (Context, K, K) bool)
-    +AutoHashMap(K, V) type
-    +AutoHashMapUnmanaged(K, V) type
-    +AutoContext(K) type
-    +StringHashMap(V) type
-    +StringHashMapUnmanaged(V) type
-    +eqlString(a, b) bool
-    +hashString(s) u64
-    +verifyContext(RawContext, PseudoKey, Key, Hash, is_array) void
-    +HashMap(K, V, Context, max_load_percentage) type
-    +HashMapUnmanaged(K, V, Context, max_load_percentage) type
-}
-`hash_map.zig` <-- StringContext
-`hash_map.zig` <-- StringIndexContext
-`hash_map.zig` <-- StringIndexAdapter
-link `hash_map.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/hash_map.zig"
 class TestContext["TestContext [str]"] {
     -storage: Storage
     -superblock: SuperBlock
