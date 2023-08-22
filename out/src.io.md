@@ -71,9 +71,9 @@ class IO["IO [str]"] {
 IO <-- Completion
 IO <-- Operation
 link IO "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/linux.zig#L15"
-class `io/linux.zig`
-`io/linux.zig` <-- IO
-link `io/linux.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/linux.zig"
+class `linux.zig`
+`linux.zig` <-- IO
+link `linux.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/linux.zig"
 class Completion["Completion [str]"] {
     +next: ?*Completion
     +context: ?*anyopaque
@@ -124,9 +124,9 @@ class IO["IO [str]"] {
 IO <-- Completion
 IO <-- Operation
 link IO "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/darwin.zig#L12"
-class `io/darwin.zig`
-`io/darwin.zig` <-- IO
-link `io/darwin.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/darwin.zig"
+class `darwin.zig`
+`darwin.zig` <-- IO
+link `darwin.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/darwin.zig"
 class FlushMode["FlushMode [enu]"] {
     -blocking
     -non_blocking
@@ -170,11 +170,11 @@ class IO["IO [str]"] {
 IO <-- FlushMode
 IO <-- Completion
 link IO "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/windows.zig#L11"
-class `io/windows.zig` {
+class `windows.zig` {
     -getsockoptError(socket) IO.ConnectError!void
 }
-`io/windows.zig` <-- IO
-link `io/windows.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/windows.zig"
+`windows.zig` <-- IO
+link `windows.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/windows.zig"
 class Socket["Socket [str]"] {
     -fd: os.socket_t
     -completion: IO.Completion
@@ -205,12 +205,12 @@ Context <-- Socket
 Context <-- Pipe
 Context <-- TransferType
 link Context "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/benchmark.zig#L97"
-class `io/benchmark.zig` {
+class `benchmark.zig` {
     +main() !void
 }
-`io/benchmark.zig` <-- Context
-link `io/benchmark.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/benchmark.zig"
-class `io/test.zig` {
+`benchmark.zig` <-- Context
+link `benchmark.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/benchmark.zig"
+class `test.zig` {
     test "write/read/close"()
     test "accept/connect/send/receive"()
     test "timeout"()
@@ -218,5 +218,5 @@ class `io/test.zig` {
     test "tick to wait"()
     test "pipe data over socket"()
 }
-link `io/test.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/test.zig"
+link `test.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/test.zig"
 ```

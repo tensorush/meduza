@@ -458,7 +458,7 @@ pub fn generate(
                         }
                     }
 
-                    // Print link to source line location
+                    // Print source line link
                     try writer.print("{c}\nlink {s} \"{s}/{s}#L{d}\"\n", .{ '}', src[start..end], remote_src_dir_path, entry.path, line_num });
 
                     // Validate output file because it's been written to
@@ -572,7 +572,7 @@ pub fn generate(
                         }
                     }
 
-                    // Print link to source line location
+                    // Print source line link
                     try writer.print("link {s} \"{s}/{s}#L{d}\"\n", .{ src[start..end], remote_src_dir_path, entry.path, line_num });
 
                     // Validate output file because it's been written to
@@ -627,19 +627,21 @@ pub fn generate(
             }
         }
 
+        const file_name = std.fs.path.basename(entry.path);
+
         // Print file container declaration
-        try writer.print("class `{s}`", .{entry.path});
+        try writer.print("class `{s}`", .{file_name});
 
         // Print file container declarations
         try printDecls(true, false, src, &file_decls, &file_funcs, writer);
 
         // Print "top-level to file" container relationships
         for (top_types.constSlice()) |container| {
-            try writer.print("`{s}` <-- {s}\n", .{ entry.path, src[container.start..container.end] });
+            try writer.print("`{s}` <-- {s}\n", .{ file_name, src[container.start..container.end] });
         }
 
-        // Print link to source file location
-        try writer.print("link `{s}` \"{s}/{s}\"\n", .{ entry.path, remote_src_dir_path, entry.path });
+        // Print source file link
+        try writer.print("link `{s}` \"{s}/{s}\"\n", .{ file_name, remote_src_dir_path, entry.path });
     }
 
     // Close valid and delete invalid output files

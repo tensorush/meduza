@@ -15,8 +15,8 @@ title: Tigerbeetle database (clients)
     }
 }%%
 classDiagram
-class `clients/docs_samples.zig`
-link `clients/docs_samples.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_samples.zig"
+class `docs_samples.zig`
+link `docs_samples.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_samples.zig"
 class Docs["Docs [str]"] {
     +directory: String
     +name: String
@@ -76,17 +76,16 @@ class Sample["Sample [str]"] {
     +long_description: String
 }
 link Sample "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_types.zig#L129"
-class `clients/docs_types.zig`
-`clients/docs_types.zig` <-- Docs
-`clients/docs_types.zig` <-- Sample
-link `clients/docs_types.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_types.zig"
-class `clients/run_with_tb.zig` {
-    -free_port() !u16
+class `docs_types.zig`
+`docs_types.zig` <-- Docs
+`docs_types.zig` <-- Sample
+link `docs_types.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_types.zig"
+class `run_with_tb.zig` {
     +run_with_tb(arena, commands, cwd) !void
     -error_main() !void
     +main() !void
 }
-link `clients/run_with_tb.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/run_with_tb.zig"
+link `run_with_tb.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/run_with_tb.zig"
 class MarkdownWriter["MarkdownWriter [str]"] {
     -buf: *std.ArrayList(u8)
     -writer: std.ArrayList(u8)
@@ -100,7 +99,7 @@ class MarkdownWriter["MarkdownWriter [str]"] {
     -diff_on_disk(mw, filename) !enum [ same, different ]
     -save(mw, filename) !void
 }
-link MarkdownWriter "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_generate.zig#L25"
+link MarkdownWriter "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_generate.zig#L27"
 class Generator["Generator [str]"] {
     -arena: *std.heap.ArenaAllocator
     -language: Docs
@@ -115,10 +114,11 @@ class Generator["Generator [str]"] {
     -validate_aggregate(self, keep_tmp) !void
     -make_aggregate_sample(self) ![]const u8
     -generate_language_setup_steps(self, mw, directory_info, include_project_file) void
+    -sample_exists(self, sample) !bool
     -generate_main_readme(self, mw) !void
     -generate_sample_readmes(self, mw) !void
 }
-link Generator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_generate.zig#L200"
+link Generator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_generate.zig#L203"
 class CliArgs["CliArgs [str]"] {
     -language: ?[]const u8
     -validate: ?[]const u8
@@ -126,16 +126,16 @@ class CliArgs["CliArgs [str]"] {
     -no_generate: bool
     -keep_tmp: bool
 }
-link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_generate.zig#L787"
-class `clients/docs_generate.zig` {
+link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_generate.zig#L807"
+class `docs_generate.zig` {
     +prepare_directory(arena, language, dir) !void
     +integrate(arena, language, dir, run) !void
     +main() !void
 }
-`clients/docs_generate.zig` <-- MarkdownWriter
-`clients/docs_generate.zig` <-- Generator
-`clients/docs_generate.zig` <-- CliArgs
-link `clients/docs_generate.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_generate.zig"
+`docs_generate.zig` <-- MarkdownWriter
+`docs_generate.zig` <-- Generator
+`docs_generate.zig` <-- CliArgs
+link `docs_generate.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_generate.zig"
 class TmpDir["TmpDir [str]"] {
     +dir: std.testing.TmpDir
     +path: []const u8
@@ -143,7 +143,7 @@ class TmpDir["TmpDir [str]"] {
     +deinit(self) void
 }
 link TmpDir "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/shutil.zig#L131"
-class `clients/shutil.zig` {
+class `shutil.zig` {
     +exec(arena, cmd) !std.ChildProcess.ExecResult
     +run_with_env(arena, cmd, env) !void
     +shell_wrap(arena, cmd) ![]const []const u8
@@ -156,8 +156,8 @@ class `clients/shutil.zig` {
     +file_or_directory_exists(f_or_d) bool
     +write_shell_newlines_into_single_line(into, from) !void
 }
-`clients/shutil.zig` <-- TmpDir
-link `clients/shutil.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/shutil.zig"
+`shutil.zig` <-- TmpDir
+link `shutil.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/shutil.zig"
 class CliArgs["CliArgs [str]"] {
     -dotnet
     -go
@@ -168,10 +168,10 @@ class CliArgs["CliArgs [str]"] {
     -keep_tmp: bool
 }
 link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/integration.zig#L24"
-class `clients/integration.zig` {
+class `integration.zig` {
     -error_main() !void
     +main() !void
 }
-`clients/integration.zig` <-- CliArgs
-link `clients/integration.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/integration.zig"
+`integration.zig` <-- CliArgs
+link `integration.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/integration.zig"
 ```

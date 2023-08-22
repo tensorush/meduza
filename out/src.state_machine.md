@@ -70,15 +70,15 @@ class AccountingAuditor["AccountingAuditor [str]"] {
 }
 AccountingAuditor <-- Options
 link AccountingAuditor "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine/auditor.zig#L58"
-class `state_machine/auditor.zig` {
+class `auditor.zig` {
     +IteratorForCreate(Result) type
     +IteratorForLookup(Result) type
 }
-`state_machine/auditor.zig` <-- InFlight
-`state_machine/auditor.zig` <-- PendingTransfer
-`state_machine/auditor.zig` <-- PendingExpiry
-`state_machine/auditor.zig` <-- AccountingAuditor
-link `state_machine/auditor.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine/auditor.zig"
+`auditor.zig` <-- InFlight
+`auditor.zig` <-- PendingTransfer
+`auditor.zig` <-- PendingExpiry
+`auditor.zig` <-- AccountingAuditor
+link `auditor.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine/auditor.zig"
 class TransferOutcome["TransferOutcome [enu]"] {
     -success
     -failure
@@ -111,15 +111,15 @@ class TransferBatch["TransferBatch [str]"] {
     -compare(_, a, b) std.math.Order
 }
 link TransferBatch "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine/workload.zig#L92"
-class `state_machine/workload.zig` {
+class `workload.zig` {
     +WorkloadType(AccountingStateMachine) type
     -OptionsType(StateMachine, Action) type
     -sample_distribution(random, distribution) std.meta.FieldEnum(@TypeOf(distribution))
     -chance(random, p) bool
 }
-`state_machine/workload.zig` <-- TransferOutcome
-`state_machine/workload.zig` <-- TransferPlan
-`state_machine/workload.zig` <-- TransferTemplate
-`state_machine/workload.zig` <-- TransferBatch
-link `state_machine/workload.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine/workload.zig"
+`workload.zig` <-- TransferOutcome
+`workload.zig` <-- TransferPlan
+`workload.zig` <-- TransferTemplate
+`workload.zig` <-- TransferBatch
+link `workload.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_machine/workload.zig"
 ```

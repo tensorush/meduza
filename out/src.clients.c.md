@@ -31,7 +31,7 @@ class ffi["ffi [str]"] {
     +c_init_echo(out_client, cluster_id, addresses_ptr, addresses_len, packets_count, on_completion_ctx, on_completion_fn) callconv(.C) tb_status_t
 }
 link ffi "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/tb_client.zig#L68"
-class `clients/c/tb_client.zig` {
+class `tb_client.zig` {
     +context_to_client(implementation) tb_client_t
     -client_to_context(tb_client) *ContextImplementation
     +init_error_to_status(err) tb_status_t
@@ -42,24 +42,24 @@ class `clients/c/tb_client.zig` {
     +submit(client, packet) callconv(.C) void
     +deinit(client) callconv(.C) void
 }
-`clients/c/tb_client.zig` <-- tb_status_t
-`clients/c/tb_client.zig` <-- ffi
-link `clients/c/tb_client.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/tb_client.zig"
-class `clients/c/tb_client_header_test.zig` {
+`tb_client.zig` <-- tb_status_t
+`tb_client.zig` <-- ffi
+link `tb_client.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/tb_client.zig"
+class `tb_client_header_test.zig` {
     test "valid tb_client.h"()
     -to_lowercase(input) []const u8
     -to_uppercase(input) []const u8
     -to_snakecase(input) []const u8
 }
-link `clients/c/tb_client_header_test.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/tb_client_header_test.zig"
-class `clients/c/tb_client_header.zig` {
+link `tb_client_header_test.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/tb_client_header_test.zig"
+class `tb_client_header.zig` {
     -resolve_c_type(Type) []const u8
     -to_uppercase(input) []const u8
     -emit_enum(buffer, Type, type_info, c_name, value_fmt, skip_fields) !void
     -emit_struct(buffer, type_info, c_name) !void
     +main() !void
 }
-link `clients/c/tb_client_header.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/tb_client_header.zig"
+link `tb_client_header.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/tb_client_header.zig"
 class Completion["Completion [str]"] {
     -pending: usize
     -mutex: Mutex
@@ -68,12 +68,12 @@ class Completion["Completion [str]"] {
     +wait_pending(self) void
 }
 link Completion "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/test.zig#L63"
-class `clients/c/test.zig` {
+class `test.zig` {
     test "c_client echo"()
     test "c_client tb_status"()
     test "c_client tb_packet_status"()
     -RequestContextType(request_size_max) type
 }
-`clients/c/test.zig` <-- Completion
-link `clients/c/test.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/test.zig"
+`test.zig` <-- Completion
+link `test.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/c/test.zig"
 ```

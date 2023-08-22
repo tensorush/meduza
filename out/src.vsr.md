@@ -32,6 +32,7 @@ class CommitStage["CommitStage [enu]"] {
     -compact_state_machine
     -checkpoint_state_machine
     -checkpoint_client_replies
+    -checkpoint_grid_repair
     -checkpoint_superblock
     -cleanup
 }
@@ -46,18 +47,18 @@ class ReplicaEvent["ReplicaEvent [uni]"] {
     +checkpoint_divergence_detected: struct
     +sync_stage_changed
 }
-link ReplicaEvent "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L67"
+link ReplicaEvent "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L68"
 class Prepare["Prepare [str]"] {
     -message: *Message
     -ok_from_all_replicas: QuorumCounter
     -ok_quorum_received: bool
 }
-link Prepare "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L91"
+link Prepare "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L92"
 class Request["Request [str]"] {
     -message: *Message
     -realtime: i64
 }
-link Request "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L102"
+link Request "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L103"
 class HeaderIterator["HeaderIterator [str]"] {
     -static_allocator: StaticAllocator
     -cluster: u32
@@ -161,7 +162,7 @@ class HeaderIterator["HeaderIterator [str]"] {
     -on_request_reply_read_callback(client_replies, reply_header, reply_, destination_replica) void
     -on_headers(self, message) void
     -on_request_blocks(self, message) void
-    -on_request_blocks_read_repair(grid_read, result) void
+    -on_request_blocks_read_block(grid_read, result) void
     -on_block(self, message) void
     -on_block_write_repair(grid_write) void
     -on_request_sync_trailer(self, message) void
@@ -197,6 +198,8 @@ class HeaderIterator["HeaderIterator [str]"] {
     -commit_op_compact_callback(state_machine) void
     -commit_op_checkpoint_state_machine_callback(state_machine) void
     -commit_op_checkpoint_client_replies_callback(client_replies) void
+    -commit_op_checkpoint_grid_repair(self) void
+    -commit_op_checkpoint_grid_repair_callback(grid) void
     -commit_op_checkpoint_superblock(self) void
     -commit_op_checkpoint_superblock_callback(superblock_context) void
     -commit_op_cleanup(self) void
@@ -233,7 +236,7 @@ class HeaderIterator["HeaderIterator [str]"] {
     -op_head_certain(self) bool
     +op_checkpoint(self) u64
     -op_checkpoint_next(self) u64
-    -op_checkpoint_trigger(self) u64
+    -op_checkpoint_next_trigger(self) u64
     -checkpoint_id_for_op(self, op) ?u128
     -op_repair_min(self) u64
     -op_repair_max(self) u64
@@ -308,7 +311,7 @@ class HeaderIterator["HeaderIterator [str]"] {
     -send_sync_trailer(self, command, parameters) void
     -next(iterator) ?*const Header
 }
-link HeaderIterator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8743"
+link HeaderIterator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8732"
 class DVCQuorum["DVCQuorum [str]"] {
     -verify(dvc_quorum) void
     -verify_message(message) void
@@ -324,7 +327,7 @@ class DVCQuorum["DVCQuorum [str]"] {
     -quorum_headers(dvc_quorum, options) union(enum)
 }
 DVCQuorum <-- HeaderIterator
-link DVCQuorum "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8417"
+link DVCQuorum "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8406"
 class PipelineQueue["PipelineQueue [str]"] {
     -prepare_queue: PrepareQueue
     -request_queue: RequestQueue
@@ -339,7 +342,7 @@ class PipelineQueue["PipelineQueue [str]"] {
     -push_request(pipeline, request) void
     -push_prepare(pipeline, message) void
 }
-link PipelineQueue "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8860"
+link PipelineQueue "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8849"
 class PipelineCache["PipelineCache [str]"] {
     -prepares: [prepares_max]?*Message
     -init_from_queue(queue) PipelineCache
@@ -349,33 +352,33 @@ class PipelineCache["PipelineCache [str]"] {
     -prepare_by_op_and_checksum(pipeline, op, checksum) ?*Message
     -insert(pipeline, prepare) ?*Message
 }
-link PipelineCache "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L9026"
-class `vsr/replica.zig` {
+link PipelineCache "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L9015"
+class `replica.zig` {
     +ReplicaType(StateMachine, MessageBus, Storage, Time, AOF) type
     -message_body_as_view_headers(message) vsr.Headers.ViewChangeSlice
     -message_body_as_headers(message) []const Header
     -message_body_as_headers_unchecked(message) []const Header
 }
-`vsr/replica.zig` <-- Status
-`vsr/replica.zig` <-- CommitStage
-`vsr/replica.zig` <-- ReplicaEvent
-`vsr/replica.zig` <-- Prepare
-`vsr/replica.zig` <-- Request
-`vsr/replica.zig` <-- DVCQuorum
-`vsr/replica.zig` <-- PipelineQueue
-`vsr/replica.zig` <-- PipelineCache
-link `vsr/replica.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig"
-class `vsr/replica_format.zig` {
+`replica.zig` <-- Status
+`replica.zig` <-- CommitStage
+`replica.zig` <-- ReplicaEvent
+`replica.zig` <-- Prepare
+`replica.zig` <-- Request
+`replica.zig` <-- DVCQuorum
+`replica.zig` <-- PipelineQueue
+`replica.zig` <-- PipelineCache
+link `replica.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig"
+class `replica_format.zig` {
     test "format"()
     +format(Storage, allocator, options, storage, superblock) !void
     -ReplicaFormatType(Storage) type
 }
-link `vsr/replica_format.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_format.zig"
-class `vsr/grid.zig` {
+link `replica_format.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_format.zig"
+class `grid.zig` {
     +allocate_block(allocator) error[OutOfMemory]!*align(constants.sector_size) [constants.block_size]u8
     +GridType(Storage) type
 }
-link `vsr/grid.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/grid.zig"
+link `grid.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/grid.zig"
 class Environment["Environment [str]"] {
     -sequence_states: SequenceStates
     -members: vsr.Members
@@ -405,13 +408,13 @@ class Environment["Environment [str]"] {
     -checkpoint_callback(context) void
 }
 link Environment "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_fuzz.zig#L162"
-class `vsr/superblock_fuzz.zig` {
+class `superblock_fuzz.zig` {
     +main() !void
     -run_fuzz(allocator, seed, transitions_count_total) !void
     -checksum_free_set(superblock) u128
 }
-`vsr/superblock_fuzz.zig` <-- Environment
-link `vsr/superblock_fuzz.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_fuzz.zig"
+`superblock_fuzz.zig` <-- Environment
+link `superblock_fuzz.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_fuzz.zig"
 class Reservation["Reservation [str]"] {
     +block_base: usize
     +block_count: usize
@@ -439,6 +442,7 @@ class FreeSet["FreeSet [str]"] {
     +acquire(set, reservation) ?u64
     -find_free_block_in_shard(set, shard) ?usize
     +is_free(set, address) bool
+    +is_released(set, address) bool
     +release(set, address) void
     -release_now(set, address) void
     +checkpoint(set) void
@@ -454,14 +458,14 @@ class TestPattern["TestPattern [str]"] {
     -fill: TestPatternFill
     -words: usize
 }
-link TestPattern "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set.zig#L721"
+link TestPattern "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set.zig#L726"
 class TestPatternFill["TestPatternFill [enu]"] {
     -uniform_ones
     -uniform_zeros
     -literal
 }
-link TestPatternFill "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set.zig#L726"
-class `vsr/superblock_free_set.zig` {
+link TestPatternFill "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set.zig#L731"
+class `superblock_free_set.zig` {
     test "FreeSet block shard count"()
     test "FreeSet highest_address_acquired"()
     test "FreeSet acquire/release"()
@@ -480,11 +484,11 @@ class `vsr/superblock_free_set.zig` {
     -find_bit(bit_set, bit_min, bit_max, bit_kind) ?usize
     -test_find_bit(random, bit_set, bit_kind) !void
 }
-`vsr/superblock_free_set.zig` <-- Reservation
-`vsr/superblock_free_set.zig` <-- FreeSet
-`vsr/superblock_free_set.zig` <-- TestPattern
-`vsr/superblock_free_set.zig` <-- TestPatternFill
-link `vsr/superblock_free_set.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set.zig"
+`superblock_free_set.zig` <-- Reservation
+`superblock_free_set.zig` <-- FreeSet
+`superblock_free_set.zig` <-- TestPattern
+`superblock_free_set.zig` <-- TestPatternFill
+link `superblock_free_set.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set.zig"
 class VSRState["VSRState [str]"] {
     +previous_checkpoint_id: u128
     +commit_min_checksum: u128
@@ -509,7 +513,7 @@ class Snapshot["Snapshot [str]"] {
     +timeout: u64
     +exists(snapshot) bool
 }
-link Snapshot "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L236"
+link Snapshot "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L237"
 class SuperBlockHeader["SuperBlockHeader [str]"] {
     +checksum: u128
     +copy: u16
@@ -553,14 +557,14 @@ class Caller["Caller [enu]"] {
     -updates_vsr_headers(caller) bool
     -updates_trailers(caller) bool
 }
-link Caller "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1628"
+link Caller "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1629"
 class Trailer["Trailer [enu]"] {
     +manifest
     +free_set
     +client_sessions
     +zone(trailer) SuperBlockZone
 }
-link Trailer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1674"
+link Trailer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1675"
 class SuperBlockZone["SuperBlockZone [enu]"] {
     +header
     +manifest
@@ -570,23 +574,23 @@ class SuperBlockZone["SuperBlockZone [enu]"] {
     +start_for_copy(zone, copy) u64
     +size_max(zone) u64
 }
-link SuperBlockZone "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1688"
-class `vsr/superblock.zig` {
+link SuperBlockZone "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1689"
+class `superblock.zig` {
     test "SuperBlockHeader"()
     +SuperBlockType(Storage) type
 }
-`vsr/superblock.zig` <-- SuperBlockHeader
-`vsr/superblock.zig` <-- Caller
-`vsr/superblock.zig` <-- Trailer
-`vsr/superblock.zig` <-- SuperBlockZone
-link `vsr/superblock.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig"
-class `vsr/journal_format_fuzz.zig` {
+`superblock.zig` <-- SuperBlockHeader
+`superblock.zig` <-- Caller
+`superblock.zig` <-- Trailer
+`superblock.zig` <-- SuperBlockZone
+link `superblock.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig"
+class `journal_format_fuzz.zig` {
     +main() !void
     +fuzz_format_wal_headers(write_size_max) !void
     +fuzz_format_wal_prepares(write_size_max) !void
     -verify_slot_header(slot, header) !void
 }
-link `vsr/journal_format_fuzz.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/journal_format_fuzz.zig"
+link `journal_format_fuzz.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/journal_format_fuzz.zig"
 class ProcessSelector["ProcessSelector [enu]"] {
     -__
     -R_
@@ -682,7 +686,7 @@ class TestClients["TestClients [str]"] {
     +replies(t) usize
 }
 link TestClients "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1498"
-class `vsr/replica_test.zig` {
+class `replica_test.zig` {
     test "Cluster: recovery: WAL prepare corruption (R=3, corrupt right of head)"()
     test "Cluster: recovery: WAL prepare corruption (R=3, corrupt left of head, 3/3 corrupt)"()
     test "Cluster: recovery: WAL prepare corruption (R=3, corrupt root)"()
@@ -716,28 +720,28 @@ class `vsr/replica_test.zig` {
     test "Cluster: sync: checkpoint diverges, sync (primary diverges)"()
     test "Cluster: sync: R=4, 2/4 ahead + idle, 2/4 lagging, sync"()
 }
-`vsr/replica_test.zig` <-- ProcessSelector
-`vsr/replica_test.zig` <-- TestContext
-`vsr/replica_test.zig` <-- TestReplicas
-`vsr/replica_test.zig` <-- TestClients
-link `vsr/replica_test.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig"
+`replica_test.zig` <-- ProcessSelector
+`replica_test.zig` <-- TestContext
+`replica_test.zig` <-- TestReplicas
+`replica_test.zig` <-- TestClients
+link `replica_test.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig"
 class TestVector["TestVector [str]"] {
     -source: []const u8
     -hash: u128
 }
 link TestVector "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/checksum.zig#L67"
-class `vsr/checksum.zig` {
+class `checksum.zig` {
     test "checksum test vectors"()
     test "checksum simple fuzzing"()
     test "checksum stability"()
     -seed_init() void
     +checksum(source) u128
 }
-link `vsr/checksum.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/checksum.zig"
-class `vsr/client.zig` {
+link `checksum.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/checksum.zig"
+class `client.zig` {
     +Client(StateMachine_, MessageBus) type
 }
-link `vsr/client.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/client.zig"
+link `client.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/client.zig"
 class Variant["Variant [enu]"] {
     -valid
     -valid_high_copy
@@ -762,14 +766,14 @@ class CopyTemplate["CopyTemplate [str]"] {
 }
 CopyTemplate <-- Variant
 link CopyTemplate "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_quorums_fuzz.zig#L200"
-class `vsr/superblock_quorums_fuzz.zig` {
+class `superblock_quorums_fuzz.zig` {
     +main() !void
     +fuzz_quorums_working(random) !void
     -test_quorums_working(random, threshold_count, initial_copies, result) !void
     +fuzz_quorum_repairs(random, options) !void
 }
-`vsr/superblock_quorums_fuzz.zig` <-- CopyTemplate
-link `vsr/superblock_quorums_fuzz.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_quorums_fuzz.zig"
+`superblock_quorums_fuzz.zig` <-- CopyTemplate
+link `superblock_quorums_fuzz.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_quorums_fuzz.zig"
 class FreeSetEvent["FreeSetEvent [uni]"] {
     -blocks: usize
     -reserve: struct
@@ -803,25 +807,25 @@ class FreeSetModel["FreeSetModel [str]"] {
     -assert_reservation_active(set, reservation) void
 }
 link FreeSetModel "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set_fuzz.zig#L165"
-class `vsr/superblock_free_set_fuzz.zig` {
+class `superblock_free_set_fuzz.zig` {
     +main() !void
     -run_fuzz(allocator, random, blocks_count, events) !void
     -generate_events(allocator, random, blocks_count) ![]const FreeSetEvent
 }
-`vsr/superblock_free_set_fuzz.zig` <-- FreeSetEvent
-`vsr/superblock_free_set_fuzz.zig` <-- FreeSetModel
-link `vsr/superblock_free_set_fuzz.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set_fuzz.zig"
+`superblock_free_set_fuzz.zig` <-- FreeSetEvent
+`superblock_free_set_fuzz.zig` <-- FreeSetModel
+link `superblock_free_set_fuzz.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set_fuzz.zig"
 class Options["Options [str]"] {
     +superblock_copies: u8
 }
 link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_quorums.zig#L10"
-class `vsr/superblock_quorums.zig` {
+class `superblock_quorums.zig` {
     test "Quorums.working"()
     test "Quorum.repairs"()
     +QuorumsType(options) type
 }
-`vsr/superblock_quorums.zig` <-- Options
-link `vsr/superblock_quorums.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_quorums.zig"
+`superblock_quorums.zig` <-- Options
+link `superblock_quorums.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_quorums.zig"
 class ReplySlot["ReplySlot [str]"] {
     +index: usize
 }
@@ -859,10 +863,10 @@ class ClientSessions["ClientSessions [str]"] {
 ClientSessions <-- Entry
 ClientSessions <-- Iterator
 link ClientSessions "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_client_sessions.zig#L15"
-class `vsr/superblock_client_sessions.zig`
-`vsr/superblock_client_sessions.zig` <-- ReplySlot
-`vsr/superblock_client_sessions.zig` <-- ClientSessions
-link `vsr/superblock_client_sessions.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_client_sessions.zig"
+class `superblock_client_sessions.zig`
+`superblock_client_sessions.zig` <-- ReplySlot
+`superblock_client_sessions.zig` <-- ClientSessions
+link `superblock_client_sessions.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_client_sessions.zig"
 class Interval["Interval [str]"] {
     +lower_bound: i64
     +upper_bound: i64
@@ -883,12 +887,12 @@ class Marzullo["Marzullo [str]"] {
 Marzullo <-- Interval
 Marzullo <-- Tuple
 link Marzullo "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/marzullo.zig#L8"
-class `vsr/marzullo.zig` {
+class `marzullo.zig` {
     test "marzullo"()
     -test_smallest_interval(bounds, smallest_interval) !void
 }
-`vsr/marzullo.zig` <-- Marzullo
-link `vsr/marzullo.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/marzullo.zig"
+`marzullo.zig` <-- Marzullo
+link `marzullo.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/marzullo.zig"
 class RequestingTrailers["RequestingTrailers [str]"] {
     +target: Target
     +trailers: Trailers
@@ -942,16 +946,16 @@ class Trailer["Trailer [str]"] {
     +write_chunk(trailer, destination, chunk) enum [ complete, incomplete, ignore ]
 }
 link Trailer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/sync.zig#L154"
-class `vsr/sync.zig` {
+class `sync.zig` {
     test "sync: Trailer chunk sequence"()
     test "sync: Trailer past/future chunk"()
 }
-`vsr/sync.zig` <-- Stage
-`vsr/sync.zig` <-- TargetCandidate
-`vsr/sync.zig` <-- Target
-`vsr/sync.zig` <-- TargetQuorum
-`vsr/sync.zig` <-- Trailer
-link `vsr/sync.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/sync.zig"
+`sync.zig` <-- Stage
+`sync.zig` <-- TargetCandidate
+`sync.zig` <-- Target
+`sync.zig` <-- TargetQuorum
+`sync.zig` <-- Trailer
+link `sync.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/sync.zig"
 class AssertionPoint["AssertionPoint [str]"] {
     -replica: u8
     -time: *Time
@@ -1018,14 +1022,14 @@ class ClockSimulator["ClockSimulator [str]"] {
 ClockSimulator <-- Packet
 ClockSimulator <-- Options
 link ClockSimulator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/clock.zig#L633"
-class `vsr/clock.zig` {
+class `clock.zig` {
     test "ideal clocks get clamped to cluster time"()
     test "clock: fuzz test"()
     +ClockType(Time) type
 }
-`vsr/clock.zig` <-- ClockUnitTestContainer
-`vsr/clock.zig` <-- ClockSimulator
-link `vsr/clock.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/clock.zig"
+`clock.zig` <-- ClockUnitTestContainer
+`clock.zig` <-- ClockSimulator
+link `clock.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/clock.zig"
 class Ring["Ring [enu]"] {
     -headers
     -prepares
@@ -1085,7 +1089,7 @@ class BitSet["BitSet [str]"] {
     +set(bit_set, slot) void
 }
 link BitSet "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/journal.zig#L2364"
-class `vsr/journal.zig` {
+class `journal.zig` {
     test "recovery_cases"()
     test "format_wal_headers"()
     test "format_wal_prepares"()
@@ -1095,14 +1099,14 @@ class `vsr/journal.zig` {
     +format_wal_headers(cluster, offset_logical, target) usize
     +format_wal_prepares(cluster, offset_logical, target) usize
 }
-`vsr/journal.zig` <-- Ring
-`vsr/journal.zig` <-- Slot
-`vsr/journal.zig` <-- SlotRange
-`vsr/journal.zig` <-- RecoveryDecision
-`vsr/journal.zig` <-- Matcher
-`vsr/journal.zig` <-- Case
-`vsr/journal.zig` <-- BitSet
-link `vsr/journal.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/journal.zig"
+`journal.zig` <-- Ring
+`journal.zig` <-- Slot
+`journal.zig` <-- SlotRange
+`journal.zig` <-- RecoveryDecision
+`journal.zig` <-- Matcher
+`journal.zig` <-- Case
+`journal.zig` <-- BitSet
+link `journal.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/journal.zig"
 class TableExtentKey["TableExtentKey [str]"] {
     +tree_hash: u128
     +table: u64
@@ -1157,16 +1161,16 @@ Manifest <-- TableExtent
 Manifest <-- BlockReference
 Manifest <-- IteratorReverse
 link Manifest "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_manifest.zig#L18"
-class `vsr/superblock_manifest.zig` {
+class `superblock_manifest.zig` {
     test "SuperBlockManifest"()
     -test_iterator_reverse(manifest, tree, expect) !void
     -test_codec(manifest) !void
 }
-`vsr/superblock_manifest.zig` <-- Manifest
-link `vsr/superblock_manifest.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_manifest.zig"
-class `vsr/client_replies.zig` {
+`superblock_manifest.zig` <-- Manifest
+link `superblock_manifest.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_manifest.zig"
+class `client_replies.zig` {
     -slot_offset(slot) usize
     +ClientRepliesType(Storage) type
 }
-link `vsr/client_replies.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/client_replies.zig"
+link `client_replies.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/client_replies.zig"
 ```

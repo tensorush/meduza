@@ -177,7 +177,6 @@ class ConfigCluster["ConfigCluster [str]"] {
     -lsm_growth_factor: u32
     -lsm_batch_multiple: comptime_int
     -lsm_snapshots_max: usize
-    -lsm_value_to_key_layout_ratio_min: comptime_int
     +message_size_max_min(clients_max) usize
     +checksum(config) u128
 }
@@ -188,20 +187,20 @@ class ConfigBase["ConfigBase [enu]"] {
     +test_min
     +default
 }
-link ConfigBase "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L186"
+link ConfigBase "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L185"
 class TracerBackend["TracerBackend [enu]"] {
     +none
     +tracy
 }
-link TracerBackend "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L193"
+link TracerBackend "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L192"
 class HashLogMode["HashLogMode [enu]"] {
     +none
     +create
     +check
 }
-link HashLogMode "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L199"
+link HashLogMode "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L198"
 class configs["configs [str]"]
-link configs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L205"
+link configs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L204"
 class `config.zig` {
     -launder_type(T, value) T
 }
@@ -323,7 +322,7 @@ class Operation["Operation [enu]"] {
     +valid(self, StateMachine) bool
     +vsr_reserved(self) bool
     +tag_name(self, StateMachine) []const u8
-    -check_state_machine_operations(Op) void
+    -check_state_machine_operations(StateMachine) void
 }
 link Operation "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L157"
 class Header["Header [str]"] {
@@ -383,13 +382,13 @@ class Header["Header [str]"] {
     +reserved(cluster, slot) Header
     +root_prepare(cluster) Header
 }
-link Header "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L233"
+link Header "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L234"
 class BlockRequest["BlockRequest [str]"] {
     +block_checksum: u128
     +block_address: u64
     +reserved: [8]u8
 }
-link BlockRequest "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L936"
+link BlockRequest "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L937"
 class ReconfigurationRequest["ReconfigurationRequest [str]"] {
     +members: Members
     +epoch: u32
@@ -399,7 +398,7 @@ class ReconfigurationRequest["ReconfigurationRequest [str]"] {
     +result: ReconfigurationResult
     +validate(request, current) ReconfigurationResult
 }
-link ReconfigurationRequest "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L948"
+link ReconfigurationRequest "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L949"
 class ReconfigurationResult["ReconfigurationResult [enu]"] {
     +reserved
     +ok
@@ -419,7 +418,7 @@ class ReconfigurationResult["ReconfigurationResult [enu]"] {
     +configuration_conflict
     +configuration_is_no_op
 }
-link ReconfigurationResult "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1037"
+link ReconfigurationResult "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1038"
 class Test["Test [str]"] {
     -members: Members
     -epoch: u32
@@ -429,7 +428,7 @@ class Test["Test [str]"] {
     -check(t, request, expected) !void
     -to_members(m) Members
 }
-link Test "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1091"
+link Test "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1092"
 class Timeout["Timeout [str]"] {
     +name: []const u8
     +id: u128
@@ -449,7 +448,7 @@ class Timeout["Timeout [str]"] {
     +tick(self) void
 }
 Timeout <-- Test
-link Timeout "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1194"
+link Timeout "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1195"
 class IdSeed["IdSeed [str]"] {
     -raw: []const u8
     -addresses: []const std.net.Address
@@ -459,24 +458,24 @@ class IdSeed["IdSeed [str]"] {
     -cluster: u32 align(1)
     -replica: u8 align(1)
 }
-link IdSeed "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1594"
+link IdSeed "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1595"
 class Headers["Headers [str]"] {
     -dvc_blank(op) Header
     +dvc_header_type(header) enum [ blank, valid ]
 }
 Headers <-- IdSeed
-link Headers "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1641"
+link Headers "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1642"
 class ViewChangeCommand["ViewChangeCommand [enu]"] {
     +do_view_change
     +start_view
 }
-link ViewChangeCommand "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1669"
+link ViewChangeCommand "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1670"
 class ViewRange["ViewRange [str]"] {
     -min: u32
     -max: u32
     +contains(range, view) bool
 }
-link ViewRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1733"
+link ViewRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1734"
 class ViewChangeHeadersSlice["ViewChangeHeadersSlice [str]"] {
     -command: ViewChangeCommand
     -slice: []const Header
@@ -485,7 +484,7 @@ class ViewChangeHeadersSlice["ViewChangeHeadersSlice [str]"] {
     +view_for_op(headers, op, log_view) ViewRange
 }
 ViewChangeHeadersSlice <-- ViewRange
-link ViewChangeHeadersSlice "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1671"
+link ViewChangeHeadersSlice "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1672"
 class ViewChangeHeadersArray["ViewChangeHeadersArray [str]"] {
     -command: ViewChangeCommand
     -array: Headers.Array
@@ -498,7 +497,14 @@ class ViewChangeHeadersArray["ViewChangeHeadersArray [str]"] {
     +append(headers, header) void
     +append_blank(headers, op) void
 }
-link ViewChangeHeadersArray "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1832"
+link ViewChangeHeadersArray "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1833"
+class Checkpoint["Checkpoint [str]"] {
+    +checkpoint_before(checkpoint) ?u64
+    +checkpoint_after(checkpoint) u64
+    +trigger_for_checkpoint(checkpoint) ?u64
+    +valid(op) bool
+}
+link Checkpoint "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1943"
 class `vsr.zig` {
     test "ReconfigurationRequest"()
     test "exponential_backoff_with_jitter"()
@@ -529,26 +535,33 @@ class `vsr.zig` {
 `vsr.zig` <-- ViewChangeCommand
 `vsr.zig` <-- ViewChangeHeadersSlice
 `vsr.zig` <-- ViewChangeHeadersArray
+`vsr.zig` <-- Checkpoint
 link `vsr.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig"
 class T["T [str]"] {
     -check(cmd, args, want) !void
 }
-link T "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/shell.zig#L285"
+link T "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/shell.zig#L388"
 class `shell.zig` {
     +gpa: std.mem.Allocator
     +arena: std.heap.ArenaAllocator
+    +project_root: std.fs.Dir
     test "shell: expand_argv"()
     +create(allocator) !*Shell
     +destroy(shell) void
     +echo(shell, fmt, fmt_args) void
     +dir_exists(shell, path) !bool
+    -subdir_exists(dir, path) !bool
     +find(shell, options) ![]const []const u8
     +exec(shell, cmd, cmd_args) !void
     +exec_status_ok(shell, cmd, cmd_args) !bool
     +exec_stdout(shell, cmd, cmd_args) ![]const u8
-    +git_commit(shell) ![40]u8
+    +spawn(shell, cmd, cmd_args) !std.ChildProcess
+    +zig(shell, cmd, cmd_args) !void
+    -echo_command(child) void
+    +git_commit(shell) ![]const u8
     +git_tag(shell) ![]const u8
     -expand_argv(argv, cmd, cmd_args) !void
+    -discover_project_root() !std.fs.Dir
 }
 link `shell.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/shell.zig"
 class `ewah_fuzz.zig` {
@@ -1174,7 +1187,7 @@ class StateMachineConfig["StateMachineConfig [str]"] {
     +lsm_batch_multiple: comptime_int
     +vsr_operations_reserved: u8
 }
-link StateMachineConfig "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/constants.zig#L542"
+link StateMachineConfig "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/constants.zig#L540"
 class `constants.zig`
 `constants.zig` <-- StateMachineConfig
 link `constants.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/constants.zig"

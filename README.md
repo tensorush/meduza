@@ -81,7 +81,7 @@ title: Title (path/to/directory)
     }
 }%%
 classDiagram
-class `dir/file.zig` {
+class `file.zig` {
     fld: T
     test "tst"()
 }
@@ -104,16 +104,16 @@ class Opaque["Opaque [opa]"] {
     fld: T
     +func(arg) E!R
 }
-`dir/file.zig` <-- Error
-`dir/file.zig` <-- Enum
-`dir/file.zig` <-- Union
-`dir/file.zig` <-- Struct
-`dir/file.zig` <-- Opaque
+`file.zig` <-- Error
+`file.zig` <-- Enum
+`file.zig` <-- Union
+`file.zig` <-- Struct
+`file.zig` <-- Opaque
 ```
 
 | Type          |                  Zig                  |                  Meduza                   |
 |---------------|:-------------------------------------:|:-----------------------------------------:|
-| File          |            `dir/file.zig`             |          `class dir/file.zig {}`          |
+| File          |              `file.zig`               |            `class file.zig {}`            |
 | Error         |   `const Error = error { Value, };`   |  `class Error["Error [err]"] { Value }`   |
 | Enum          |    `const Enum = enum { Value, };`    |   `class Enum["Enum [enu]"] { Value }`    |
 | Union         |  `const Union = union { fld: T, };`   |  `class Union["Union [uni]"] { fld: T }`  |

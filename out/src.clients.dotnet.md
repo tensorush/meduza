@@ -27,7 +27,7 @@ class TypeMapping["TypeMapping [str]"] {
     +is_read_only(self, name) bool
 }
 link TypeMapping "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/dotnet/dotnet_bindings.zig#L7"
-class `clients/dotnet/dotnet_bindings.zig` {
+class `dotnet_bindings.zig` {
     test "bindings dotnet"()
     -dotnet_type(Type) []const u8
     -get_mapped_type_name(Type) ?[]const u8
@@ -38,10 +38,10 @@ class `clients/dotnet/dotnet_bindings.zig` {
     +generate_bindings(buffer) !void
     +main() !void
 }
-`clients/dotnet/dotnet_bindings.zig` <-- TypeMapping
-link `clients/dotnet/dotnet_bindings.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/dotnet/dotnet_bindings.zig"
-class `clients/dotnet/docs.zig` {
+`dotnet_bindings.zig` <-- TypeMapping
+link `dotnet_bindings.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/dotnet/dotnet_bindings.zig"
+class `docs.zig` {
     -current_commit_post_install_hook(arena, sample_directory, root) !void
 }
-link `clients/dotnet/docs.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/dotnet/docs.zig"
+link `docs.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/dotnet/docs.zig"
 ```

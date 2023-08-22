@@ -15,7 +15,7 @@ title: Tigerbeetle database (clients/java/src)
     }
 }%%
 classDiagram
-class `clients/java/src/jni_tests.zig` {
+class `jni_tests.zig` {
     test "JNI: check jvm"()
     test "JNI: GetVersion"()
     test "JNI: FindClass"()
@@ -50,7 +50,7 @@ class `clients/java/src/jni_tests.zig` {
     test "JNI: object array"()
     test "JNI: primitive arrays"()
 }
-link `clients/java/src/jni_tests.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni_tests.zig"
+link `jni_tests.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni_tests.zig"
 class JNIResultType["JNIResultType [enu]"] {
     +ok
     +unknown
@@ -478,21 +478,21 @@ class JavaVM["JavaVM [opa]"] {
 }
 JavaVM <-- FunctionTable
 link JavaVM "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni.zig#L3094"
-class `clients/java/src/jni.zig` {
+class `jni.zig` {
     -JniInterface(T) type
 }
-`clients/java/src/jni.zig` <-- JNIResultType
-`clients/java/src/jni.zig` <-- JBoolean
-`clients/java/src/jni.zig` <-- JValue
-`clients/java/src/jni.zig` <-- JArrayReleaseMode
-`clients/java/src/jni.zig` <-- JObjectRefType
-`clients/java/src/jni.zig` <-- JNINativeMethod
-`clients/java/src/jni.zig` <-- JNIEnv
-`clients/java/src/jni.zig` <-- JavaVMOption
-`clients/java/src/jni.zig` <-- JavaVMInitArgs
-`clients/java/src/jni.zig` <-- JavaVMAttachArgs
-`clients/java/src/jni.zig` <-- JavaVM
-link `clients/java/src/jni.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni.zig"
+`jni.zig` <-- JNIResultType
+`jni.zig` <-- JBoolean
+`jni.zig` <-- JValue
+`jni.zig` <-- JArrayReleaseMode
+`jni.zig` <-- JObjectRefType
+`jni.zig` <-- JNINativeMethod
+`jni.zig` <-- JNIEnv
+`jni.zig` <-- JavaVMOption
+`jni.zig` <-- JavaVMInitArgs
+`jni.zig` <-- JavaVMAttachArgs
+`jni.zig` <-- JavaVM
+link `jni.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/jni.zig"
 class Context["Context [str]"] {
     -jvm: *jni.JavaVM
     -client: tb.tb_client_t
@@ -542,10 +542,10 @@ class JNIHelper["JNIHelper [str]"] {
     +get_string_utf(env, string) ?[:0]const u8
 }
 link JNIHelper "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/client.zig#L526"
-class `clients/java/src/client.zig`
-`clients/java/src/client.zig` <-- Context
-`clients/java/src/client.zig` <-- NativeClient
-`clients/java/src/client.zig` <-- ReflectionHelper
-`clients/java/src/client.zig` <-- JNIHelper
-link `clients/java/src/client.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/client.zig"
+class `client.zig`
+`client.zig` <-- Context
+`client.zig` <-- NativeClient
+`client.zig` <-- ReflectionHelper
+`client.zig` <-- JNIHelper
+link `client.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/src/client.zig"
 ```

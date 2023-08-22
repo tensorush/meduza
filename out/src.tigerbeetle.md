@@ -52,14 +52,14 @@ class Command["Command [uni]"] {
 }
 Command <-- Start
 link Command "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/cli.zig#L122"
-class `tigerbeetle/cli.zig` {
+class `cli.zig` {
     +parse_args(allocator) !Command
     -parse_addresses(allocator, raw_addresses) []net.Address
     -parse_cache_size_to_count(T, SetAssociativeCache, size) u32
 }
-`tigerbeetle/cli.zig` <-- CliArgs
-`tigerbeetle/cli.zig` <-- Command
-link `tigerbeetle/cli.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/cli.zig"
+`cli.zig` <-- CliArgs
+`cli.zig` <-- Command
+link `cli.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/cli.zig"
 class std_options["std_options [str]"]
 link std_options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/main.zig#L34"
 class Command["Command [str]"] {
@@ -75,11 +75,11 @@ class Command["Command [str]"] {
     +version(allocator, verbose) !void
 }
 link Command "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/main.zig#L66"
-class `tigerbeetle/main.zig` {
+class `main.zig` {
     +main() !void
     -print_value(writer, field, value) !void
 }
-`tigerbeetle/main.zig` <-- std_options
-`tigerbeetle/main.zig` <-- Command
-link `tigerbeetle/main.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/main.zig"
+`main.zig` <-- std_options
+`main.zig` <-- Command
+link `main.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/main.zig"
 ```

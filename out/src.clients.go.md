@@ -15,12 +15,12 @@ title: Tigerbeetle database (clients/go)
     }
 }%%
 classDiagram
-class `clients/go/docs.zig` {
+class `docs.zig` {
     -go_current_commit_pre_install_hook(arena, sample_dir, _) !void
     -go_current_commit_post_install_hook(arena, sample_dir, root) !void
 }
-link `clients/go/docs.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/go/docs.zig"
-class `clients/go/go_bindings.zig` {
+link `docs.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/go/docs.zig"
+class `go_bindings.zig` {
     test "bindings go"()
     -go_type(Type) []const u8
     -get_mapped_type_name(Type) ?[]const u8
@@ -33,5 +33,5 @@ class `clients/go/go_bindings.zig` {
     +generate_bindings(buffer) !void
     +main() !void
 }
-link `clients/go/go_bindings.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/go/go_bindings.zig"
+link `go_bindings.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/go/go_bindings.zig"
 ```

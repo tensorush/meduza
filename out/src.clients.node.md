@@ -15,11 +15,11 @@ title: Tigerbeetle database (clients/node)
     }
 }%%
 classDiagram
-class `clients/node/docs.zig` {
+class `docs.zig` {
     -find_node_client_tar(arena, root) ![]const u8
     -node_current_commit_post_install_hook(arena, sample_dir, root) !void
 }
-link `clients/node/docs.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/docs.zig"
+link `docs.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/docs.zig"
 class TypeMapping["TypeMapping [str]"] {
     -name: []const u8
     -hidden_fields: []const []const u8
@@ -27,7 +27,7 @@ class TypeMapping["TypeMapping [str]"] {
     +hidden(self, name) bool
 }
 link TypeMapping "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/node_bindings.zig#L7"
-class `clients/node/node_bindings.zig` {
+class `node_bindings.zig` {
     test "bindings node"()
     -typescript_type(Type) []const u8
     -get_mapped_type_name(Type) ?[]const u8
@@ -38,6 +38,6 @@ class `clients/node/node_bindings.zig` {
     +generate_bindings(buffer) !void
     +main() !void
 }
-`clients/node/node_bindings.zig` <-- TypeMapping
-link `clients/node/node_bindings.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/node_bindings.zig"
+`node_bindings.zig` <-- TypeMapping
+link `node_bindings.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/node_bindings.zig"
 ```

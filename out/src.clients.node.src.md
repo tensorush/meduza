@@ -24,7 +24,7 @@ class UserData["UserData [str]"] {
     +callback_reference: c.napi_ref
 }
 link UserData "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/translate.zig#L73"
-class `clients/node/src/translate.zig` {
+class `translate.zig` {
     +register_function(env, exports, name, function) !void
     +throw(env, message) TranslationError
     +capture_undefined(env) !c.napi_value
@@ -60,11 +60,11 @@ class `clients/node/src/translate.zig` {
     +scope(env, error_message) !c.napi_value
     +reference_value(env, callback_reference, error_message) !c.napi_value
 }
-`clients/node/src/translate.zig` <-- TranslationError
-`clients/node/src/translate.zig` <-- UserData
-link `clients/node/src/translate.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/translate.zig"
-class `clients/node/src/c.zig`
-link `clients/node/src/c.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/c.zig"
+`translate.zig` <-- TranslationError
+`translate.zig` <-- UserData
+link `translate.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/translate.zig"
+class `c.zig`
+link `c.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/c.zig"
 class std_options["std_options [str]"]
 link std_options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/node.zig#L27"
 class Globals["Globals [str]"] {
@@ -84,7 +84,7 @@ class Context["Context [str]"] {
     -create(env, allocator, io, cluster, addresses_raw) !c.napi_value
 }
 link Context "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/node.zig#L123"
-class `clients/node/src/node.zig` {
+class `node.zig` {
     -napi_register_module_v1(env, exports) c.napi_value
     -globalsCast(globals_raw) *Globals
     -contextCast(context_raw) !*Context
@@ -100,8 +100,8 @@ class `clients/node/src/node.zig` {
     -tick(env, info) callconv(.C) c.napi_value
     -deinit(env, info) callconv(.C) c.napi_value
 }
-`clients/node/src/node.zig` <-- std_options
-`clients/node/src/node.zig` <-- Globals
-`clients/node/src/node.zig` <-- Context
-link `clients/node/src/node.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/node.zig"
+`node.zig` <-- std_options
+`node.zig` <-- Globals
+`node.zig` <-- Context
+link `node.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/node/src/node.zig"
 ```

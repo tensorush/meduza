@@ -23,16 +23,16 @@ class Checkpoint["Checkpoint [str]"] {
     -checksum_grid: u128
 }
 link Checkpoint "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/storage_checker.zig#L47"
-class `testing/cluster/storage_checker.zig` {
+class `storage_checker.zig` {
     +StorageCheckerType(Replica) type
 }
-`testing/cluster/storage_checker.zig` <-- Checkpoint
-link `testing/cluster/storage_checker.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/storage_checker.zig"
-class `testing/cluster/sync_checker.zig` {
+`storage_checker.zig` <-- Checkpoint
+link `storage_checker.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/storage_checker.zig"
+class `sync_checker.zig` {
     +SyncCheckerType(Replica) type
     -checkpoint_index(checkpoint_op) usize
 }
-link `testing/cluster/sync_checker.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/sync_checker.zig"
+link `sync_checker.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/sync_checker.zig"
 class Process["Process [uni]"] {
     +replica: u8
     +client: u128
@@ -58,10 +58,10 @@ class MessageBus["MessageBus [str]"] {
 }
 MessageBus <-- Options
 link MessageBus "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/message_bus.zig#L18"
-class `testing/cluster/message_bus.zig`
-`testing/cluster/message_bus.zig` <-- Process
-`testing/cluster/message_bus.zig` <-- MessageBus
-link `testing/cluster/message_bus.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/message_bus.zig"
+class `message_bus.zig`
+`message_bus.zig` <-- Process
+`message_bus.zig` <-- MessageBus
+link `message_bus.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/message_bus.zig"
 class ReplicaHead["ReplicaHead [str]"] {
     -header: vsr.Header
     -replicas: ReplicaSet
@@ -69,11 +69,11 @@ class ReplicaHead["ReplicaHead [str]"] {
     -op: u64
 }
 link ReplicaHead "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/state_checker.zig#L18"
-class `testing/cluster/state_checker.zig` {
+class `state_checker.zig` {
     +StateCheckerType(Client, Replica) type
 }
-`testing/cluster/state_checker.zig` <-- ReplicaHead
-link `testing/cluster/state_checker.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/state_checker.zig"
+`state_checker.zig` <-- ReplicaHead
+link `state_checker.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/state_checker.zig"
 class Packet["Packet [str]"] {
     +network: *Network
     +message: *Message
@@ -114,7 +114,7 @@ class Network["Network [str]"] {
 Network <-- Packet
 Network <-- Path
 link Network "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/network.zig#L25"
-class `testing/cluster/network.zig`
-`testing/cluster/network.zig` <-- Network
-link `testing/cluster/network.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/network.zig"
+class `network.zig`
+`network.zig` <-- Network
+link `network.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/network.zig"
 ```
