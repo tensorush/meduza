@@ -21,7 +21,7 @@ const PARSERS = .{
 pub fn main() anyerror!void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer if (gpa.deinit() == .leak) {
-        @panic("PANIC: Memory leak has occurred!");
+        @panic("Memory leak has occurred!\n");
     };
 
     var arena = std.heap.ArenaAllocator.init(gpa.allocator());
