@@ -1,6 +1,6 @@
 ```mermaid
 ---
-title: Tigerbeetle database (clients)
+title: TigerBeetle database (clients)
 ---
 %%{
     init: {
@@ -82,10 +82,53 @@ class `docs_types.zig`
 link `docs_types.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_types.zig"
 class `run_with_tb.zig` {
     +run_with_tb(arena, commands, cwd) !void
+    +run_many_with_tb(arena, commands, cwd) !void
     -error_main() !void
     +main() !void
 }
 link `run_with_tb.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/run_with_tb.zig"
+class JSONAccount["JSONAccount [str]"] {
+    -id: []const u8
+    -user_data: []const u8
+    -ledger: []const u8
+    -code: []const u8
+    -flags: []const []const u8
+    -debits_pending: []const u8
+    -debits_posted: []const u8
+    -credits_pending: []const u8
+    -credits_posted: []const u8
+    -timestamp: []const u8
+}
+link JSONAccount "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/repl_integration.zig#L113"
+class JSONTransfer["JSONTransfer [str]"] {
+    -id: []const u8
+    -debit_account_id: []const u8
+    -credit_account_id: []const u8
+    -user_data: []const u8
+    -pending_id: []const u8
+    -timeout: []const u8
+    -ledger: []const u8
+    -code: []const u8
+    -flags: [][]const u8
+    -amount: []const u8
+    -timestamp: []const u8
+}
+link JSONTransfer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/repl_integration.zig#L128"
+class CliArgs["CliArgs [str]"] {
+    -keep_tmp: bool
+}
+link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/repl_integration.zig#L226"
+class `repl_integration.zig` {
+    -tb_client_command(arena, tb_binary, command) ![]const []const u8
+    -tb_client_command_json_out(arena, tb_binary, command, out_name) ![]const []const u8
+    -expect_json_file_equals(arena, expected, out_directory_name, out_file_name) !void
+    -test_basic_accounts_and_transfers(arena, tb_binary, tmp_dir) !void
+    +main() !void
+}
+`repl_integration.zig` <-- JSONAccount
+`repl_integration.zig` <-- JSONTransfer
+`repl_integration.zig` <-- CliArgs
+link `repl_integration.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/repl_integration.zig"
 class MarkdownWriter["MarkdownWriter [str]"] {
     -buf: *std.ArrayList(u8)
     -writer: std.ArrayList(u8)

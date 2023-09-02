@@ -1,6 +1,6 @@
 ```mermaid
 ---
-title: Tigerbeetle database (io)
+title: TigerBeetle database (io)
 ---
 %%{
     init: {
@@ -70,7 +70,7 @@ class IO["IO [str]"] {
 }
 IO <-- Completion
 IO <-- Operation
-link IO "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/linux.zig#L15"
+link IO "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/linux.zig#L16"
 class `linux.zig`
 `linux.zig` <-- IO
 link `linux.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/io/linux.zig"

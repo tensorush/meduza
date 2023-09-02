@@ -1,6 +1,6 @@
 ```mermaid
 ---
-title: Tigerbeetle database (demos)
+title: TigerBeetle database (demos)
 ---
 %%{
     init: {

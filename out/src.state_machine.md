@@ -1,6 +1,6 @@
 ```mermaid
 ---
-title: Tigerbeetle database (state_machine)
+title: TigerBeetle database (state_machine)
 ---
 %%{
     init: {

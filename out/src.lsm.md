@@ -1,6 +1,6 @@
 ```mermaid
 ---
-title: Tigerbeetle database (lsm)
+title: TigerBeetle database (lsm)
 ---
 %%{
     init: {
@@ -41,23 +41,24 @@ class Config["Config [str]"] {
     +lower_bound
     +upper_bound
     +mode: enum
+    +prefetch: bool
 }
-link Config "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/binary_search.zig#L7"
+link Config "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/binary_search.zig#L9"
 class BinarySearchResult["BinarySearchResult [str]"] {
     -index: u32
     -exact: bool
 }
-link BinarySearchResult "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/binary_search.zig#L116"
+link BinarySearchResult "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/binary_search.zig#L157"
 class BinarySearchRangeUpsertIndexes["BinarySearchRangeUpsertIndexes [str]"] {
     +start: u32
     +end: u32
 }
-link BinarySearchRangeUpsertIndexes "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/binary_search.zig#L159"
+link BinarySearchRangeUpsertIndexes "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/binary_search.zig#L200"
 class BinarySearchRange["BinarySearchRange [str]"] {
     +start: u32
     +count: u32
 }
-link BinarySearchRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/binary_search.zig#L237"
+link BinarySearchRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/binary_search.zig#L278"
 class test_binary_search["test_binary_search [str]"] {
     -key_min
     -key_max
@@ -70,7 +71,7 @@ class test_binary_search["test_binary_search [str]"] {
     +explicit_range_search(sequence, key_min, key_max, expected) !void
     -random_range_search(random, iter) !void
 }
-link test_binary_search "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/binary_search.zig#L304"
+link test_binary_search "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/binary_search.zig#L345"
 class `binary_search.zig` {
     test "binary search: exhaustive"()
     test "binary search: explicit"()
@@ -114,7 +115,7 @@ class Layout["Layout [str]"] {
     -searches: usize
 }
 Layout <-- Page
-link Layout "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/binary_search_benchmark.zig#L117"
+link Layout "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/binary_search_benchmark.zig#L119"
 class BenchmarkResult["BenchmarkResult [str]"] {
     -wall_time: u64
     -utime: u64
@@ -124,7 +125,7 @@ class BenchmarkResult["BenchmarkResult [str]"] {
     -cache_misses: usize
     -branch_misses: usize
 }
-link BenchmarkResult "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/binary_search_benchmark.zig#L148"
+link BenchmarkResult "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/binary_search_benchmark.zig#L150"
 class Benchmark["Benchmark [str]"] {
     -timer: std.time.Timer
     -rusage: std.os.rusage
@@ -132,7 +133,7 @@ class Benchmark["Benchmark [str]"] {
     -begin() !Benchmark
     -end(self, samples) !BenchmarkResult
 }
-link Benchmark "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/binary_search_benchmark.zig#L167"
+link Benchmark "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/binary_search_benchmark.zig#L169"
 class `binary_search_benchmark.zig` {
     +main() !void
     -run_benchmark(layout, blob, random) !void
@@ -309,7 +310,8 @@ class Context["Context [str]"] {
 }
 link Context "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L113"
 class Parent["Parent [str]"] {
-    +tree_id: u128
+    +tree_id: u16
+    +padding: [14]u8
 }
 link Parent "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L125"
 class Parameters["Parameters [str]"] {
@@ -360,7 +362,8 @@ class Context["Context [str]"] {
 }
 link Context "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L328"
 class Parent["Parent [str]"] {
-    +tree_id: u128
+    +tree_id: u16
+    +padding: [14]u8
 }
 link Parent "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/schema.zig#L338"
 class TableFilter["TableFilter [str]"] {
@@ -552,7 +555,7 @@ class Model["Model [str]"] {
     +checkpoint(model, op) !void
     +storage_reset(model) void
 }
-link Model "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/forest_fuzz.zig#L294"
+link Model "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/forest_fuzz.zig#L296"
 class Environment["Environment [str]"] {
     -state: State
     -storage: *Storage
@@ -687,7 +690,7 @@ class TableEntry["TableEntry [str]"] {
     -level: u7
     -table: TableInfo
 }
-link TableEntry "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/manifest_log_fuzz.zig#L540"
+link TableEntry "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/manifest_log_fuzz.zig#L542"
 class ManifestLogModel["ManifestLogModel [str]"] {
     -insert
     -remove
@@ -701,7 +704,7 @@ class ManifestLogModel["ManifestLogModel [str]"] {
     -checkpoint(model) !void
 }
 ManifestLogModel <-- TableEntry
-link ManifestLogModel "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/manifest_log_fuzz.zig#L535"
+link ManifestLogModel "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/lsm/manifest_log_fuzz.zig#L537"
 class `manifest_log_fuzz.zig` {
     +main() !void
     -run_fuzz(allocator, random, events) !void
@@ -835,8 +838,8 @@ class Options["Options [str]"] {
     -pool: TestPool
     -level: TestLevel
     -snapshot_max: u64
-    -snapshots: std.BoundedArray(u64, 8)
-    -snapshot_tables: std.BoundedArray(std.ArrayList(TableInfo)
+    -snapshots: stdx.BoundedArray(u64, 8)
+    -snapshot_tables: stdx.BoundedArray(std.ArrayList(TableInfo)
     -reference: std.ArrayList(TableInfo)
     -inserts: u64
     -removes: u64

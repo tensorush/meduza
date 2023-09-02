@@ -33,10 +33,10 @@ jobs:
       - name: Set up Zig
         uses: goto-bus-stop/setup-zig@v2
 
-      - name: Run Meduza codebase graph generator on Tigerbeetle database
+      - name: Run Meduza codebase graph generator on TigerBeetle database
         run: |
           zig env
-          zig build exe -- -r https://github.com/tigerbeetle/tigerbeetle/blob/main/src -l tigerbeetle/src -t "Tigerbeetle database" -e mmd
+          zig build exe -- -r https://github.com/tigerbeetle/tigerbeetle/blob/main/src -l tigerbeetle/src -t "TigerBeetle database" -e mmd
 
       - name: Install Mermaid CLI
         run: |

@@ -1,6 +1,6 @@
 ```mermaid
 ---
-title: Tigerbeetle database (vsr)
+title: TigerBeetle database (vsr)
 ---
 %%{
     init: {
@@ -298,6 +298,8 @@ class HeaderIterator["HeaderIterator [str]"] {
     -sync_requesting_trailers_callback(self) void
     -sync_superblock_update(self) void
     -sync_superblock_update_callback(superblock_context) void
+    -sync_content(self) void
+    +sync_content_done(self) bool
     -valid_hash_chain(self, method) bool
     -valid_hash_chain_between(self, op_min, op_max) bool
     -jump_view(self, header) void
@@ -311,8 +313,10 @@ class HeaderIterator["HeaderIterator [str]"] {
     -send_sync_trailer(self, command, parameters) void
     -next(iterator) ?*const Header
 }
-link HeaderIterator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8732"
+link HeaderIterator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8834"
 class DVCQuorum["DVCQuorum [str]"] {
+    -min: u64
+    -max: u64
     -verify(dvc_quorum) void
     -verify_message(message) void
     -dvcs_all(dvc_quorum) DVCArray
@@ -327,7 +331,7 @@ class DVCQuorum["DVCQuorum [str]"] {
     -quorum_headers(dvc_quorum, options) union(enum)
 }
 DVCQuorum <-- HeaderIterator
-link DVCQuorum "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8406"
+link DVCQuorum "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8508"
 class PipelineQueue["PipelineQueue [str]"] {
     -prepare_queue: PrepareQueue
     -request_queue: RequestQueue
@@ -342,7 +346,7 @@ class PipelineQueue["PipelineQueue [str]"] {
     -push_request(pipeline, request) void
     -push_prepare(pipeline, message) void
 }
-link PipelineQueue "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8849"
+link PipelineQueue "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8951"
 class PipelineCache["PipelineCache [str]"] {
     -prepares: [prepares_max]?*Message
     -init_from_queue(queue) PipelineCache
@@ -352,7 +356,7 @@ class PipelineCache["PipelineCache [str]"] {
     -prepare_by_op_and_checksum(pipeline, op, checksum) ?*Message
     -insert(pipeline, prepare) ?*Message
 }
-link PipelineCache "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L9015"
+link PipelineCache "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L9117"
 class `replica.zig` {
     +ReplicaType(StateMachine, MessageBus, Storage, Time, AOF) type
     -message_body_as_view_headers(message) vsr.Headers.ViewChangeSlice
@@ -407,7 +411,7 @@ class Environment["Environment [str]"] {
     -checkpoint(env) !void
     -checkpoint_callback(context) void
 }
-link Environment "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_fuzz.zig#L162"
+link Environment "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_fuzz.zig#L165"
 class `superblock_fuzz.zig` {
     +main() !void
     -run_fuzz(allocator, seed, transitions_count_total) !void
@@ -494,26 +498,29 @@ class VSRState["VSRState [str]"] {
     +commit_min_checksum: u128
     +replica_id: u128
     +members: vsr.Members
+    +commit_min_canonical: u64
     +commit_min: u64
     +commit_max: u64
+    +sync_op_min: u64
+    +sync_op_max: u64
     +log_view: u32
     +view: u32
     +replica_count: u8
-    +reserved: [7]u8
+    +reserved: [15]u8
     +root(options) VSRState
     +assert_internally_consistent(state) void
     +monotonic(old, new) bool
     +would_be_updated_by(old, new) bool
     +op_compacted(state, op) bool
 }
-link VSRState "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L127"
+link VSRState "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L129"
 class Snapshot["Snapshot [str]"] {
     +created: u64
     +queried: u64
     +timeout: u64
     +exists(snapshot) bool
 }
-link Snapshot "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L237"
+link Snapshot "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L263"
 class SuperBlockHeader["SuperBlockHeader [str]"] {
     +checksum: u128
     +copy: u16
@@ -533,7 +540,7 @@ class SuperBlockHeader["SuperBlockHeader [str]"] {
     +free_set_size: u32
     +client_sessions_size: u32
     +vsr_headers_count: u32
-    +reserved: [2920]u8
+    +reserved: [2888]u8
     +vsr_headers_all: [constants.view_change_headers_max]vsr.Header
     +vsr_headers_reserved: [vsr_headers_reserved_size]u8
     +calculate_checksum(superblock) u128
@@ -547,7 +554,7 @@ class SuperBlockHeader["SuperBlockHeader [str]"] {
 }
 SuperBlockHeader <-- VSRState
 SuperBlockHeader <-- Snapshot
-link SuperBlockHeader "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L42"
+link SuperBlockHeader "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L44"
 class Caller["Caller [enu]"] {
     +format
     +open
@@ -557,14 +564,14 @@ class Caller["Caller [enu]"] {
     -updates_vsr_headers(caller) bool
     -updates_trailers(caller) bool
 }
-link Caller "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1629"
+link Caller "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1702"
 class Trailer["Trailer [enu]"] {
     +manifest
     +free_set
     +client_sessions
     +zone(trailer) SuperBlockZone
 }
-link Trailer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1675"
+link Trailer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1748"
 class SuperBlockZone["SuperBlockZone [enu]"] {
     +header
     +manifest
@@ -574,7 +581,7 @@ class SuperBlockZone["SuperBlockZone [enu]"] {
     +start_for_copy(zone, copy) u64
     +size_max(zone) u64
 }
-link SuperBlockZone "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1689"
+link SuperBlockZone "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1762"
 class `superblock.zig` {
     test "SuperBlockHeader"()
     +SuperBlockType(Storage) type
@@ -615,7 +622,7 @@ class ProcessSelector["ProcessSelector [enu]"] {
     -B5
     -C_
 }
-link ProcessSelector "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1013"
+link ProcessSelector "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1014"
 class TestContext["TestContext [str]"] {
     -cluster: *Cluster
     -log_level: std.log.Level
@@ -630,15 +637,15 @@ class TestContext["TestContext [str]"] {
     -on_client_reply(cluster, client, request, reply) void
     -processes(t, selector) ProcessList
 }
-link TestContext "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1038"
+link TestContext "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1039"
 class Role["Role [enu]"]
-link Role "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1328"
+link Role "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1327"
 class LinkDirection["LinkDirection [enu]"]
-link LinkDirection "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1423"
+link LinkDirection "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1422"
 class TestReplicas["TestReplicas [str]"] {
     -context: *TestContext
     -cluster: *Cluster
-    -replicas: std.BoundedArray(u8, constants.members_max)
+    -replicas: stdx.BoundedArray(u8, constants.members_max)
     -primary
     -backup
     -standby
@@ -672,20 +679,20 @@ class TestReplicas["TestReplicas [str]"] {
     +drop(t, peer, direction, command) void
     +record(t, peer, direction, command) void
     +replay_recorded(t) void
-    -peer_paths(t, peer, direction) std.BoundedArray(Network.Path, paths_max)
+    -peer_paths(t, peer, direction) stdx.BoundedArray(Network.Path, paths_max)
 }
 TestReplicas <-- Role
 TestReplicas <-- LinkDirection
-link TestReplicas "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1208"
+link TestReplicas "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1207"
 class TestClients["TestClients [str]"] {
     -context: *TestContext
     -cluster: *Cluster
-    -clients: std.BoundedArray(usize, constants.clients_max)
+    -clients: stdx.BoundedArray(usize, constants.clients_max)
     -requests: usize
     +request(t, requests, expect_replies) !void
     +replies(t) usize
 }
-link TestClients "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1498"
+link TestClients "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1497"
 class `replica_test.zig` {
     test "Cluster: recovery: WAL prepare corruption (R=3, corrupt right of head)"()
     test "Cluster: recovery: WAL prepare corruption (R=3, corrupt left of head, 3/3 corrupt)"()

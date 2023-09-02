@@ -1,6 +1,6 @@
 ```mermaid
 ---
-title: Tigerbeetle database (testing/cluster)
+title: TigerBeetle database (testing/cluster)
 ---
 %%{
     init: {
@@ -15,18 +15,18 @@ title: Tigerbeetle database (testing/cluster)
     }
 }%%
 classDiagram
-class Checkpoint["Checkpoint [str]"] {
-    -checksum_superblock_manifest: u128
-    -checksum_superblock_free_set: u128
-    -checksum_superblock_client_sessions: u128
-    -checksum_client_replies: u128
-    -checksum_grid: u128
+class CheckpointArea["CheckpointArea [enu]"] {
+    -superblock_manifest
+    -superblock_free_set
+    -superblock_client_sessions
+    -client_replies
+    -grid
 }
-link Checkpoint "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/storage_checker.zig#L47"
+link CheckpointArea "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/storage_checker.zig#L44"
 class `storage_checker.zig` {
-    +StorageCheckerType(Replica) type
+    +StorageCheckerType(Storage) type
 }
-`storage_checker.zig` <-- Checkpoint
+`storage_checker.zig` <-- CheckpointArea
 link `storage_checker.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/storage_checker.zig"
 class `sync_checker.zig` {
     +SyncCheckerType(Replica) type

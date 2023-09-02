@@ -1,6 +1,6 @@
 ```mermaid
 ---
-title: Tigerbeetle database (testing)
+title: TigerBeetle database (testing)
 ---
 %%{
     init: {
@@ -123,7 +123,7 @@ class `table.zig` {
     test "struct (nested)"()
     test "array"()
     test "union"()
-    +parse(Row, table_string) std.BoundedArray(Row, 128)
+    +parse(Row, table_string) stdx.BoundedArray(Row, 128)
     -parse_data(Data, tokens) Data
     -eat(tokens, token) bool
     -field(Enum, name) Enum
@@ -212,7 +212,7 @@ class StderrReader["StderrReader [str]"] {
 link StderrReader "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/tmp_tigerbeetle.zig#L126"
 class `tmp_tigerbeetle.zig` {
     +port: u16
-    +port_str: std.BoundedArray(u8, 8)
+    +port_str: stdx.BoundedArray(u8, 8)
     +tmp_dir: std.testing.TmpDir
     +process: std.ChildProcess
     +stderr_reader: *StderrReader
@@ -272,7 +272,7 @@ class MessageRaw["MessageRaw [str]"] {
     -header: vsr.Header
     -body: [constants.message_size_max - @sizeOf(vsr.Header)
 }
-link MessageRaw "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L518"
+link MessageRaw "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L550"
 class Storage["Storage [str]"] {
     +lsm
     +vsr
@@ -306,6 +306,8 @@ class Storage["Storage [str]"] {
     -x_in_100(storage, x) bool
     -fault_faulty_sectors(storage, zone, offset_in_zone, size) void
     -fault_sector(storage, zone, sector) void
+    +area_memory(storage, area) []align(constants.sector_size) const u8
+    +area_faulty(storage, area) bool
     +superblock_header(storage, copy_) *const superblock.SuperBlockHeader
     +wal_headers(storage) []const vsr.Header
     +wal_prepares(storage) []const MessageRaw
@@ -335,7 +337,7 @@ class Area["Area [uni]"] {
     +grid: struct
     -sectors(area) SectorRange
 }
-link Area "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L605"
+link Area "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L637"
 class SectorRange["SectorRange [str]"] {
     -min: usize
     -max: usize
@@ -345,7 +347,7 @@ class SectorRange["SectorRange [str]"] {
     -next(range) ?usize
     -intersect(a, b) ?SectorRange
 }
-link SectorRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L643"
+link SectorRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L675"
 class Options["Options [str]"] {
     +faulty_superblock: bool
     +faulty_wal_headers: bool
@@ -353,7 +355,7 @@ class Options["Options [str]"] {
     +faulty_client_replies: bool
     +faulty_grid: bool
 }
-link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L690"
+link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L722"
 class ClusterFaultAtlas["ClusterFaultAtlas [str]"] {
     +options: Options
     +faulty_superblock_areas: FaultySuperBlockAreas
@@ -369,14 +371,14 @@ class ClusterFaultAtlas["ClusterFaultAtlas [str]"] {
     -faulty_sectors(chunk_count, chunk_size, zone, faulty_chunks, offset_in_zone, size) ?SectorRange
 }
 ClusterFaultAtlas <-- Options
-link ClusterFaultAtlas "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L689"
+link ClusterFaultAtlas "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L721"
 class StackTrace["StackTrace [str]"] {
     -addresses: [64]usize
     -index: usize
     -capture() StackTrace
     +format(self, fmt, options, writer) !void
 }
-link StackTrace "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L937"
+link StackTrace "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L969"
 class `storage.zig` {
     -verify_alignment(buffer) void
 }

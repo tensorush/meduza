@@ -1,6 +1,6 @@
 ```mermaid
 ---
-title: Tigerbeetle database (clients/c)
+title: TigerBeetle database (clients/c)
 ---
 %%{
     init: {

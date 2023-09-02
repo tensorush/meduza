@@ -1,6 +1,6 @@
 ```mermaid
 ---
-title: Tigerbeetle database (tigerbeetle/src)
+title: TigerBeetle database (tigerbeetle/src)
 ---
 %%{
     init: {
@@ -187,20 +187,20 @@ class ConfigBase["ConfigBase [enu]"] {
     +test_min
     +default
 }
-link ConfigBase "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L185"
+link ConfigBase "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L181"
 class TracerBackend["TracerBackend [enu]"] {
     +none
     +tracy
 }
-link TracerBackend "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L192"
+link TracerBackend "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L188"
 class HashLogMode["HashLogMode [enu]"] {
     +none
     +create
     +check
 }
-link HashLogMode "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L198"
+link HashLogMode "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L194"
 class configs["configs [str]"]
-link configs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L204"
+link configs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig#L200"
 class `config.zig` {
     -launder_type(T, value) T
 }
@@ -214,7 +214,8 @@ class `config.zig` {
 `config.zig` <-- configs
 link `config.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/config.zig"
 class `tidy.zig` {
-    test "tidy: lines are under 100 characters long"()
+    test "tidy"()
+    -banned(source) ?[]const u8
     -is_naughty(path) bool
     -find_long_line(file_text) !?usize
     -is_url(line) bool
@@ -464,18 +465,18 @@ class Headers["Headers [str]"] {
     +dvc_header_type(header) enum [ blank, valid ]
 }
 Headers <-- IdSeed
-link Headers "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1642"
+link Headers "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1645"
 class ViewChangeCommand["ViewChangeCommand [enu]"] {
     +do_view_change
     +start_view
 }
-link ViewChangeCommand "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1670"
+link ViewChangeCommand "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1673"
 class ViewRange["ViewRange [str]"] {
     -min: u32
     -max: u32
     +contains(range, view) bool
 }
-link ViewRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1734"
+link ViewRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1737"
 class ViewChangeHeadersSlice["ViewChangeHeadersSlice [str]"] {
     -command: ViewChangeCommand
     -slice: []const Header
@@ -484,7 +485,7 @@ class ViewChangeHeadersSlice["ViewChangeHeadersSlice [str]"] {
     +view_for_op(headers, op, log_view) ViewRange
 }
 ViewChangeHeadersSlice <-- ViewRange
-link ViewChangeHeadersSlice "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1672"
+link ViewChangeHeadersSlice "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1675"
 class ViewChangeHeadersArray["ViewChangeHeadersArray [str]"] {
     -command: ViewChangeCommand
     -array: Headers.Array
@@ -497,14 +498,13 @@ class ViewChangeHeadersArray["ViewChangeHeadersArray [str]"] {
     +append(headers, header) void
     +append_blank(headers, op) void
 }
-link ViewChangeHeadersArray "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1833"
+link ViewChangeHeadersArray "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1836"
 class Checkpoint["Checkpoint [str]"] {
-    +checkpoint_before(checkpoint) ?u64
     +checkpoint_after(checkpoint) u64
     +trigger_for_checkpoint(checkpoint) ?u64
     +valid(op) bool
 }
-link Checkpoint "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1943"
+link Checkpoint "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr.zig#L1946"
 class `vsr.zig` {
     test "ReconfigurationRequest"()
     test "exponential_backoff_with_jitter"()
@@ -520,7 +520,7 @@ class `vsr.zig` {
     +root_members(cluster) Members
     +valid_members(members) bool
     -member_count(members) u8
-    +assert_valid_member(members, replica_id) void
+    +member_index(members, replica_id) ?u8
 }
 `vsr.zig` <-- ProcessType
 `vsr.zig` <-- Zone
@@ -968,13 +968,14 @@ class Foo["Foo [str]"] {
     +pop(self) ?*T
     +peek(self) ?*T
     +empty(self) bool
+    +contains(self, elem_needle) bool
     +remove(self, to_remove) void
     +reset(self) void
     -plot(self) void
 }
-link Foo "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/fifo.zig#L89"
+link Foo "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/fifo.zig#L101"
 class `fifo.zig` {
-    test "push/pop/peek/remove/empty"()
+    test "FIFO: push/pop/peek/remove/empty"()
     +FIFO(T) type
 }
 link `fifo.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/fifo.zig"
@@ -982,17 +983,23 @@ class CopyPrecision["CopyPrecision [enu]"] {
     +exact
     +inexact
 }
-link CopyPrecision "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/stdx.zig#L51"
+link CopyPrecision "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/stdx.zig#L47"
 class Cut["Cut [str]"] {
     -prefix: []const u8
     -suffix: []const u8
 }
-link Cut "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/stdx.zig#L157"
+link Cut "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/stdx.zig#L155"
 class TimeIt["TimeIt [str]"] {
     -inner: std.time.Timer
     +lap(self, label) void
 }
-link TimeIt "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/stdx.zig#L208"
+link TimeIt "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/stdx.zig#L206"
+class SemverTestCase["SemverTestCase [str]"] {
+    -dirty_release: []const u8
+    -expected_version: std.SemanticVersion
+    +scoped(scope) type
+}
+link SemverTestCase "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/stdx.zig#L462"
 class `stdx.zig` {
     test "div_ceil"()
     test "copy_left"()
@@ -1000,6 +1007,7 @@ class `stdx.zig` {
     test "disjoint_slices"()
     test no_padding()
     test "hash_inline"()
+    test "stdx.zig: parse_dirty_semver"()
     +div_ceil(numerator, denominator) @TypeOf(numerator, denominator)
     +copy_left(precision, T, target, source) void
     +copy_right(precision, T, target, source) void
@@ -1016,6 +1024,7 @@ class `stdx.zig` {
     +hash_inline(value) u64
     -low_level_hash(seed, input) u64
     +update(base, diff) @TypeOf(base)
+    +parse_dirty_semver(dirty_release) !std.SemanticVersion
 }
 `stdx.zig` <-- CopyPrecision
 `stdx.zig` <-- Cut
@@ -1133,7 +1142,7 @@ class CliArgs["CliArgs [str]"] {
     -transfer_count: usize
     -transfer_count_per_second: usize
     -print_batch_timings: bool
-    -enable_statsd: bool
+    -statsd: bool
     -addresses: []const u8
 }
 link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/benchmark.zig#L58"
