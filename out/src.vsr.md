@@ -21,7 +21,7 @@ class Status["Status [enu]"] {
     +recovering
     +recovering_head
 }
-link Status "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L33"
+link Status "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L36"
 class CommitStage["CommitStage [enu]"] {
     -idle
     -next
@@ -36,7 +36,7 @@ class CommitStage["CommitStage [enu]"] {
     -checkpoint_superblock
     -cleanup
 }
-link CommitStage "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L49"
+link CommitStage "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L52"
 class ReplicaEvent["ReplicaEvent [uni]"] {
     +message_sent: *const Message
     +committed
@@ -47,18 +47,18 @@ class ReplicaEvent["ReplicaEvent [uni]"] {
     +checkpoint_divergence_detected: struct
     +sync_stage_changed
 }
-link ReplicaEvent "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L68"
+link ReplicaEvent "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L71"
 class Prepare["Prepare [str]"] {
     -message: *Message
     -ok_from_all_replicas: QuorumCounter
     -ok_quorum_received: bool
 }
-link Prepare "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L92"
+link Prepare "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L95"
 class Request["Request [str]"] {
     -message: *Message
     -realtime: i64
 }
-link Request "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L103"
+link Request "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L106"
 class HeaderIterator["HeaderIterator [str]"] {
     -static_allocator: StaticAllocator
     -cluster: u32
@@ -83,13 +83,14 @@ class HeaderIterator["HeaderIterator [str]"] {
     -superblock_context_view_change: SuperBlock.Context
     -grid: Grid
     -grid_reads: IOPS(BlockRead, constants.grid_repair_reads_max)
-    -grid_writes: IOPS(BlockWrite, constants.grid_repair_writes_max)
-    -grid_write_blocks: [constants.grid_repair_writes_max]Grid.BlockPtr
-    -grid_read_fault_next_tick: Grid.NextTick
+    -grid_repair_tables: IOPS(RepairTable, constants.grid_missing_tables_max)
+    -grid_repair_writes: IOPS(BlockWrite, constants.grid_repair_writes_max)
+    -grid_repair_write_blocks: [constants.grid_repair_writes_max]Grid.BlockPtr
     -opened: bool
     -syncing: SyncStage
     -sync_target_max: ?SyncTarget
     -sync_target_quorum: SyncTargetQuorum
+    -sync_tables: ?ForestTableIterator
     -view: u32
     -log_view: u32
     -status: Status
@@ -164,7 +165,7 @@ class HeaderIterator["HeaderIterator [str]"] {
     -on_request_blocks(self, message) void
     -on_request_blocks_read_block(grid_read, result) void
     -on_block(self, message) void
-    -on_block_write_repair(grid_write) void
+    -grid_repair_block_callback(grid_write) void
     -on_request_sync_trailer(self, message) void
     -on_sync_trailer(self, trailer, message) void
     -on_ping_timeout(self) void
@@ -300,20 +301,20 @@ class HeaderIterator["HeaderIterator [str]"] {
     -sync_superblock_update_callback(superblock_context) void
     -sync_content(self) void
     +sync_content_done(self) bool
+    -sync_enqueue_tables(self) void
+    -sync_reclaim_tables(self) void
     -valid_hash_chain(self, method) bool
     -valid_hash_chain_between(self, op_min, op_max) bool
     -jump_view(self, header) void
     -jump_sync_target(self, header) void
     -write_prepare(self, message, trigger) void
     -write_prepare_callback(self, wrote, trigger) void
-    -on_grid_read_fault(grid, read) void
-    -on_grid_read_fault_next_tick(next_tick) void
     -send_request_blocks(self) void
     -send_request_sync_trailer(self, command, offset) void
     -send_sync_trailer(self, command, parameters) void
     -next(iterator) ?*const Header
 }
-link HeaderIterator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8834"
+link HeaderIterator "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8913"
 class DVCQuorum["DVCQuorum [str]"] {
     -min: u64
     -max: u64
@@ -331,7 +332,7 @@ class DVCQuorum["DVCQuorum [str]"] {
     -quorum_headers(dvc_quorum, options) union(enum)
 }
 DVCQuorum <-- HeaderIterator
-link DVCQuorum "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8508"
+link DVCQuorum "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8587"
 class PipelineQueue["PipelineQueue [str]"] {
     -prepare_queue: PrepareQueue
     -request_queue: RequestQueue
@@ -346,7 +347,7 @@ class PipelineQueue["PipelineQueue [str]"] {
     -push_request(pipeline, request) void
     -push_prepare(pipeline, message) void
 }
-link PipelineQueue "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L8951"
+link PipelineQueue "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L9030"
 class PipelineCache["PipelineCache [str]"] {
     -prepares: [prepares_max]?*Message
     -init_from_queue(queue) PipelineCache
@@ -356,7 +357,7 @@ class PipelineCache["PipelineCache [str]"] {
     -prepare_by_op_and_checksum(pipeline, op, checksum) ?*Message
     -insert(pipeline, prepare) ?*Message
 }
-link PipelineCache "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L9117"
+link PipelineCache "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica.zig#L9196"
 class `replica.zig` {
     +ReplicaType(StateMachine, MessageBus, Storage, Time, AOF) type
     -message_body_as_view_headers(message) vsr.Headers.ViewChangeSlice
@@ -383,6 +384,72 @@ class `grid.zig` {
     +GridType(Storage) type
 }
 link `grid.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/grid.zig"
+class FaultyBlock["FaultyBlock [str]"] {
+    -checksum: u128
+    -progress: FaultProgress
+    -state: enum
+}
+link FaultyBlock "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/grid_blocks_missing.zig#L38"
+class FaultProgress["FaultProgress [uni]"] {
+    -block
+    -table_index: TableIndex
+    -table_content: TableContent
+}
+link FaultProgress "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/grid_blocks_missing.zig#L48"
+class RepairTable["RepairTable [str]"] {
+    +index_address: u64
+    +index_checksum: u128
+    +content_blocks_received: TableContentBlocksSet
+    +table_blocks_written: u32
+    +table_blocks_total: ?u32
+    +next: ?*RepairTable
+}
+link RepairTable "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/grid_blocks_missing.zig#L60"
+class Options["Options [str]"] {
+    +blocks_max: usize
+    +tables_max: usize
+}
+link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/grid_blocks_missing.zig#L81"
+class GridBlocksMissing["GridBlocksMissing [str]"] {
+    +waiting
+    +writing
+    +aborting
+    +table: *RepairTable
+    +table: *RepairTable
+    +index: u32
+    +options: Options
+    +faulty_blocks: FaultyBlocks
+    +faulty_blocks_repair_index: usize
+    +enqueued_blocks_single: usize
+    +enqueued_blocks_table: usize
+    +faulty_tables: FIFO(RepairTable)
+    +faulty_tables_free: FIFO(RepairTable)
+    +checkpointing: ?struct
+    +init(allocator, options) error[OutOfMemory]!GridBlocksMissing
+    +deinit(queue, allocator) void
+    +next_batch_of_block_requests(queue, requests) usize
+    +reclaim_table(queue) ?*RepairTable
+    +enqueue_blocks_available(queue) usize
+    +enqueue_block(queue, address, checksum) void
+    +enqueue_table(queue, table, address, checksum) void
+    -enqueue_faulty_block(queue, address, checksum, progress) union(enum)
+    +repair_waiting(queue, address, checksum) bool
+    +repair_commence(queue, address, checksum) void
+    +repair_complete(queue, block) void
+    -enqueue_table_content(queue, table, index_block_data) void
+    -release_fault(queue, fault_index) void
+    +cancel(queue) void
+    +checkpoint_commence(queue, free_set) void
+    +checkpoint_complete(queue) bool
+}
+GridBlocksMissing <-- FaultyBlock
+GridBlocksMissing <-- FaultProgress
+GridBlocksMissing <-- RepairTable
+GridBlocksMissing <-- Options
+link GridBlocksMissing "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/grid_blocks_missing.zig#L27"
+class `grid_blocks_missing.zig`
+`grid_blocks_missing.zig` <-- GridBlocksMissing
+link `grid_blocks_missing.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/grid_blocks_missing.zig"
 class Environment["Environment [str]"] {
     -sequence_states: SequenceStates
     -members: vsr.Members
@@ -438,7 +505,6 @@ class FreeSet["FreeSet [str]"] {
     +reset(set) void
     +count_reservations(set) usize
     +count_free(set) usize
-    +count_free_reserved(set, reservation) usize
     +count_acquired(set) usize
     +highest_address_acquired(set) ?u64
     +reserve(set, reserve_count) ?Reservation
@@ -462,13 +528,13 @@ class TestPattern["TestPattern [str]"] {
     -fill: TestPatternFill
     -words: usize
 }
-link TestPattern "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set.zig#L726"
+link TestPattern "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set.zig#L708"
 class TestPatternFill["TestPatternFill [enu]"] {
     -uniform_ones
     -uniform_zeros
     -literal
 }
-link TestPatternFill "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set.zig#L731"
+link TestPatternFill "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set.zig#L713"
 class `superblock_free_set.zig` {
     test "FreeSet block shard count"()
     test "FreeSet highest_address_acquired"()
@@ -564,14 +630,14 @@ class Caller["Caller [enu]"] {
     -updates_vsr_headers(caller) bool
     -updates_trailers(caller) bool
 }
-link Caller "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1702"
+link Caller "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1699"
 class Trailer["Trailer [enu]"] {
     +manifest
     +free_set
     +client_sessions
     +zone(trailer) SuperBlockZone
 }
-link Trailer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1748"
+link Trailer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1745"
 class SuperBlockZone["SuperBlockZone [enu]"] {
     +header
     +manifest
@@ -581,7 +647,7 @@ class SuperBlockZone["SuperBlockZone [enu]"] {
     +start_for_copy(zone, copy) u64
     +size_max(zone) u64
 }
-link SuperBlockZone "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1762"
+link SuperBlockZone "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock.zig#L1759"
 class `superblock.zig` {
     test "SuperBlockHeader"()
     +SuperBlockType(Storage) type
@@ -622,7 +688,7 @@ class ProcessSelector["ProcessSelector [enu]"] {
     -B5
     -C_
 }
-link ProcessSelector "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1014"
+link ProcessSelector "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1027"
 class TestContext["TestContext [str]"] {
     -cluster: *Cluster
     -log_level: std.log.Level
@@ -637,11 +703,11 @@ class TestContext["TestContext [str]"] {
     -on_client_reply(cluster, client, request, reply) void
     -processes(t, selector) ProcessList
 }
-link TestContext "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1039"
+link TestContext "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1052"
 class Role["Role [enu]"]
-link Role "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1327"
+link Role "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1340"
 class LinkDirection["LinkDirection [enu]"]
-link LinkDirection "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1422"
+link LinkDirection "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1435"
 class TestReplicas["TestReplicas [str]"] {
     -context: *TestContext
     -cluster: *Cluster
@@ -680,10 +746,11 @@ class TestReplicas["TestReplicas [str]"] {
     +record(t, peer, direction, command) void
     +replay_recorded(t) void
     -peer_paths(t, peer, direction) stdx.BoundedArray(Network.Path, paths_max)
+    -expect_equal_grid(want, got) !void
 }
 TestReplicas <-- Role
 TestReplicas <-- LinkDirection
-link TestReplicas "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1207"
+link TestReplicas "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1220"
 class TestClients["TestClients [str]"] {
     -context: *TestContext
     -cluster: *Cluster
@@ -692,7 +759,7 @@ class TestClients["TestClients [str]"] {
     +request(t, requests, expect_replies) !void
     +replies(t) usize
 }
-link TestClients "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1497"
+link TestClients "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig#L1536"
 class `replica_test.zig` {
     test "Cluster: recovery: WAL prepare corruption (R=3, corrupt right of head)"()
     test "Cluster: recovery: WAL prepare corruption (R=3, corrupt left of head, 3/3 corrupt)"()
@@ -732,11 +799,18 @@ class `replica_test.zig` {
 `replica_test.zig` <-- TestReplicas
 `replica_test.zig` <-- TestClients
 link `replica_test.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/replica_test.zig"
+class ChecksumStream["ChecksumStream [str]"] {
+    +state: Aegis128LMac_128
+    +init() ChecksumStream
+    +add(stream, bytes) void
+    +checksum(stream) u128
+}
+link ChecksumStream "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/checksum.zig#L56"
 class TestVector["TestVector [str]"] {
     -source: []const u8
     -hash: u128
 }
-link TestVector "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/checksum.zig#L67"
+link TestVector "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/checksum.zig#L84"
 class `checksum.zig` {
     test "checksum test vectors"()
     test "checksum simple fuzzing"()
@@ -744,6 +818,7 @@ class `checksum.zig` {
     -seed_init() void
     +checksum(source) u128
 }
+`checksum.zig` <-- ChecksumStream
 link `checksum.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/checksum.zig"
 class `client.zig` {
     +Client(StateMachine_, MessageBus) type
@@ -791,7 +866,7 @@ class FreeSetEvent["FreeSetEvent [uni]"] {
     -release: struct
     -checkpoint: void
 }
-link FreeSetEvent "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set_fuzz.zig#L118"
+link FreeSetEvent "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set_fuzz.zig#L109"
 class FreeSetModel["FreeSetModel [str]"] {
     -blocks_acquired: std.DynamicBitSetUnmanaged
     -blocks_released: std.DynamicBitSetUnmanaged
@@ -802,7 +877,6 @@ class FreeSetModel["FreeSetModel [str]"] {
     -deinit(set, allocator) void
     +count_reservations(set) usize
     +count_free(set) usize
-    +count_free_reserved(set, reservation) usize
     +count_acquired(set) usize
     +highest_address_acquired(set) ?u64
     +reserve(set, reserve_count) ?Reservation
@@ -813,7 +887,7 @@ class FreeSetModel["FreeSetModel [str]"] {
     +checkpoint(set) void
     -assert_reservation_active(set, reservation) void
 }
-link FreeSetModel "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set_fuzz.zig#L165"
+link FreeSetModel "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_free_set_fuzz.zig#L156"
 class `superblock_free_set_fuzz.zig` {
     +main() !void
     -run_fuzz(allocator, random, blocks_count, events) !void
@@ -1114,31 +1188,23 @@ class `journal.zig` {
 `journal.zig` <-- Case
 `journal.zig` <-- BitSet
 link `journal.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/journal.zig"
-class TableExtentKey["TableExtentKey [str]"] {
-    +tree_hash: u128
-    +table: u64
-}
-link TableExtentKey "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_manifest.zig#L42"
 class TableExtent["TableExtent [str]"] {
     +block: u64
     +entry: u32
 }
-link TableExtent "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_manifest.zig#L47"
+link TableExtent "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_manifest.zig#L40"
 class BlockReference["BlockReference [str]"] {
-    +tree: u128
     +checksum: u128
     +address: u64
 }
-link BlockReference "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_manifest.zig#L377"
+link BlockReference "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_manifest.zig#L343"
 class IteratorReverse["IteratorReverse [str]"] {
     +manifest: *const Manifest
-    +tree: u128
     +count: u32
     +next(it) ?BlockReference
 }
-link IteratorReverse "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_manifest.zig#L386"
+link IteratorReverse "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_manifest.zig#L356"
 class Manifest["Manifest [str]"] {
-    +trees: []u128
     +checksums: []u128
     +addresses: []u64
     +count: u32
@@ -1150,27 +1216,26 @@ class Manifest["Manifest [str]"] {
     +reset(manifest) void
     +encode(manifest, target) u8) u64
     +decode(manifest, source) const u8) void
-    +append(manifest, tree, checksum, address) void
-    +remove(manifest, tree, checksum, address) void
+    +append(manifest, checksum, address) void
+    +remove(manifest, checksum, address) void
     -index_for_address(manifest, address) ?u32
     +queue_for_compaction(manifest, address) void
     +queued_for_compaction(manifest, address) bool
-    +oldest_block_queued_for_compaction(manifest, tree) ?BlockReference
-    +insert_table_extent(manifest, tree_hash, table, block, entry) bool
-    +update_table_extent(manifest, tree_hash, table, block, entry) ?u64
-    +remove_table_extent(manifest, tree_hash, table, block, entry) bool
-    +iterator_reverse(manifest, tree) IteratorReverse
+    +oldest_block_queued_for_compaction(manifest) ?BlockReference
+    +insert_table_extent(manifest, table, block, entry) bool
+    +update_table_extent(manifest, table, block, entry) ?u64
+    +remove_table_extent(manifest, table, block, entry) bool
+    +iterator_reverse(manifest) IteratorReverse
     +verify(manifest) void
-    +verify_index_tree_checksum_address(manifest, index, tree, checksum, address) void
+    -verify_index_checksum_address(manifest, index, checksum, address) void
 }
-Manifest <-- TableExtentKey
 Manifest <-- TableExtent
 Manifest <-- BlockReference
 Manifest <-- IteratorReverse
-link Manifest "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_manifest.zig#L18"
+link Manifest "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vsr/superblock_manifest.zig#L17"
 class `superblock_manifest.zig` {
     test "SuperBlockManifest"()
-    -test_iterator_reverse(manifest, tree, expect) !void
+    -test_iterator_reverse(manifest, expect) !void
     -test_codec(manifest) !void
 }
 `superblock_manifest.zig` <-- Manifest

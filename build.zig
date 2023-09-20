@@ -9,7 +9,7 @@ pub fn build(b: *std.Build) void {
     const exe_step = b.step("exe", "Run Meduza codebase graph generator");
 
     const exe = b.addExecutable(.{
-        .name = "exe",
+        .name = "meduza",
         .root_source_file = std.Build.FileSource.relative("src/main.zig"),
         .target = b.standardTargetOptions(.{}),
         .optimize = b.standardOptimizeOption(.{}),

@@ -27,6 +27,11 @@ class TypeMapping["TypeMapping [str]"] {
     +is_read_only(self, name) bool
 }
 link TypeMapping "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/java_bindings.zig#L10"
+class big_integer["big_integer [str]"] {
+    -contains(field) bool
+    -contains_any(type_info) bool
+}
+link big_integer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/java_bindings.zig#L36"
 class `java_bindings.zig` {
     test "bindings java"()
     -java_type(Type) []const u8
@@ -42,6 +47,7 @@ class `java_bindings.zig` {
     +main() !void
 }
 `java_bindings.zig` <-- TypeMapping
+`java_bindings.zig` <-- big_integer
 link `java_bindings.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/java/java_bindings.zig"
 class `docs.zig` {
     -find_tigerbeetle_client_jar(arena, root) ![]const u8

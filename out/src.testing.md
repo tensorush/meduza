@@ -101,13 +101,13 @@ class ReplicaHealth["ReplicaHealth [enu]"] {
     +up
     +down
 }
-link ReplicaHealth "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster.zig#L29"
+link ReplicaHealth "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster.zig#L30"
 class Failure["Failure [enu]"] {
     +crash
     +liveness
     +correctness
 }
-link Failure "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster.zig#L34"
+link Failure "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster.zig#L35"
 class `cluster.zig` {
     +ClusterType(StateMachineType) type
 }
@@ -236,8 +236,9 @@ class Options["Options [str]"] {
     +write_fault_probability: u8
     +crash_fault_probability: u8
     +fault_atlas: ?*const ClusterFaultAtlas
+    +grid_checker: ?*GridChecker
 }
-link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L56"
+link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L57"
 class Read["Read [str]"] {
     +always_synchronous
     +always_asynchronous
@@ -249,7 +250,7 @@ class Read["Read [str]"] {
     +stack_trace: StackTrace
     -less_than(context, a, b) math.Order
 }
-link Read "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L94"
+link Read "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L98"
 class Write["Write [str]"] {
     +callback: *const fn (write: *Storage.Write)
     +buffer: []const u8
@@ -259,20 +260,20 @@ class Write["Write [str]"] {
     +stack_trace: StackTrace
     -less_than(context, a, b) math.Order
 }
-link Write "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L111"
+link Write "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L115"
 class NextTick["NextTick [str]"] {
     +next: ?*NextTick
     +source: NextTickSource
     +callback: *const fn (next_tick: *NextTick)
 }
-link NextTick "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L128"
+link NextTick "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L132"
 class NextTickSource["NextTickSource [enu]"]
-link NextTickSource "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L134"
+link NextTickSource "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L138"
 class MessageRaw["MessageRaw [str]"] {
     -header: vsr.Header
     -body: [constants.message_size_max - @sizeOf(vsr.Header)
 }
-link MessageRaw "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L550"
+link MessageRaw "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L554"
 class Storage["Storage [str]"] {
     +lsm
     +vsr
@@ -311,10 +312,11 @@ class Storage["Storage [str]"] {
     +superblock_header(storage, copy_) *const superblock.SuperBlockHeader
     +wal_headers(storage) []const vsr.Header
     +wal_prepares(storage) []const MessageRaw
-    +grid_block(storage, address) *align(constants.sector_size) [constants.block_size]u8
+    +grid_block(storage, address) ?*align(constants.sector_size) const [constants.block_size]u8
     +log_pending_io(storage) void
     +assert_no_pending_reads(storage, zone) void
     +assert_no_pending_writes(storage, zone) void
+    +verify_table(storage, index_address, index_checksum) void
 }
 Storage <-- Options
 Storage <-- Read
@@ -322,7 +324,7 @@ Storage <-- Write
 Storage <-- NextTick
 Storage <-- NextTickSource
 Storage <-- MessageRaw
-link Storage "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L54"
+link Storage "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L55"
 class Area["Area [uni]"] {
     +zone: superblock.SuperBlockZone
     +copy: u8
@@ -337,7 +339,7 @@ class Area["Area [uni]"] {
     +grid: struct
     -sectors(area) SectorRange
 }
-link Area "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L637"
+link Area "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L668"
 class SectorRange["SectorRange [str]"] {
     -min: usize
     -max: usize
@@ -347,7 +349,7 @@ class SectorRange["SectorRange [str]"] {
     -next(range) ?usize
     -intersect(a, b) ?SectorRange
 }
-link SectorRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L675"
+link SectorRange "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L706"
 class Options["Options [str]"] {
     +faulty_superblock: bool
     +faulty_wal_headers: bool
@@ -355,7 +357,7 @@ class Options["Options [str]"] {
     +faulty_client_replies: bool
     +faulty_grid: bool
 }
-link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L722"
+link Options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L753"
 class ClusterFaultAtlas["ClusterFaultAtlas [str]"] {
     +options: Options
     +faulty_superblock_areas: FaultySuperBlockAreas
@@ -371,14 +373,14 @@ class ClusterFaultAtlas["ClusterFaultAtlas [str]"] {
     -faulty_sectors(chunk_count, chunk_size, zone, faulty_chunks, offset_in_zone, size) ?SectorRange
 }
 ClusterFaultAtlas <-- Options
-link ClusterFaultAtlas "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L721"
+link ClusterFaultAtlas "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L752"
 class StackTrace["StackTrace [str]"] {
     -addresses: [64]usize
     -index: usize
     -capture() StackTrace
     +format(self, fmt, options, writer) !void
 }
-link StackTrace "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L969"
+link StackTrace "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/storage.zig#L1000"
 class `storage.zig` {
     -verify_alignment(buffer) void
 }

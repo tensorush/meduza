@@ -22,7 +22,7 @@ class CheckpointArea["CheckpointArea [enu]"] {
     -client_replies
     -grid
 }
-link CheckpointArea "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/storage_checker.zig#L44"
+link CheckpointArea "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/storage_checker.zig#L45"
 class `storage_checker.zig` {
     +StorageCheckerType(Storage) type
 }
@@ -117,4 +117,14 @@ link Network "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/c
 class `network.zig`
 `network.zig` <-- Network
 link `network.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/network.zig"
+class GridChecker["GridChecker [str]"] {
+    +blocks: Blocks
+    +init(allocator) GridChecker
+    +deinit(checker) void
+    +assert_coherent(checker, checkpoint_id, block_address, block_checksum) void
+}
+link GridChecker "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/grid_checker.zig#L4"
+class `grid_checker.zig`
+`grid_checker.zig` <-- GridChecker
+link `grid_checker.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/testing/cluster/grid_checker.zig"
 ```

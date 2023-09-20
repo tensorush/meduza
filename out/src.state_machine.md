@@ -23,7 +23,7 @@ link InFlight "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/state_ma
 class PendingTransfer["PendingTransfer [str]"] {
     -client_index: usize
     -client_request: usize
-    -amount: u64
+    -amount: u128
     -debit_account_index: usize
     -credit_account_index: usize
 }

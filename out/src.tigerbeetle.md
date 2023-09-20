@@ -75,7 +75,7 @@ class `cli.zig` {
 `cli.zig` <-- Command
 link `cli.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/cli.zig"
 class std_options["std_options [str]"]
-link std_options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/main.zig#L36"
+link std_options "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/main.zig#L37"
 class Command["Command [str]"] {
     -dir_fd: os.fd_t
     -fd: os.fd_t
@@ -89,7 +89,7 @@ class Command["Command [str]"] {
     +version(allocator, verbose) !void
     +repl(arena, args) !void
 }
-link Command "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/main.zig#L69"
+link Command "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/tigerbeetle/main.zig#L70"
 class `main.zig` {
     +main() !void
     -print_value(writer, field, value) !void

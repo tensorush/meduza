@@ -89,14 +89,16 @@ class `run_with_tb.zig` {
 link `run_with_tb.zig` "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/run_with_tb.zig"
 class JSONAccount["JSONAccount [str]"] {
     -id: []const u8
-    -user_data: []const u8
-    -ledger: []const u8
-    -code: []const u8
-    -flags: []const []const u8
     -debits_pending: []const u8
     -debits_posted: []const u8
     -credits_pending: []const u8
     -credits_posted: []const u8
+    -user_data_128: []const u8
+    -user_data_64: []const u8
+    -user_data_32: []const u8
+    -ledger: []const u8
+    -code: []const u8
+    -flags: []const []const u8
     -timestamp: []const u8
 }
 link JSONAccount "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/repl_integration.zig#L113"
@@ -104,20 +106,22 @@ class JSONTransfer["JSONTransfer [str]"] {
     -id: []const u8
     -debit_account_id: []const u8
     -credit_account_id: []const u8
-    -user_data: []const u8
+    -amount: []const u8
     -pending_id: []const u8
+    -user_data_128: []const u8
+    -user_data_64: []const u8
+    -user_data_32: []const u8
     -timeout: []const u8
     -ledger: []const u8
     -code: []const u8
     -flags: [][]const u8
-    -amount: []const u8
     -timestamp: []const u8
 }
-link JSONTransfer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/repl_integration.zig#L128"
+link JSONTransfer "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/repl_integration.zig#L130"
 class CliArgs["CliArgs [str]"] {
     -keep_tmp: bool
 }
-link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/repl_integration.zig#L226"
+link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/repl_integration.zig#L236"
 class `repl_integration.zig` {
     -tb_client_command(arena, tb_binary, command) ![]const []const u8
     -tb_client_command_json_out(arena, tb_binary, command, out_name) ![]const []const u8
@@ -169,7 +173,7 @@ class CliArgs["CliArgs [str]"] {
     -no_generate: bool
     -keep_tmp: bool
 }
-link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_generate.zig#L807"
+link CliArgs "https://github.com/tigerbeetle/tigerbeetle/blob/main/src/clients/docs_generate.zig#L801"
 class `docs_generate.zig` {
     +prepare_directory(arena, language, dir) !void
     +integrate(arena, language, dir, run) !void
