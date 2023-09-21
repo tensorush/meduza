@@ -12,7 +12,7 @@
 ```zig
 git clone https://github.com/tensorush/meduza
 cd meduza/
-zig build exe
+zig build exe -- -h
 ```
 
 #### :sparkles: Features
