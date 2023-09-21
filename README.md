@@ -9,7 +9,7 @@
 
 #### :rocket: Usage
 
-```zig
+```sh
 git clone https://github.com/tensorush/meduza
 cd meduza/
 zig build exe -- -h
