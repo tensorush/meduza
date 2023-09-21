@@ -9,44 +9,11 @@
 
 #### :rocket: Usage
 
-1. Add `meduza` as a dependency in your `build.zig.zon`.
-
-    <details>
-
-    <summary><code>build.zig.zon</code> example</summary>
-
-    ```zig
-    .{
-        .name = "<name_of_your_package>",
-        .version = "<version_of_your_package>",
-        .dependencies = .{
-            .meduza = .{
-                .url = "https://github.com/tensorush/meduza/archive/<git_tag_or_commit_hash>.tar.gz",
-                .hash = "<package_hash>",
-            },
-        },
-    }
-    ```
-
-    Set `<package_hash>` to `12200000000000000000000000000000000000000000000000000000000000000000`, and Zig will provide the correct found value in an error message.
-
-    </details>
-
-2. Add `meduza` as a run artifact in your `build.zig`.
-
-    <details>
-
-    <summary><code>build.zig</code> example</summary>
-
-    ```zig
-    const meduza = b.dependency("meduza", .{});
-    const meduza_run = b.addRunArtifact(meduza.artifact("exe"));
-    if (b.args) |args| {
-        meduza_run.addArgs(args);
-    }
-    ```
-
-    </details>
+```zig
+git clone https://github.com/tensorush/meduza
+cd meduza/
+zig build exe
+```
 
 #### :sparkles: Features
 
