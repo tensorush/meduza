@@ -40,7 +40,7 @@ jobs:
         uses: oven-sh/setup-bun@v1
 
       - name: Install Mermaid CLI
-        run: bun install -g @mermaid-js/mermaid-cli
+        run: bun a -g @mermaid-js/mermaid-cli
 
       - name: Emit SVG
         run: |
