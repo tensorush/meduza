@@ -40,7 +40,7 @@ jobs:
         uses: oven-sh/setup-bun@v1
 
       - name: Install Mermaid CLI
-        run: bun i -g @mermaid-js/mermaid-cli --cache-dir /home/runner/.cache/puppeteer
+        run: bun i @mermaid-js/mermaid-cli
 
       - name: Emit SVG
         run: |
