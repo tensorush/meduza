@@ -42,7 +42,7 @@ jobs:
       - name: Install Mermaid CLI
         run: |
           bun a -g @mermaid-js/mermaid-cli
-          bun a -g /home/runner/.bun/install/global/node_modules/puppeteer/install.js
+          bun /home/runner/.bun/install/global/node_modules/puppeteer/install.js
 
       - name: Emit SVG
         run: |
