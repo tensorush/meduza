@@ -36,11 +36,11 @@ jobs:
           zig env
           zig build exe -- -e mmd
 
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v1
+
       - name: Install Mermaid CLI
-        run: |
-          curl -so node.tar.xz https://nodejs.org/dist/v18.17.0/node-v18.17.0-linux-x64.tar.xz
-          tar xf node.tar.xz
-          node-v18.17.0-linux-x64/bin/npm install -g @mermaid-js/mermaid-cli
+        run: bun install -g @mermaid-js/mermaid-cli
 
       - name: Emit SVG
         run: |
