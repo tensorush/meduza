@@ -223,7 +223,8 @@ pub fn generate(
         const token_tags = ast.tokens.items(.tag);
         const starts = ast.tokens.items(.start);
 
-        outer: for (node_tags, 0..) |node_tag, i| {
+        outer: for (0..node_tags.len - 1) |i| {
+            const node_tag = node_tags[i];
             switch (node_tag) {
                 .test_decl => {
                     const start = starts[main_tokens[i]];
