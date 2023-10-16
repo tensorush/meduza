@@ -375,7 +375,7 @@ pub fn generate(
                 },
                 .error_set_decl => {
                     // Skip error set declaration expressions
-                    if (node_tags[i + 1] != .simple_var_decl) {
+                    if (i + 1 < node_tags.len and node_tags[i + 1] != .simple_var_decl) {
                         continue;
                     }
 
@@ -478,7 +478,7 @@ pub fn generate(
                 .tagged_union_enum_tag_trailing,
                 => {
                     // Skip container declaration expressions
-                    if (node_tags[i + 1] != .simple_var_decl) {
+                    if (i + 1 < node_tags.len and node_tags[i + 1] != .simple_var_decl) {
                         continue;
                     }
 
