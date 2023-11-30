@@ -25,20 +25,11 @@ class Ext["Ext [enu]"] {
     +md
 }
 link Ext "https://github.com/tensorush/meduza/blob/main/src/meduza.zig#L22"
-class Tag["Tag [enu]"] {
-    -str
-    -opa
-    -uni
-    -err
-    -enu
-}
-link Tag "https://github.com/tensorush/meduza/blob/main/src/meduza.zig#L37"
 class Type["Type [str]"] {
     -start: std.zig.Ast.ByteOffset
     -end: std.zig.Ast.ByteOffset
     -tag: Tag
 }
-Type <-- Tag
 link Type "https://github.com/tensorush/meduza/blob/main/src/meduza.zig#L32"
 class Func["Func [str]"] {
     -start: std.zig.Ast.ByteOffset
@@ -50,19 +41,6 @@ class Func["Func [str]"] {
     -print(self, src, writer) @TypeOf(writer).Error!void
 }
 link Func "https://github.com/tensorush/meduza/blob/main/src/meduza.zig#L52"
-class Tag["Tag [enu]"] {
-    -fld
-    -tst
-}
-link Tag "https://github.com/tensorush/meduza/blob/main/src/meduza.zig#L90"
-class Decl["Decl [str]"] {
-    -start: std.zig.Ast.ByteOffset
-    -end: std.zig.Ast.ByteOffset
-    -tag: Tag
-    -print(self, is_pub, src, writer) @TypeOf(writer).Error!void
-}
-Decl <-- Tag
-link Decl "https://github.com/tensorush/meduza/blob/main/src/meduza.zig#L85"
 class `meduza.zig` {
     +generate(allocator, remote_src_dir_path, local_src_dir_path, codebase_title, out_dir_path, extension, do_info_log) Error!void
     -parseFunc(func, src, first_token_start, file_funcs, top_type_funcs, nested_type_funcs) bool
@@ -73,6 +51,5 @@ class `meduza.zig` {
 `meduza.zig` <-- Ext
 `meduza.zig` <-- Type
 `meduza.zig` <-- Func
-`meduza.zig` <-- Decl
 link `meduza.zig` "https://github.com/tensorush/meduza/blob/main/src/meduza.zig"
 ```

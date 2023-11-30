@@ -1,6 +1,6 @@
 .{
     .name = "meduza",
-    .version = "1.9.3",
+    .version = "1.9.4",
     .dependencies = .{
         .clap = .{
             .url = "https://github.com/Hejsil/zig-clap/archive/0.7.0.tar.gz",

@@ -121,13 +121,10 @@ pub fn generate(
 
     try cur_dir.makePath(out_dir_path);
 
-    var src_dir = try cur_dir.openDir(local_src_dir_path, .{});
+    var src_dir = try cur_dir.openDir(local_src_dir_path, .{ .iterate = true });
     defer src_dir.close();
 
-    var src_dir_iter = try cur_dir.openIterableDir(local_src_dir_path, .{});
-    defer src_dir_iter.close();
-
-    var walker = try src_dir_iter.walk(allocator);
+    var walker = try src_dir.walk(allocator);
     defer walker.deinit();
 
     var out_dir = try cur_dir.openDir(out_dir_path, .{});

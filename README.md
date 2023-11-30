@@ -10,7 +10,7 @@
 #### :rocket: Usage
 
 ```sh
-git clone https://github.com/tensorush/meduza
+git clone https://github.com/tensorush/meduza.git
 cd meduza/
 zig build exe -- -h
 ```
