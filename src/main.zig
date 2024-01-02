@@ -29,7 +29,7 @@ pub fn main() anyerror!void {
     const allocator = arena.allocator();
 
     var diag = clap.Diagnostic{};
-    var res = clap.parse(clap.Help, &PARAMS, PARSERS, .{ .diagnostic = &diag }) catch |err| {
+    var res = clap.parse(clap.Help, &PARAMS, PARSERS, .{ .allocator = allocator, .diagnostic = &diag }) catch |err| {
         diag.report(std.io.getStdErr().writer(), err) catch {};
         return err;
     };

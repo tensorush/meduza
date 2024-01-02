@@ -1,11 +1,11 @@
 .{
     .name = "meduza",
-    .version = "1.9.5",
+    .version = "1.9.6",
     .paths = .{""},
     .dependencies = .{
         .clap = .{
-            .url = "https://github.com/Hejsil/zig-clap/archive/c37ea05.tar.gz",
-            .hash = "1220f48518ce22882e102255ed3bcdb7aeeb4891f50b2cdd3bd74b5b2e24d3149ba2",
+            .url = "https://github.com/Hejsil/zig-clap/archive/7af04ee.tar.gz",
+            .hash = "12206c9e6c485e2e0d3cdbc05ef5ef78e06e839d5e0b76270a0e2698baf1f1f24375",
         },
     },
 }
