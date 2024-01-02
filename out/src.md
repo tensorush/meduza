@@ -42,7 +42,7 @@ class Func["Func [str]"] {
 }
 link Func "https://github.com/tensorush/meduza/blob/main/src/meduza.zig#L52"
 class `meduza.zig` {
-    +generate(allocator, remote_src_dir_path, local_src_dir_path, codebase_title, out_dir_path, extension, do_info_log) Error!void
+    +generate(allocator, remote_src_dir_path, local_src_dir_path, codebase_title, out_dir_path, extension, do_log) Error!void
     -parseFunc(func, src, first_token_start, file_funcs, top_type_funcs, nested_type_funcs) bool
     -printDecls(is_pub, do_resize, src, decls, funcs, writer) (error[Overflow] || @TypeOf(writer).Error)!void
     -writePrologue(codebase_title, out_file_basename, extension, writer) std.fs.File.WriteError!void

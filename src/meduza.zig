@@ -115,7 +115,7 @@ pub fn generate(
     codebase_title: []const u8,
     out_dir_path: []const u8,
     extension: Ext,
-    do_info_log: bool,
+    do_log: bool,
 ) Error!void {
     const cur_dir = std.fs.cwd();
 
@@ -306,7 +306,7 @@ pub fn generate(
                             // Skip multi-line return type declaration expressions
                             '\n' => {
                                 rt_end = @intCast(j - 2);
-                                if (do_info_log) {
+                                if (do_log) {
                                     var line_num: u32 = 2;
                                     for (src[0..j]) |b| {
                                         if (b == '\n') {
