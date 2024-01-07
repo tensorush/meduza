@@ -20,7 +20,9 @@ const PARSERS = .{
 
 pub fn main() anyerror!void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    defer if (gpa.deinit() == .leak) @panic("OOM");
+    defer if (gpa.deinit() == .leak) {
+        @panic("Memory leak has occurred!");
+    };
 
     var arena = std.heap.ArenaAllocator.init(gpa.allocator());
     defer arena.deinit();
