@@ -9,7 +9,7 @@ const PARAMS = clap.parseParamsComptime(
     \\-o, --out <STR>      Output directory path.
     \\-e, --ext <EXT>      Output file extension.
     \\-i, --info           Enable info logging.
-    \\-h, --help           Print help menu.
+    \\-h, --help           Display help menu.
     \\
 );
 
@@ -20,9 +20,7 @@ const PARSERS = .{
 
 pub fn main() anyerror!void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    defer if (gpa.deinit() == .leak) {
-        @panic("Memory leak has occurred!\n");
-    };
+    defer if (gpa.deinit() == .leak) @panic("OOM");
 
     var arena = std.heap.ArenaAllocator.init(gpa.allocator());
     defer arena.deinit();
