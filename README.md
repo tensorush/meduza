@@ -1,9 +1,9 @@
 ## :lizard: :mermaid: **meduza**
 
-[![CI][ci-shield]][ci-url]
-[![CD][cd-shield]][cd-url]
-[![Meduza][mdz-shield]][mdz-url]
-[![License][license-shield]][license-url]
+[![CI][ci-shd]][ci-url]
+[![CD][cd-shd]][cd-url]
+[![MZ][mz-shd]][mz-url]
+[![LC][lc-shd]][lc-url]
 
 ### Zig codebase graph generator that emits a [Mermaid class diagram](https://mermaid.js.org/syntax/classDiagram.html).
 
@@ -23,9 +23,9 @@ zig build exe -- -h
 
 - Learn how to improve code readability from logged tips (enable with `-i`).
 
-- Convert `.md` or `.mmd` diagram to `.svg` with Mermaid CLI ([see CD pipeline](https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml#L48)).
+- Convert `.md` or `.mmd` diagram to `.svg` with Mermaid CLI ([see CD pipeline](https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml#L50)).
 
-- Generate a large diagram (`maxTextSize` > 50'000) with Mermaid CLI ([see CD pipeline](https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml#L47)).
+- Generate a large diagram (`maxTextSize` > 250'000) with Mermaid CLI ([see CD pipeline](https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml#L49)).
 
 - Click on types to go to respective code lines on the remote (GitHub Mermaid forbids this, though).
 
@@ -93,11 +93,11 @@ class Opaque["Opaque [opa]"] {
 
 <!-- MARKDOWN LINKS -->
 
-[ci-shield]: https://img.shields.io/github/actions/workflow/status/tensorush/meduza/ci.yaml?branch=main&style=for-the-badge&logo=github&label=CI&labelColor=black
+[ci-shd]: https://img.shields.io/github/actions/workflow/status/tensorush/meduza/ci.yaml?branch=main&style=for-the-badge&logo=github&label=CI&labelColor=black
 [ci-url]: https://github.com/tensorush/meduza/blob/main/.github/workflows/ci.yaml
-[cd-shield]: https://img.shields.io/github/actions/workflow/status/tensorush/meduza/cd.yaml?branch=main&style=for-the-badge&logo=github&label=CD&labelColor=black
+[cd-shd]: https://img.shields.io/github/actions/workflow/status/tensorush/meduza/cd.yaml?branch=main&style=for-the-badge&logo=github&label=CD&labelColor=black
 [cd-url]: https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml
-[mdz-shield]: https://img.shields.io/badge/click-F6A516?style=for-the-badge&logo=zig&logoColor=F6A516&label=meduza&labelColor=black
-[mdz-url]: https://tensorush.github.io/meduza/src.svg
-[license-shield]: https://img.shields.io/github/license/tensorush/meduza.svg?style=for-the-badge&labelColor=black&kill_cache=1
-[license-url]: https://github.com/tensorush/meduza/blob/main/LICENSE.md
+[mz-shd]: https://img.shields.io/badge/click-F6A516?style=for-the-badge&logo=zig&logoColor=F6A516&label=meduza&labelColor=black
+[mz-url]: https://tensorush.github.io/meduza/src.svg
+[lc-shd]: https://img.shields.io/github/license/tensorush/meduza.svg?style=for-the-badge&labelColor=black
+[lc-url]: https://github.com/tensorush/meduza/blob/main/LICENSE.md

@@ -14,48 +14,44 @@ const CHECK_INDENTATION_LEVEL_3 = SPACE ** 9;
 
 const log = std.log.scoped(.meduza);
 
-pub const Error = error{
-    Overflow,
-} || std.mem.Allocator.Error || std.fs.Dir.DeleteTreeError || std.fs.File.WriteError || std.fs.File.OpenError || std.fs.Dir.OpenError || std.os.PReadError || std.os.MakeDirError;
-
-/// Output file extension
+/// Output file extension.
 pub const Ext = enum {
-    /// HTML
+    /// HTML.
     html,
-    /// Mermaid
+    /// Mermaid.
     mmd,
-    /// Markdown
+    /// Markdown.
     md,
 };
 
-/// Type declaration
+/// Type declaration.
 const Type = struct {
     start: std.zig.Ast.ByteOffset,
     end: std.zig.Ast.ByteOffset,
     tag: Tag,
 
     const Tag = enum {
-        /// Struct
+        /// Struct.
         str,
-        /// Opaque
+        /// Opaque.
         opa,
-        /// Union
+        /// Union.
         uni,
-        /// Error
+        /// Error.
         err,
-        /// Enum
+        /// Enum.
         enu,
     };
 };
 
-/// Function declaration
+/// Function declaration.
 const Func = struct {
     args: std.BoundedArray(struct { start: std.zig.Ast.ByteOffset, end: std.zig.Ast.ByteOffset }, MAX_NUM_ARGS),
     rt_start: std.zig.Ast.ByteOffset,
     rt_end: std.zig.Ast.ByteOffset,
     is_pub: bool,
 
-    fn print(self: Func, src: []const u8, writer: anytype) @TypeOf(writer).Error!void {
+    fn print(self: Func, src: []const u8, writer: anytype) !void {
         try writer.writeAll(INDENTATION_LEVEL_1[0..]);
 
         const fn_proto_name = src[self.args.get(0).start..self.args.get(0).end];
@@ -81,20 +77,20 @@ const Func = struct {
     }
 };
 
-/// Simple declaration
+/// Simple declaration.
 const Decl = struct {
     start: std.zig.Ast.ByteOffset,
     end: std.zig.Ast.ByteOffset,
     tag: Tag,
 
     const Tag = enum {
-        /// Container field
+        /// Container field.
         fld,
-        /// Test function
+        /// Test function.
         tst,
     };
 
-    fn print(self: Decl, is_pub: bool, src: []const u8, writer: anytype) @TypeOf(writer).Error!void {
+    fn print(self: Decl, is_pub: bool, src: []const u8, writer: anytype) !void {
         try writer.writeAll(INDENTATION_LEVEL_1[0..]);
 
         switch (self.tag) {
@@ -108,6 +104,7 @@ const Decl = struct {
     }
 };
 
+/// Generate Zig codebase class diagram.
 pub fn generate(
     allocator: std.mem.Allocator,
     remote_src_dir_path: []const u8,
@@ -116,7 +113,7 @@ pub fn generate(
     out_dir_path: []const u8,
     extension: Ext,
     do_log: bool,
-) Error!void {
+) !void {
     const cur_dir = std.fs.cwd();
 
     try cur_dir.makePath(out_dir_path);
@@ -171,9 +168,9 @@ pub fn generate(
                 continue;
             },
             .file => {
-                // Parse only Zig source files
+                // Parse only Zig source files.
                 if (std.mem.eql(u8, ".zig", std.fs.path.extension(entry.basename))) {
-                    // Load the previously defined output file
+                    // Load the previously defined output file.
                     if (std.fs.path.dirname(entry.path)) |file_dir_path| {
                         out_file_basename = try std.fmt.allocPrint(allocator, "{s}.{s}", .{ local_src_dir_basename, file_dir_path });
                         for (out_file_basename[local_src_dir_basename.len + 1 ..]) |*byte| {
@@ -226,11 +223,11 @@ pub fn generate(
                     const start = starts[main_tokens[i]];
                     const end = starts[main_tokens[i - 1]] - 1;
 
-                    // Parse file and top-level container test declarations
+                    // Parse file and top-level container test declarations.
                     if (start > 0 and src[start - 1] == ' ') {
-                        // Parse top-level and nested container test declarations
+                        // Parse top-level and nested container test declarations.
                         if (std.mem.eql(u8, CHECK_INDENTATION_LEVEL_2[0..], src[start - 5 .. start])) {
-                            // Skip double-nested container test declarations
+                            // Skip double-nested container test declarations.
                             if (std.mem.eql(u8, CHECK_INDENTATION_LEVEL_3[0..], src[start - 9 .. start])) {
                                 continue;
                             }
@@ -242,17 +239,17 @@ pub fn generate(
                         file_decls.appendAssumeCapacity(.{ .tag = .tst, .start = start, .end = end });
                     }
 
-                    // Validate output file because it's been written to
+                    // Validate output file because it's been written to.
                     try are_files_valid.put(allocator, out_file_basename, true);
                 },
                 .fn_proto_simple, .fn_proto_multi, .fn_proto_one, .fn_proto => {
                     const start = starts[main_tokens[i] + 1];
 
-                    // Parse only function declarations
+                    // Parse only function declarations.
                     switch (src[start]) {
-                        // Skip function types
+                        // Skip function types.
                         '(' => continue,
-                        // Skip extern functions
+                        // Skip extern functions.
                         else => switch (token_tags[main_tokens[i] - 1]) {
                             .keyword_extern, .string_literal => continue,
                             else => {},
@@ -262,7 +259,7 @@ pub fn generate(
                     var end_token_idx: std.zig.Ast.TokenIndex = undefined;
                     var rt_end: std.zig.Ast.ByteOffset = undefined;
 
-                    // Find return type
+                    // Find return type.
                     for (node_tags[i + 1 ..], i + 1..) |tag, j| {
                         if (tag == .fn_decl) {
                             end_token_idx = main_tokens[node_datas[j].rhs];
@@ -277,21 +274,21 @@ pub fn generate(
                     var token_idx = main_tokens[i] + 3;
                     var is_arg = true;
 
-                    // Parse arguments
+                    // Parse arguments.
                     while (true) : (token_idx += 1) {
                         switch (token_tags[token_idx]) {
-                            // Skip type declaration expressions
+                            // Skip type declaration expressions.
                             .l_brace => token_idx = @intCast(std.mem.indexOfScalarPos(std.zig.Token.Tag, token_tags, token_idx + 1, .r_brace).?),
-                            // Skip function calls
+                            // Skip function calls.
                             .l_paren => token_idx = @intCast(std.mem.indexOfScalarPos(std.zig.Token.Tag, token_tags, token_idx + 1, .r_paren).?),
-                            // Parse argument names and remember not to parse argument types
+                            // Parse argument names and remember not to parse argument types.
                             .colon => if (is_arg) {
                                 args.appendAssumeCapacity(.{ .start = starts[token_idx - 1], .end = starts[token_idx] });
                                 is_arg = false;
                             },
-                            // Remember to parse argument names
+                            // Remember to parse argument names.
                             .comma => is_arg = true,
-                            // Stop argument parsing
+                            // Stop argument parsing.
                             .r_paren => {
                                 rt_start = starts[token_idx + 1];
                                 break;
@@ -300,10 +297,10 @@ pub fn generate(
                         }
                     }
 
-                    // Parse return type
+                    // Parse return type.
                     for (src[rt_start..rt_end], rt_start..rt_end) |*byte, j| {
                         switch (byte.*) {
-                            // Skip multi-line return type declaration expressions
+                            // Skip multi-line return type declaration expressions.
                             '\n' => {
                                 rt_end = @intCast(j - 2);
                                 if (do_log) {
@@ -317,9 +314,9 @@ pub fn generate(
                                 }
                                 break;
                             },
-                            // Change left brace to left bracket for Mermaid to render correctly
+                            // Change left brace to left bracket for Mermaid to render correctly.
                             '{' => byte.* = '[',
-                            // Change right brace to right bracket for Mermaid to render correctly
+                            // Change right brace to right bracket for Mermaid to render correctly.
                             '}' => byte.* = ']',
                             else => {},
                         }
@@ -328,7 +325,7 @@ pub fn generate(
                     var first_token_idx = main_tokens[i] - 1;
                     var is_pub = false;
 
-                    // Find first token and determine visibility
+                    // Find first token and determine visibility.
                     switch (token_tags[first_token_idx]) {
                         .keyword_export, .keyword_inline, .keyword_noinline => {
                             if (token_tags[first_token_idx - 1] == .keyword_pub) {
@@ -342,11 +339,11 @@ pub fn generate(
 
                     const first_token_start = starts[first_token_idx];
 
-                    // Parse functions declared on the first line and consequent lines
+                    // Parse functions declared on the first line and consequent lines.
                     if (node_tags[i - 1] != .root) {
                         var do_skip: bool = undefined;
 
-                        // Parse public and private functions declared on consequent lines
+                        // Parse public and private functions declared on consequent lines.
                         if (token_tags[first_token_idx] == .keyword_pub) {
                             const func = Func{ .is_pub = true, .args = args, .rt_start = rt_start, .rt_end = rt_end };
                             do_skip = parseFunc(func, src, first_token_start, &file_funcs, &top_type_funcs, &nested_type_funcs);
@@ -359,7 +356,7 @@ pub fn generate(
                             continue;
                         }
                     } else {
-                        // Parse public and private functions declared on the first line
+                        // Parse public and private functions declared on the first line.
                         if (token_tags[first_token_idx] == .keyword_pub) {
                             file_funcs.appendAssumeCapacity(.{ .is_pub = true, .args = args, .rt_start = rt_start, .rt_end = rt_end });
                         } else {
@@ -367,11 +364,11 @@ pub fn generate(
                         }
                     }
 
-                    // Validate output file because it's been written to
+                    // Validate output file because it's been written to.
                     try are_files_valid.put(allocator, out_file_basename, true);
                 },
                 .error_set_decl => {
-                    // Skip error set declaration expressions
+                    // Skip error set declaration expressions.
                     if (i + 1 < node_tags.len and node_tags[i + 1] != .simple_var_decl) {
                         continue;
                     }
@@ -379,7 +376,7 @@ pub fn generate(
                     var first_token_idx = main_tokens[i] - 3;
                     var is_pub = false;
 
-                    // Find first token and determine visibility
+                    // Find first token and determine visibility.
                     switch (token_tags[first_token_idx]) {
                         .keyword_const, .keyword_var => {
                             switch (token_tags[first_token_idx - 1]) {
@@ -409,7 +406,7 @@ pub fn generate(
 
                     const first_token_start = starts[first_token_idx];
 
-                    // Skip double-nested error set declarations
+                    // Skip double-nested error set declarations.
                     if (first_token_start > 0 and std.mem.eql(u8, CHECK_INDENTATION_LEVEL_2[0..], src[first_token_start - 5 .. first_token_start])) {
                         continue;
                     }
@@ -417,13 +414,13 @@ pub fn generate(
                     const start = starts[main_tokens[i] - 2];
                     const end = starts[main_tokens[i] - 1] - 1;
 
-                    // Print error set declaration
+                    // Print error set declaration.
                     try writer.print("class {s}[\"{s} [err]\"] {c}\n", .{ src[start..end], src[start..end], '{' });
 
                     var token_idx = main_tokens[i] + 2;
                     var token_tag = token_tags[token_idx];
 
-                    // Print error set values
+                    // Print error set values.
                     while (token_tag != .semicolon) : (token_tag = token_tags[token_idx]) {
                         if (token_tag == .identifier) {
                             const val_start = starts[token_idx];
@@ -440,14 +437,14 @@ pub fn generate(
                         token_idx += 1;
                     }
 
-                    // Parse top-level and nested error set declarations
+                    // Parse top-level and nested error set declarations.
                     if (first_token_start > 0 and src[first_token_start - 1] == ' ') {
                         nested_types.appendAssumeCapacity(.{ .tag = .err, .start = start, .end = end });
                     } else {
                         top_types.appendAssumeCapacity(.{ .tag = .err, .start = start, .end = end });
                     }
 
-                    // Find source line location
+                    // Find source line location.
                     var line_num: u32 = 1;
                     for (src[0..start]) |byte| {
                         if (byte == '\n') {
@@ -455,10 +452,10 @@ pub fn generate(
                         }
                     }
 
-                    // Print source line link
+                    // Print source line link.
                     try writer.print("{c}\nlink {s} \"{s}/{s}#L{d}\"\n", .{ '}', src[start..end], remote_src_dir_path, entry.path, line_num });
 
-                    // Validate output file because it's been written to
+                    // Validate output file because it's been written to.
                     try are_files_valid.put(allocator, out_file_basename, true);
                 },
                 .container_decl,
@@ -474,7 +471,7 @@ pub fn generate(
                 .tagged_union_enum_tag,
                 .tagged_union_enum_tag_trailing,
                 => {
-                    // Skip container declaration expressions
+                    // Skip container declaration expressions.
                     if (i + 1 < node_tags.len and node_tags[i + 1] != .simple_var_decl) {
                         continue;
                     }
@@ -484,7 +481,7 @@ pub fn generate(
                     name_token_idx -= 1;
                     var start = starts[name_token_idx];
 
-                    // Find name token
+                    // Find name token.
                     switch (token_tags[main_tokens[i] - 1]) {
                         .keyword_extern, .keyword_packed => {
                             end = starts[name_token_idx] - 1;
@@ -499,7 +496,7 @@ pub fn generate(
                     var first_token_idx = name_token_idx - 1;
                     var is_pub = false;
 
-                    // Find first token and determine visibility
+                    // Find first token and determine visibility.
                     switch (token_tags[first_token_idx]) {
                         .keyword_const, .keyword_var => {
                             switch (token_tags[first_token_idx - 1]) {
@@ -530,28 +527,28 @@ pub fn generate(
                     const first_token_start = starts[first_token_idx];
                     const is_not_at_root = first_token_start > 0;
 
-                    // Skip double-nested container declarations
+                    // Skip double-nested container declarations.
                     if (is_not_at_root and std.mem.eql(u8, CHECK_INDENTATION_LEVEL_2[0..], src[first_token_start - 5 .. first_token_start])) {
                         continue;
                     }
 
-                    // Print top-level or nested container declaration
+                    // Print top-level or nested container declaration.
                     try writer.print("class {s}[\"{s} [{s}]\"]", .{ src[start..end], src[start..end], tag_name });
 
-                    // Print simple and function declarations declared on the first line and consequent lines
+                    // Print simple and function declarations declared on the first line and consequent lines.
                     if (is_not_at_root and src[first_token_start - 1] == ' ') {
-                        // Print nested container declarations
+                        // Print nested container declarations.
                         try printDecls(is_pub, true, src, &nested_type_decls, &nested_type_funcs, writer);
                     } else {
-                        // Print top-level container declarations
+                        // Print top-level container declarations.
                         try printDecls(is_pub, true, src, &top_type_decls, &top_type_funcs, writer);
                     }
 
-                    // Parse top-level and nested container declarations
+                    // Parse top-level and nested container declarations.
                     if (is_not_at_root and src[first_token_start - 1] == ' ') {
                         nested_types.appendAssumeCapacity(.{ .tag = tag, .start = start, .end = end });
                     } else {
-                        // Print "nested to top-level" container relationships
+                        // Print "nested to top-level" container relationships.
                         for (nested_types.constSlice()) |container| {
                             try writer.print("{s} <-- {s}\n", .{ src[start..end], src[container.start..container.end] });
                         }
@@ -561,7 +558,7 @@ pub fn generate(
                         top_types.appendAssumeCapacity(.{ .tag = tag, .start = start, .end = end });
                     }
 
-                    // Find source line location
+                    // Find source line location.
                     var line_num: u32 = 1;
                     for (src[0..start]) |byte| {
                         if (byte == '\n') {
@@ -569,14 +566,14 @@ pub fn generate(
                         }
                     }
 
-                    // Print source line link
+                    // Print source line link.
                     try writer.print("link {s} \"{s}/{s}#L{d}\"\n", .{ src[start..end], remote_src_dir_path, entry.path, line_num });
 
-                    // Validate output file because it's been written to
+                    // Validate output file because it's been written to.
                     try are_files_valid.put(allocator, out_file_basename, true);
                 },
                 .container_field_init, .container_field_align, .container_field => {
-                    // Skip container field declarations in container declaration expressions
+                    // Skip container field declarations in container declaration expressions.
                     for (node_tags[i..]) |tag| {
                         switch (tag) {
                             .fn_proto_simple, .fn_proto_multi, .fn_proto_one, .fn_proto => break,
@@ -588,24 +585,24 @@ pub fn generate(
                     const start = starts[main_tokens[i]];
                     var end: std.zig.Ast.ByteOffset = @intCast(std.mem.indexOfAnyPos(u8, src, start, "(={,}").?);
 
-                    // Find end token
+                    // Find end token.
                     switch (src[end]) {
                         '(' => end = @intCast(std.mem.indexOfScalarPos(u8, src, end, ')').? + 1),
                         '=', '{', '}' => end -= 1,
                         else => {},
                     }
 
-                    // Change left braces to left brackets for Mermaid to render correctly
+                    // Change left braces to left brackets for Mermaid to render correctly.
                     std.mem.replaceScalar(u8, src[start..end], '{', '[');
 
-                    // Change right braces to right brackets for Mermaid to render correctly
+                    // Change right braces to right brackets for Mermaid to render correctly.
                     std.mem.replaceScalar(u8, src[start..end], '}', ']');
 
-                    // Parse file and top-level container field declarations
+                    // Parse file and top-level container field declarations.
                     if (node_tags[i - 2] != .root and src[start - 1] == ' ') {
-                        // Parse top-level and nested container field declarations
+                        // Parse top-level and nested container field declarations.
                         if (std.mem.eql(u8, CHECK_INDENTATION_LEVEL_2[0..], src[start - 5 .. start])) {
-                            // Skip double-nested container field declarations
+                            // Skip double-nested container field declarations.
                             if (std.mem.eql(u8, CHECK_INDENTATION_LEVEL_3[0..], src[start - 9 .. start])) {
                                 continue;
                             }
@@ -617,7 +614,7 @@ pub fn generate(
                         file_decls.appendAssumeCapacity(.{ .tag = .fld, .start = start, .end = end });
                     }
 
-                    // Validate output file because it's been written to
+                    // Validate output file because it's been written to.
                     try are_files_valid.put(allocator, out_file_basename, true);
                 },
                 else => {},
@@ -626,22 +623,22 @@ pub fn generate(
 
         const file_name = std.fs.path.basename(entry.path);
 
-        // Print file container declaration
+        // Print file container declaration.
         try writer.print("class `{s}`", .{file_name});
 
-        // Print file container declarations
+        // Print file container declarations.
         try printDecls(true, false, src, &file_decls, &file_funcs, writer);
 
-        // Print "top-level to file" container relationships
+        // Print "top-level to file" container relationships.
         for (top_types.constSlice()) |container| {
             try writer.print("`{s}` <-- {s}\n", .{ file_name, src[container.start..container.end] });
         }
 
-        // Print source file link
+        // Print source file link.
         try writer.print("link `{s}` \"{s}/{s}\"\n", .{ file_name, remote_src_dir_path, entry.path });
     }
 
-    // Close valid and delete invalid output files
+    // Close valid and delete invalid output files.
     for (are_files_valid.keys(), 0..) |basename, i| {
         out_file = out_files.get(basename).?;
 
@@ -666,11 +663,11 @@ fn parseFunc(
     top_type_funcs: *std.BoundedArray(Func, MAX_NUM_FUNCS),
     nested_type_funcs: *std.BoundedArray(Func, MAX_NUM_FUNCS),
 ) bool {
-    // Parse top-level and nested function declarations
+    // Parse top-level and nested function declarations.
     if (src[first_token_start - 1] == ' ') {
-        // Parse single- and double-nested function declarations
+        // Parse single- and double-nested function declarations.
         if (std.mem.eql(u8, CHECK_INDENTATION_LEVEL_2[0..], src[first_token_start - 5 .. first_token_start])) {
-            // Skip triple-nested function declarations
+            // Skip triple-nested function declarations.
             if (std.mem.eql(u8, CHECK_INDENTATION_LEVEL_3[0..], src[first_token_start - 9 .. first_token_start])) {
                 return true;
             }
@@ -691,11 +688,11 @@ fn printDecls(
     decls: *std.BoundedArray(Decl, MAX_NUM_DECLS),
     funcs: *std.BoundedArray(Func, MAX_NUM_FUNCS),
     writer: anytype,
-) (error{Overflow} || @TypeOf(writer).Error)!void {
+) !void {
     if (decls.len > 0 or funcs.len > 0) {
         try writer.writeAll(" {\n");
 
-        // Print simple declarations
+        // Print simple declarations.
         for (decls.constSlice()) |decl| {
             try decl.print(is_pub, src, writer);
         }
@@ -704,7 +701,7 @@ fn printDecls(
             try decls.resize(0);
         }
 
-        // Print function declarations
+        // Print function declarations.
         for (funcs.constSlice()) |func| {
             try func.print(src, writer);
         }
@@ -724,7 +721,7 @@ fn writePrologue(
     out_file_basename: []const u8,
     extension: Ext,
     writer: anytype,
-) std.fs.File.WriteError!void {
+) !void {
     switch (extension) {
         .html => {
             try writer.writeAll(
@@ -774,7 +771,7 @@ fn writePrologue(
     try writer.writeAll("classDiagram\n");
 }
 
-fn writeEpilogue(extension: Ext, writer: anytype) std.fs.File.WriteError!void {
+fn writeEpilogue(extension: Ext, writer: anytype) !void {
     switch (extension) {
         .html => {
             try writer.writeAll(

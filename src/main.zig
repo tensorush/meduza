@@ -18,7 +18,7 @@ const PARSERS = .{
     .STR = clap.parsers.string,
 };
 
-pub fn main() anyerror!void {
+pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer if (gpa.deinit() == .leak) {
         @panic("Memory leak has occurred!");
