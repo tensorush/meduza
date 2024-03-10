@@ -13,7 +13,7 @@ pub fn build(b: *std.Build) void {
         .root_source_file = std.Build.LazyPath.relative("src/main.zig"),
         .target = b.standardTargetOptions(.{}),
         .optimize = b.standardOptimizeOption(.{}),
-        .version = .{ .major = 1, .minor = 9, .patch = 8 },
+        .version = .{ .major = 1, .minor = 10, .patch = 0 },
     });
     exe.root_module.addImport("clap", clap_mod);
     b.installArtifact(exe);

@@ -3,13 +3,13 @@ const clap = @import("clap");
 const meduza = @import("meduza.zig");
 
 const PARAMS = clap.parseParamsComptime(
-    \\-r, --remote <STR>   Remote source directory path.
-    \\-l, --local <STR>    Local source directory path.
-    \\-t, --title <STR>    Title of the Zig codebase.
-    \\-o, --out <STR>      Output directory path.
     \\-e, --ext <EXT>      Output file extension.
     \\-i, --info           Enable info logging.
     \\-h, --help           Display help menu.
+    \\<STR>                Remote source directory path.
+    \\<STR>                Local source directory path.
+    \\<STR>                Title of the Zig codebase.
+    \\<STR>                Output directory path.
     \\
 );
 
@@ -42,20 +42,11 @@ pub fn main() !void {
     var extension = meduza.Ext.md;
     var do_log = false;
 
-    if (res.args.remote) |remote| {
-        remote_src_dir_path = remote;
-    }
-
-    if (res.args.local) |local| {
-        local_src_dir_path = local;
-    }
-
-    if (res.args.title) |title| {
-        codebase_title = title;
-    }
-
-    if (res.args.out) |out| {
-        out_dir_path = out;
+    if (res.positionals.len > 0) {
+        remote_src_dir_path = res.positionals[0];
+        codebase_title = res.positionals[1];
+        local_src_dir_path = res.positionals[2];
+        out_dir_path = res.positionals[3];
     }
 
     if (res.args.ext) |ext| {
