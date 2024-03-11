@@ -139,6 +139,7 @@ pub fn generate(
     var out_file_basename: []u8 = @constCast(local_src_dir_basename);
     var out_file_name = try std.fmt.allocPrint(allocator, "{s}.{s}", .{ local_src_dir_basename, @tagName(extension) });
     var out_file = try out_dir.createFile(out_file_name, .{});
+    allocator.free(out_file_name);
     var writer = out_file.writer();
 
     try out_files.putNoClobber(allocator, out_file_basename, out_file);
@@ -150,6 +151,8 @@ pub fn generate(
         switch (entry.kind) {
             .directory => {
                 out_file_basename = try std.fmt.allocPrint(allocator, "{s}.{s}", .{ local_src_dir_basename, entry.path });
+                defer allocator.free(out_file_basename);
+
                 for (out_file_basename[local_src_dir_basename.len + 1 ..]) |*byte| {
                     if (std.fs.path.isSep(byte.*)) {
                         byte.* = '.';
@@ -173,6 +176,8 @@ pub fn generate(
                     // Load the previously defined output file.
                     if (std.fs.path.dirname(entry.path)) |file_dir_path| {
                         out_file_basename = try std.fmt.allocPrint(allocator, "{s}.{s}", .{ local_src_dir_basename, file_dir_path });
+                        defer allocator.free(out_file_basename);
+
                         for (out_file_basename[local_src_dir_basename.len + 1 ..]) |*byte| {
                             if (std.fs.path.isSep(byte.*)) {
                                 byte.* = '.';
@@ -208,7 +213,8 @@ pub fn generate(
         var file_decls = std.BoundedArray(Decl, MAX_NUM_DECLS){};
         var file_funcs = std.BoundedArray(Func, MAX_NUM_FUNCS){};
 
-        const ast = try std.zig.Ast.parse(allocator, @ptrCast(src), .zig);
+        var ast = try std.zig.Ast.parse(allocator, @ptrCast(src), .zig);
+        defer ast.deinit(allocator);
 
         const main_tokens = ast.nodes.items(.main_token);
         const node_datas = ast.nodes.items(.data);
@@ -651,6 +657,7 @@ pub fn generate(
 
             const file_name = try std.fmt.allocPrint(allocator, "{s}.{s}", .{ basename, @tagName(extension) });
             try out_dir.deleteFile(file_name);
+            allocator.free(file_name);
         }
     }
 }
