@@ -4,8 +4,8 @@
     .paths = .{""},
     .dependencies = .{
         .clap = .{
-            .url = "https://github.com/Hejsil/zig-clap/archive/0f2db77.tar.gz",
-            .hash = "12203896de6eedec14712f4f1eaac8b646939cfed213c56accf231a0abb05f9dbb77",
+            .url = "https://github.com/Hejsil/zig-clap/archive/1d413d9.tar.gz",
+            .hash = "1220949d4e88864579067b6d4cdad6476c6176f27e782782c2c39b7f2c4817a10efb",
         },
     },
 }
