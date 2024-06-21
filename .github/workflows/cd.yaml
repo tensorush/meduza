@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  emit:
     runs-on: ubuntu-latest
 
     steps:
@@ -44,7 +44,7 @@ jobs:
           path: out/
 
   deploy:
-    needs: build
+    needs: emit
 
     runs-on: ubuntu-latest
 

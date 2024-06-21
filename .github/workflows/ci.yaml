@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  lint:
+  fmt:
     runs-on: ubuntu-latest
 
     steps:
