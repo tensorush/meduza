@@ -6,13 +6,13 @@ pub fn build(b: *std.Build) void {
     const clap_mod = clap_dep.module("clap");
 
     // Executable
-    const exe_step = b.step("exe", "Run Meduza codebase graph generator");
+    const exe_step = b.step("exe", "Run executable");
 
     const exe = b.addExecutable(.{
         .name = "meduza",
-        .root_source_file = b.path("src/main.zig"),
         .target = b.standardTargetOptions(.{}),
         .optimize = b.standardOptimizeOption(.{}),
+        .root_source_file = b.path("src/main.zig"),
         .version = .{ .major = 1, .minor = 10, .patch = 0 },
     });
     exe.root_module.addImport("clap", clap_mod);
@@ -26,14 +26,16 @@ pub fn build(b: *std.Build) void {
     exe_step.dependOn(&exe_run.step);
     b.default_step.dependOn(exe_step);
 
-    // Lints
-    const lints_step = b.step("lint", "Run lints");
+    // Formatting checks
+    const fmt_step = b.step("fmt", "Run formatting checks");
 
-    const lints = b.addFmt(.{
-        .paths = &.{ "src", "build.zig" },
+    const fmt = b.addFmt(.{
+        .paths = &.{
+            "src/",
+            "build.zig",
+        },
         .check = true,
     });
-
-    lints_step.dependOn(&lints.step);
-    b.default_step.dependOn(lints_step);
+    fmt_step.dependOn(&fmt.step);
+    b.default_step.dependOn(fmt_step);
 }

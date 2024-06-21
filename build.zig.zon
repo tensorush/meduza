@@ -1,11 +1,17 @@
 .{
     .name = "meduza",
     .version = "1.10.0",
-    .paths = .{""},
     .dependencies = .{
         .clap = .{
-            .url = "https://github.com/Hejsil/zig-clap/archive/1d413d9.tar.gz",
-            .hash = "1220949d4e88864579067b6d4cdad6476c6176f27e782782c2c39b7f2c4817a10efb",
+            .url = "https://github.com/Hejsil/zig-clap/archive/c0193e9.tar.gz",
+            .hash = "12207ee987ce045596cb992cfb15b0d6d9456e50d4721c3061c69dabc2962053644d",
         },
+    },
+    .paths = .{
+        "src/",
+        "build.zig",
+        "README.md",
+        "LICENSE.md",
+        "build.zig.zon",
     },
 }

@@ -1,13 +1,13 @@
-## :lizard: :mermaid: **meduza**
+# meduza
 
 [![CI][ci-shd]][ci-url]
 [![CD][cd-shd]][cd-url]
 [![MZ][mz-shd]][mz-url]
 [![LC][lc-shd]][lc-url]
 
-### Zig codebase graph generator that emits a [Mermaid class diagram](https://mermaid.js.org/syntax/classDiagram.html).
+## Zig codebase graph generator.
 
-#### :rocket: Usage
+### :rocket: Usage
 
 ```sh
 git clone https://github.com/tensorush/meduza.git
@@ -15,7 +15,7 @@ cd meduza/
 zig build exe -- -h
 ```
 
-#### :sparkles: Features
+### :sparkles: Features
 
 - Generate either `.html`, `.md`, or `.mmd` Mermaid class diagram.
 
@@ -29,7 +29,7 @@ zig build exe -- -h
 
 - Click on types to go to respective code lines on the remote (GitHub Mermaid forbids this, though).
 
-#### :world_map: Legend
+### :world_map: Legend
 
 ```mermaid
 ---
