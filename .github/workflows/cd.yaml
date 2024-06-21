@@ -33,7 +33,7 @@ jobs:
           bun a -g @mermaid-js/mermaid-cli
           bun /home/runner/.bun/install/global/node_modules/puppeteer/install.js
 
-      - name: Emit SVG
+      - name: Convert Meduza codebase graph from MMD to SVG
         run: |
           echo -e "{\n    \"maxTextSize\": 250000\n}" >> config.json
           mmdc -i out/src.mmd -o out/src.svg -b black -c config.json

@@ -23,9 +23,9 @@ zig build exe -- -h
 
 - Learn how to improve code readability from logged tips (enable with `-i`).
 
-- Convert `.md` or `.mmd` diagram to `.svg` with Mermaid CLI ([see CD pipeline](https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml#L50)).
+- Convert `.md` or `.mmd` diagram to `.svg` with Mermaid CLI ([see CD pipeline](https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml#L39)).
 
-- Generate a large diagram (`maxTextSize` > 250'000) with Mermaid CLI ([see CD pipeline](https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml#L49)).
+- Generate a large diagram (`maxTextSize` < 250'000) with Mermaid CLI ([see CD pipeline](https://github.com/tensorush/meduza/blob/main/.github/workflows/cd.yaml#L38)).
 
 - Click on types to go to respective code lines on the remote (GitHub Mermaid forbids this, though).
 
